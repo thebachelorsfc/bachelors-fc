@@ -9,7 +9,8 @@ export const SITE = {
   ogDescription:
     "An apolitical, non-profit football club in Khulshi, Chittagong — forged in brotherhood and driven by purpose.",
   ogImage: "https://thebachelorsfc.netlify.app/assets/logo.jpeg",
-  googleVerification: "1reD33YYQMrbRRaTtMv-YZRiSowRPgZX9n1Vwu8q-xs",
+  // Both Search Console properties must stay verified: token 1 = Netlify property, token 2 = Vercel property (added 2026-10-25). Do not remove either.
+  googleVerification: ["1reD33YYQMrbRRaTtMv-YZRiSowRPgZX9n1Vwu8q-xs", "Hj5PCmlLSlq7k6kHIZOJJuNlt6MvjqhNcByL2nD_rqI"] as string[],
   motto: "Forged in Brotherhood, Driven by Purpose",
   mottoAlt: "United, Not Alone",
   location: "Khulshi, Chittagong",
