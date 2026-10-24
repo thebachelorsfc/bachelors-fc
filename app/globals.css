@@ -1,0 +1,19 @@
+:root{--navy:#0a1633;--navy2:#101f45;--gold:#c9a227;--ink:#0b0b0f;--paper:#f7f5ef;--muted:#9aa3b2}
+*{box-sizing:border-box} body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-body),system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3,.display{font-family:var(--font-display),"Arial Narrow",sans-serif;letter-spacing:.01em}
+a{color:inherit} .wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+.eyebrow{letter-spacing:.25em;text-transform:uppercase;color:var(--gold);font-size:.75rem;font-weight:700}
+.btn{display:inline-block;background:var(--gold);color:#111;padding:.8rem 1.4rem;border-radius:999px;font-weight:700;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px #c9a22744}
+.btn.ghost{background:transparent;color:var(--paper);border:1px solid #ffffff44}
+.grid{display:grid;gap:16px} .card{background:var(--navy2);border:1px solid #ffffff1a;border-radius:16px;padding:20px}
+section{padding:64px 0} h1{font-size:clamp(2.4rem,6vw,4.5rem);line-height:.98;text-transform:uppercase} h2{font-size:clamp(1.8rem,4vw,2.8rem);text-transform:uppercase}
+/* Trading-card squad grid: fixed card width so a lone player in a position group never stretches full-width */
+.squad-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(225px,255px));justify-content:start}
+@media (max-width:560px){.squad-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}}
+.player-card{position:relative;overflow:hidden;text-align:center;padding:14px;transition:transform .18s ease,border-color .18s ease}
+.player-card:hover{transform:translateY(-4px);border-color:var(--gold)}
+.player-card .photo{position:relative;width:100%;aspect-ratio:4/5;border-radius:12px;overflow:hidden;background:#0a1633}
+.player-card .photo img{object-fit:cover}
+.player-card .num{position:absolute;top:6px;right:12px;font-family:var(--font-display);font-size:44px;font-weight:700;color:#ffffff2e;line-height:1}
+.hero{background:radial-gradient(900px 480px at 50% -80px,#1b326e88,transparent 65%),radial-gradient(600px 300px at 85% 0%,#c9a22714,transparent 60%)}
