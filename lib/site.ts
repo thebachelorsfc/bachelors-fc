@@ -45,7 +45,7 @@ export const PAYMENTS: { bkash: string; nagad: string } = { bkash: "01866855340"
 export const JSON_LD = {
   "@context": "https://schema.org",
   "@graph": [
-    { "@type": "SportsTeam", "@id": `${SITE.url}/#team`, name: SITE.name, url: `${SITE.url}/`, logo: SITE.ogImage, image: SITE.ogImage, description: SITE.description, sport: "Football", location: { "@type": "Place", name: "Khulshi, Chittagong", address: { "@type": "PostalAddress", addressLocality: "Chittagong", addressCountry: "BD" } } },
+    { "@type": "SportsTeam", "@id": `${SITE.url}/#team`, name: SITE.name, alternateName: "BFC", url: `${SITE.url}/`, logo: SITE.ogImage, image: SITE.ogImage, description: SITE.description, sport: "Football", foundingDate: "2026", slogan: SITE.motto, sameAs: ["https://www.facebook.com/TheBachelorsFC", "https://m.me/TheBachelorsFC"], location: { "@type": "Place", name: "Khulshi, Chittagong", address: { "@type": "PostalAddress", addressLocality: "Chittagong", addressRegion: "Chattogram", addressCountry: "BD" } } },
     { "@type": "WebSite", "@id": `${SITE.url}/#website`, url: `${SITE.url}/`, name: SITE.name, description: "Official website of The Bachelors FC, a football club in Khulshi, Chittagong.", publisher: { "@id": `${SITE.url}/#team` } },
   ],
 };

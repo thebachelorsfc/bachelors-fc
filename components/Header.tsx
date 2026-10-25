@@ -1,11 +1,31 @@
 "use client";
 import Link from "next/link"; import Image from "next/image";
 import { useEffect, useState } from "react";
-const NAV: [string, string][] = [["Home","/"],["Mission","/about"],["Kit","/#kit"],["Tour","/#tour"],["Gallery","/gallery"],["Squad","/squad"],["Store","/store"],["History","/history"],["Grounds","/grounds"],["Rules","/rules"],["Contact","/contact"],["Login","/login"]];
+
 const Moon = () => (<svg viewBox="0 0 24 24"><path d="M20 13.6A8.6 8.6 0 1 1 10.4 4 7 7 0 0 0 20 13.6Z"/></svg>);
 const Sun = () => (<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg>);
 const Burger = () => (<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>);
 const Close = () => (<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>);
+
+const I = {
+  home: <svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7"/><path d="M6.5 9.8V20h11V9.8"/></svg>,
+  target: <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>,
+  shirt: <svg viewBox="0 0 24 24"><path d="M9 3 3 6l2 5 2-1v11h10V10l2 1 2-5-6-3a3 3 0 0 1-6 0Z"/></svg>,
+  pin: <svg viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-10.2A6.5 6.5 0 0 1 12 4.5a6.5 6.5 0 0 1 6.5 6.3C18.5 15.4 12 21 12 21Z"/><circle cx="12" cy="10.6" r="2.4"/></svg>,
+  image: <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-4 4 3 3-2 4 3"/></svg>,
+  users: <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5"/><path d="M16 5.4a3.2 3.2 0 0 1 0 5.9M17.8 14.9c1.7.6 2.7 1.9 3 4.1"/></svg>,
+  bag: <svg viewBox="0 0 24 24"><path d="M5.5 8h13l-1.1 12.5H6.6L5.5 8Z"/><path d="M9 10.5V6.5a3 3 0 0 1 6 0v4"/></svg>,
+  clock: <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>,
+  flag: <svg viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/></svg>,
+  list: <svg viewBox="0 0 24 24"><path d="M8.5 6.5H20M8.5 12H20M8.5 17.5H20"/><circle cx="4.6" cy="6.5" r="1.1" fill="currentColor"/><circle cx="4.6" cy="12" r="1.1" fill="currentColor"/><circle cx="4.6" cy="17.5" r="1.1" fill="currentColor"/></svg>,
+  mail: <svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4.5 7.5 12 13l7.5-5.5"/></svg>,
+  user: <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.4 3.6-5 7-5s6.2 1.6 7 5"/></svg>,
+};
+const NAV: [string, string, keyof typeof I][] = [
+  ["Home","/","home"],["Mission","/about","target"],["Kit","/#kit","shirt"],["Tour","/#tour","pin"],
+  ["Gallery","/gallery","image"],["Squad","/squad","users"],["Store","/store","bag"],["History","/history","clock"],
+  ["Grounds","/grounds","flag"],["Rules","/rules","list"],["Contact","/contact","mail"],["Login","/login","user"],
+];
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -29,14 +49,17 @@ export default function Header() {
     </div></header>
     <div className={`backdrop${open ? " open" : ""}`} onClick={() => setOpen(false)} />
     <aside className={`drawer${open ? " open" : ""}`} aria-hidden={!open}>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-        <span style={{display:"flex",gap:9,alignItems:"center"}}><Image src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={28} height={33} style={{objectFit:"contain"}}/><strong style={{fontFamily:"var(--font-display)",letterSpacing:".12em",fontSize:15}}>THE BACHELORS <span style={{color:"var(--gold)"}}>FC</span></strong></span>
-        <button type="button" className="icon-btn" onClick={() => setOpen(false)} aria-label="Close menu"><Close/></button>
+      <div className="dcard" style={{display:"flex",alignItems:"center",gap:12,padding:"13px 14px"}}>
+        <Image src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={40} height={47} style={{objectFit:"contain"}}/>
+        <span style={{lineHeight:1.25}}><strong style={{fontFamily:"var(--font-display)",letterSpacing:".1em",fontSize:16,display:"block"}}>THE BACHELORS <span style={{color:"var(--gold)"}}>FC</span></strong><span style={{color:"#9aa3b2",fontSize:12.5}}>Khulshi, Chittagong · Est. 2026</span></span>
+        <button type="button" className="icon-btn" style={{marginLeft:"auto"}} onClick={() => setOpen(false)} aria-label="Close menu"><Close/></button>
       </div>
-      <nav style={{marginTop:16,overflowY:"auto"}}>{NAV.map(([l,h]) => <Link key={h+l} className="dlink" href={h} onClick={() => setOpen(false)}>{l}<span style={{color:"var(--gold)",fontSize:19}}>→</span></Link>)}</nav>
-      <div style={{marginTop:"auto",paddingTop:18}}>
+      <nav className="dcard" style={{marginTop:14,overflowY:"auto",padding:"6px 8px"}}>
+        {NAV.map(([l,h,ic]) => <Link key={h+l} className="drow" href={h} onClick={() => setOpen(false)}><span className="dico">{I[ic]}</span>{l}<span className="dchev">›</span></Link>)}
+      </nav>
+      <div style={{marginTop:14}}>
         <Link href="/join" className="btn" style={{display:"block",textAlign:"center"}} onClick={() => setOpen(false)}>Join the Squad</Link>
-        <p style={{color:"#9aa3b2",fontSize:12.5,marginTop:14,textAlign:"center"}}>Forged in Brotherhood · Khulshi, Chittagong</p>
+        <p style={{color:"#9aa3b2",fontSize:12.5,marginTop:13,textAlign:"center"}}>Forged in Brotherhood, Driven by Purpose</p>
       </div>
     </aside>
   </>);
