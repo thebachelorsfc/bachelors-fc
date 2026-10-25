@@ -51,7 +51,7 @@ export default function Header() {
     <aside className={`drawer${open ? " open" : ""}`} aria-hidden={!open}>
       <div className="dcard" style={{display:"flex",alignItems:"center",gap:12,padding:"13px 14px"}}>
         <Image src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={40} height={47} style={{objectFit:"contain"}}/>
-        <span style={{lineHeight:1.25}}><strong style={{fontFamily:"var(--font-display)",letterSpacing:".1em",fontSize:16,display:"block"}}>THE BACHELORS <span style={{color:"var(--gold)"}}>FC</span></strong><span style={{color:"#9aa3b2",fontSize:12.5}}>Khulshi, Chittagong · Est. 2026</span></span>
+        <strong style={{fontFamily:"var(--font-display)",letterSpacing:".1em",fontSize:16}}>THE BACHELORS <span style={{color:"var(--gold)"}}>FC</span></strong>
         <button type="button" className="icon-btn" style={{marginLeft:"auto"}} onClick={() => setOpen(false)} aria-label="Close menu"><Close/></button>
       </div>
       <nav className="dcard" style={{marginTop:14,overflowY:"auto",padding:"6px 8px"}}>
