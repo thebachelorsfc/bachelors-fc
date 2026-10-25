@@ -55,10 +55,14 @@ h2{font-size:clamp(2rem,4.6vw,3.2rem);line-height:1;text-transform:uppercase;mar
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
 /* — Stats strip — */
-.stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.stat-strip>div{padding:26px 14px;text-align:center;border-left:1px solid var(--line)}
-.stat-strip>div:first-child{border-left:none}
-.stat-strip strong{font-family:var(--font-display);font-size:clamp(1.9rem,4vw,2.7rem);display:block;line-height:1}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(min-width:900px){.stat-grid{grid-template-columns:repeat(4,1fr)}}
+.stat-card{position:relative;overflow:hidden;background:linear-gradient(160deg,#101a33,#0a1122);border:1px solid var(--line);border-radius:20px;padding:22px 18px}
+.stat-card::after{content:"";position:absolute;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,#c9a22726,transparent 70%);top:-70px;right:-50px;pointer-events:none}
+.stat-ico{width:52px;height:52px;border-radius:50%;background:#c9a2271a;border:1px solid #c9a22730;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.stat-ico svg{width:25px;height:25px;stroke:var(--gold2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.stat-card strong{font-family:var(--font-display);font-size:clamp(2.2rem,5vw,3rem);display:block;line-height:1}
+.stat-card span{display:block;color:var(--muted);margin-top:7px;font-size:1.02rem}
 .stat-strip span{color:var(--muted);text-transform:uppercase;letter-spacing:.18em;font-size:.68rem;font-weight:700}
 
 /* — Trading-card squad grid: fixed card width so a lone player in a position group never stretches full-width — */
