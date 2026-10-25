@@ -28,11 +28,6 @@ export default async function Home(){
         <div><strong><Counter to={2026}/></strong><span>Founded</span></div>
         <div><strong>100%</strong><span>Brotherhood</span></div>
       </div>
-      <div className="card" style={{marginTop:22,display:"flex",gap:16,alignItems:"center",flexWrap:"wrap"}}>
-        <span className="eyebrow">Next Session</span>
-        <span style={{fontSize:17}}>{next ? <><strong>{next.title}</strong>{next.session_date?` · ${next.session_date}`:""}{next.session_time?` · ${next.session_time}`:""}{next.ground?` · ${next.ground}`:""}{next.opponent?` · vs ${next.opponent}`:""}</> : "No upcoming session scheduled yet — check back soon."}</span>
-        <Link className="btn ghost" href="/join" style={{marginLeft:"auto",padding:".55rem 1.1rem"}}>Join Us</Link>
-      </div>
     </section>
 
     <section className="wrap"><p className="eyebrow">Why we exist</p><h2>Character over trophies</h2>
@@ -59,5 +54,13 @@ export default async function Home(){
     </section>)}
 
     <FacebookFeed/>
+
+    <section className="wrap" style={{paddingTop:0}}>
+      <div className="card" style={{display:"flex",gap:16,alignItems:"center",flexWrap:"wrap"}}>
+        <span className="eyebrow">Next Session</span>
+        <span style={{fontSize:17}}>{next ? <><strong>{next.title}</strong>{next.session_date?` · ${next.session_date}`:""}{next.session_time?` · ${next.session_time}`:""}{next.ground?` · ${next.ground}`:""}{next.opponent?` · vs ${next.opponent}`:""}</> : "No upcoming session scheduled yet — check back soon."}</span>
+        <Link className="btn ghost" href="/join" style={{marginLeft:"auto",padding:".55rem 1.1rem"}}>Join Us</Link>
+      </div>
+    </section>
   </main>);
 }
