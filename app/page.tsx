@@ -20,7 +20,7 @@ export default async function Home(){
       </div>
     </section>
 
-    <section className="wrap" style={{paddingTop:54,paddingBottom:0}}>
+    <section className="wrap">
       <div className="stat-strip">
         <div><strong><Counter to={players.length + OPEN_NUMBERS.length}/></strong><span>Squad shirts</span></div>
         <div><strong><Counter to={players.length}/></strong><span>Active players</span></div>

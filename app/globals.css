@@ -30,12 +30,12 @@ section .eyebrow{margin-bottom:10px}
 .grid{display:grid;gap:16px}
 .card{background:linear-gradient(160deg,var(--navy2),var(--navy) 70%);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px #00000030;transition:transform .2s ease,border-color .2s ease}
 .card:hover{transform:translateY(-3px);border-color:var(--line-gold)}
-section{padding:88px 0}
+section{padding:54px 0}
 h1{font-size:clamp(2.6rem,6.5vw,4.8rem);line-height:.96;text-transform:uppercase;margin:.2em 0}
 h2{font-size:clamp(2rem,4.6vw,3.2rem);line-height:1;text-transform:uppercase;margin:.15em 0 .4em}
 
 /* — Hero — */
-.hero{position:relative;overflow:hidden;padding:44px 0 72px;background:
+.hero{position:relative;overflow:hidden;padding:40px 0 54px;background:
   radial-gradient(1000px 520px at 50% -120px,#24448c66,transparent 65%),
   radial-gradient(700px 340px at 88% 6%,#c9a22717,transparent 60%),
   radial-gradient(560px 300px at 8% 20%,#c9a2270d,transparent 60%),
