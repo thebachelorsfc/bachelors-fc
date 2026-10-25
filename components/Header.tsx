@@ -1,3 +1,3 @@
 import Link from "next/link"; import Image from "next/image";
-const NAV=[["Mission","/about"],["Kit","/#kit"],["Tour","/#tour"],["Gallery","/gallery"],["Squad","/squad"],["History","/history"],["Contact","/contact"]];
+const NAV=[["Mission","/about"],["Kit","/#kit"],["Tour","/#tour"],["Gallery","/gallery"],["Squad","/squad"],["Store","/store"],["History","/history"],["Contact","/contact"]];
 export default function Header(){return(<header className="site-head"><div className="head-row"><Link href="/" className="brand"><Image src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={30} height={35} style={{objectFit:"contain"}}/><strong>THE BACHELORS <span style={{color:"var(--gold)"}}>FC</span></strong></Link><Link href="/join" className="btn" style={{padding:".48rem 1.05rem",marginLeft:"auto"}}>Join Us</Link></div><nav className="nav-strip">{NAV.map(([l,h])=><Link key={h+l} href={h}>{l}</Link>)}</nav></header>)}

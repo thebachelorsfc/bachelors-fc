@@ -20,6 +20,11 @@ export async function getGalleryItems() {
   if (sb) { const { data, error } = await sb.from("gallery_items").select("*").order("created_at", { ascending:false }); if (!error && data) return data; }
   return store.gallery();
 }
+export async function getProducts() {
+  const sb = supabase();
+  if (sb) { const { data, error } = await sb.from("products").select("*").order("sort").order("created_at"); if (!error && data) return data; }
+  return store.products();
+}
 export async function getHighlights() {
   const sb = supabase();
   if (sb) { const { data, error } = await sb.from("highlights").select("*").order("created_at", { ascending:false }); if (!error && data) return data; }
