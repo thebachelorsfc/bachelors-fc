@@ -5,6 +5,7 @@ import { getPlayers, getNextSession } from "@/lib/data";
 export const dynamic = "force-dynamic";
 import PlayerCard, { OpenShirt } from "@/components/PlayerCard";
 import Counter from "@/components/Counter";
+import FacebookFeed from "@/components/FacebookFeed";
 
 export default async function Home(){
   const players:any[] = (await getPlayers()) ?? SEED_PLAYERS; const next:any = await getNextSession();
@@ -40,5 +41,7 @@ export default async function Home(){
       <div className="squad-grid">{players.map((p:any)=><PlayerCard key={p.jersey_no} p={p}/> )}{OPEN_NUMBERS.slice(0,3).map(n=><OpenShirt key={n} n={n}/>)}</div>
       <p style={{marginTop:16}}><Link className="btn ghost" href="/squad">Full squad →</Link></p>
     </section>
+
+    <FacebookFeed/>
   </main>);
 }
