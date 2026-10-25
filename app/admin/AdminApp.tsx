@@ -10,7 +10,8 @@ export default function AdminApp(){
   const [gf,setGf]=useState<{caption:string;category:string;taken_on:string;file:File|null}>({caption:"",category:"team",taken_on:"",file:null});
   const [hf,setHf]=useState({title:"",video_url:"",played_on:""});
   const [prods,setProds]=useState<any[]>([]); const [pf,setPf]=useState({name:"",photo_url:"",description:"",price_bdt:"",stock:""});
-  const load=useCallback(async()=>{ const a=await fetch("/api/applications"); if(a.status===401){ setAuthed(false); return; } setAuthed(true); setApps(await a.json()); const p=await fetch("/api/players"); setPlayers(await p.json()); const g=await fetch("/api/gallery"); setGal(await g.json()); const h=await fetch("/api/highlights"); setHls(await h.json()); const pr=await fetch("/api/products"); setProds(await pr.json()); },[]);
+  const [ords,setOrds]=useState<any[]>([]);
+  const load=useCallback(async()=>{ const a=await fetch("/api/applications"); if(a.status===401){ setAuthed(false); return; } setAuthed(true); setApps(await a.json()); const p=await fetch("/api/players"); setPlayers(await p.json()); const g=await fetch("/api/gallery"); setGal(await g.json()); const h=await fetch("/api/highlights"); setHls(await h.json()); const pr=await fetch("/api/products"); setProds(await pr.json()); const or=await fetch("/api/orders"); setOrds(or.ok?await or.json():[]); },[]);
   useEffect(()=>{ load(); },[load]);
   async function login(){ const r=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})}); if(r.ok){ setMsg(""); load(); } else setMsg("Wrong password"); }
   async function setStatus(id:string,status:string){ await fetch(`/api/applications/${id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status})}); load(); }
@@ -23,11 +24,12 @@ export default function AdminApp(){
   async function delHighlight(id:string){ if(!confirm("Delete this highlight?")) return; await fetch(`/api/highlights/${id}`,{method:"DELETE"}); load(); }
   async function saveProduct(p:any){ const r=await fetch(`/api/products/${p.id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({price_bdt:p.price_bdt,stock:p.stock,is_available:p.is_available})}); setMsg(r.ok?`Saved: ${p.name}${p.price_bdt?" — now on sale at ৳"+p.price_bdt:" — showcase mode (no price)"}`:"Save failed"); if(r.ok) load(); }
   async function delProduct(id:string){ if(!confirm("Delete this product?")) return; await fetch(`/api/products/${id}`,{method:"DELETE"}); load(); }
+  async function setOrderStatus(id:string,status:string){ const r=await fetch(`/api/orders/${id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status})}); setMsg(r.ok?`Order ${status}`:"Failed"); if(r.ok) load(); }
   async function addProduct(){ const r=await fetch("/api/products",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(pf)}); const j=await r.json().catch(()=>({})); setMsg(r.ok?`Product added: ${j.name}`:(j.error||"Failed")); if(r.ok){ setPf({name:"",photo_url:"",description:"",price_bdt:"",stock:""}); load(); } }
   if(authed===null) return <p style={{color:"var(--muted)"}}>Loading…</p>;
   if(!authed) return <div className="card" style={{maxWidth:420}}><h3>Admin Login</h3>{msg&&<p style={{color:"#ff9d9d"}}>{msg}</p>}<input style={input} type="password" placeholder="Admin password" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&login()}/><button className="btn" style={{marginTop:12}} onClick={login}>Log in</button></div>;
   return(<div>
-    <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>{["applications","players","sessions","gallery","highlights","store"].map(t=><button key={t} className="btn" style={tab===t?{}:{background:"transparent",color:"#f7f5ef",border:"1px solid #ffffff33"}} onClick={()=>setTab(t)}>{t[0].toUpperCase()+t.slice(1)} {t==="applications"&&apps.length?`(${apps.length})`:""}</button>)}
+    <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>{["applications","players","sessions","gallery","highlights","store","orders"].map(t=><button key={t} className="btn" style={tab===t?{}:{background:"transparent",color:"#f7f5ef",border:"1px solid #ffffff33"}} onClick={()=>setTab(t)}>{t[0].toUpperCase()+t.slice(1)} {t==="applications"&&apps.length?`(${apps.length})`:""}</button>)}
     <button className="btn ghost" style={{marginLeft:"auto"}} onClick={async()=>{await fetch("/api/admin/login",{method:"DELETE"}); setAuthed(false);}}>Log out</button></div>
     {msg&&<p style={{color:"var(--gold)"}}>{msg}</p>}
     {tab==="applications" && (apps.length===0 ? <div className="card">No applications yet. New applications from the Join form will appear here as Pending.</div> :
@@ -79,5 +81,9 @@ export default function AdminApp(){
       <input style={input} placeholder="Price ৳ (blank = showcase)" type="number" value={pf.price_bdt} onChange={e=>setPf({...pf,price_bdt:e.target.value})}/>
       <input style={input} placeholder="Stock (optional)" type="number" value={pf.stock} onChange={e=>setPf({...pf,stock:e.target.value})}/></div>
       <button className="btn" style={{marginTop:12}} onClick={addProduct}>Add product</button></div></div>}
+    {tab==="orders" && <div className="grid">{ords.length===0 && <div className="card">No orders yet. Orders placed on the Store page will appear here.</div>}
+      {ords.map((o:any)=><div className="card" key={o.id}><div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}><strong>{o.product_name}</strong>{o.size&&<span className="eyebrow">Size {o.size}</span>}<span className="eyebrow">৳{o.amount_bdt}</span><span className="eyebrow" style={{color:o.status==="delivered"?"#7be3a0":o.status==="cancelled"?"#ff9d9d":"var(--gold2)"}}>{o.status}</span></div>
+      <p style={{color:"var(--muted)",fontSize:14,margin:"8px 0"}}>{o.customer_name} · {o.phone}<br/>{o.address}<br/>Pay: {o.payment_method==="messenger"?"pay on contact":`${o.payment_method} · from ${o.sender_number||"—"} · TrxID: ${o.trx_id||"—"}`}<br/><span style={{fontSize:12}}>{o.created_at?new Date(o.created_at).toLocaleString():""}</span></p>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>{["confirmed","delivered","cancelled","pending"].filter(s=>s!==o.status).map(s=><button key={s} className="btn ghost" style={{padding:".45rem .9rem"}} onClick={()=>setOrderStatus(o.id,s)}>{s}</button>)}</div></div>)}</div>}
   </div>);
 }

@@ -38,6 +38,9 @@ export const TOUR = [
 
 export const KIT = { base: "White, navy pinstripes", trim: "Navy sleeves & collar", crest: "Gold & black hexagon, lion emblem", image: "/assets/jersey.jpg" } as const;
 
+// Manual mobile-payment numbers buyers send money to (owner-provided; empty = that method is hidden on the order form)
+export const PAYMENTS: { bkash: string; nagad: string } = { bkash: "", nagad: "" };
+
 // JSON-LD preserved from the live site (SportsTeam + WebSite graph)
 export const JSON_LD = {
   "@context": "https://schema.org",
