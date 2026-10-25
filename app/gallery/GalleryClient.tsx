@@ -23,7 +23,7 @@ export default function GalleryClient({ items, highlights }: { items: GalleryLik
     <>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "18px 0 20px" }}>
         {CATS.map(([k, l]) => (
-          <button key={k} className="btn" style={cat === k ? { padding: ".55rem 1.1rem" } : { padding: ".55rem 1.1rem", background: "transparent", color: "#f7f5ef", border: "1px solid #ffffff33", boxShadow: "none" }} onClick={() => setCat(k)}>{l}</button>
+          <button key={k} className="btn" style={cat === k ? { padding: ".55rem 1.1rem" } : { padding: ".55rem 1.1rem", background: "transparent", color: "var(--paper)", border: "1px solid var(--line)", boxShadow: "none" }} onClick={() => setCat(k)}>{l}</button>
         ))}
       </div>
 
@@ -37,7 +37,7 @@ export default function GalleryClient({ items, highlights }: { items: GalleryLik
           {shown.map((it, i) => (
             <figure key={it.id} className="g-item" onClick={() => setOpen(i)}>
               <Image src={it.photo_url} alt={it.caption || "The Bachelors FC photo"} fill sizes="(max-width:640px) 50vw, 360px" style={{ objectFit: "cover" }} />
-              <figcaption>{it.caption || CAT_LABEL[it.category] || ""}{it.taken_on ? ` · ${it.taken_on}` : ""}</figcaption>
+              <span className="g-chip">{CAT_LABEL[it.category] || ""}</span>
             </figure>
           ))}
         </div>
@@ -58,6 +58,7 @@ export default function GalleryClient({ items, highlights }: { items: GalleryLik
 
       {open !== null && shown[open] && (
         <div className="lightbox" onClick={close}>
+          <span className="lb-count">{open + 1} / {shown.length}</span>
           <button className="lb-btn lb-close" aria-label="Close" onClick={close}>✕</button>
           <button className="lb-btn lb-prev" aria-label="Previous photo" onClick={(e) => { e.stopPropagation(); step(-1); }}>‹</button>
           <figure className="lb-fig" onClick={(e) => e.stopPropagation()}>
