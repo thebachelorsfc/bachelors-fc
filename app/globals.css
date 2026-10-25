@@ -1,19 +1,77 @@
-:root{--navy:#0a1633;--navy2:#101f45;--gold:#c9a227;--ink:#0b0b0f;--paper:#f7f5ef;--muted:#9aa3b2}
-*{box-sizing:border-box} body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-body),system-ui,-apple-system,"Segoe UI",sans-serif}
+:root{
+  --navy:#0a1633; --navy2:#101f45; --navy3:#16295a;
+  --gold:#c9a227; --gold2:#e8c766; --gold-deep:#8f6f14;
+  --ink:#06060a; --ink2:#0b0b12;
+  --paper:#f7f5ef; --muted:#9aa3b2;
+  --line:#ffffff1a; --line-gold:#c9a22755;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-body),system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+::selection{background:var(--gold);color:#111}
 h1,h2,h3,.display{font-family:var(--font-display),"Arial Narrow",sans-serif;letter-spacing:.01em}
-a{color:inherit} .wrap{max-width:1100px;margin:0 auto;padding:0 20px}
-.eyebrow{letter-spacing:.25em;text-transform:uppercase;color:var(--gold);font-size:.75rem;font-weight:700}
-.btn{display:inline-block;background:var(--gold);color:#111;padding:.8rem 1.4rem;border-radius:999px;font-weight:700;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease}
-.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px #c9a22744}
-.btn.ghost{background:transparent;color:var(--paper);border:1px solid #ffffff44}
-.grid{display:grid;gap:16px} .card{background:var(--navy2);border:1px solid #ffffff1a;border-radius:16px;padding:20px}
-section{padding:64px 0} h1{font-size:clamp(2.4rem,6vw,4.5rem);line-height:.98;text-transform:uppercase} h2{font-size:clamp(1.8rem,4vw,2.8rem);text-transform:uppercase}
-/* Trading-card squad grid: fixed card width so a lone player in a position group never stretches full-width */
-.squad-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(225px,255px));justify-content:start}
+a{color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* — Eyebrow: small gold label with a leading rule, elite-club style — */
+.eyebrow{display:flex;align-items:center;gap:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-size:.72rem;font-weight:700}
+.eyebrow::before{content:"";width:34px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+section .eyebrow{margin-bottom:10px}
+.player-card .eyebrow{justify-content:center}
+.player-card .eyebrow::before{display:none}
+
+/* — Buttons — */
+.btn{display:inline-block;background:linear-gradient(120deg,var(--gold2),var(--gold) 55%,var(--gold-deep));color:#14100a;padding:.85rem 1.7rem;border-radius:999px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;font-size:.8rem;text-decoration:none;transition:transform .18s ease,box-shadow .18s ease;box-shadow:0 4px 18px #c9a22726}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px #c9a22747}
+.btn.ghost{background:transparent;color:var(--paper);border:1px solid #ffffff3d;box-shadow:none;backdrop-filter:blur(4px)}
+.btn.ghost:hover{border-color:var(--gold);color:var(--gold2)}
+
+/* — Layout & cards — */
+.grid{display:grid;gap:16px}
+.card{background:linear-gradient(160deg,var(--navy2),var(--navy) 70%);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px #00000030;transition:transform .2s ease,border-color .2s ease}
+.card:hover{transform:translateY(-3px);border-color:var(--line-gold)}
+section{padding:88px 0}
+h1{font-size:clamp(2.6rem,6.5vw,4.8rem);line-height:.96;text-transform:uppercase;margin:.2em 0}
+h2{font-size:clamp(2rem,4.6vw,3.2rem);line-height:1;text-transform:uppercase;margin:.15em 0 .4em}
+
+/* — Hero — */
+.hero{position:relative;overflow:hidden;padding:96px 0 72px;background:
+  radial-gradient(1000px 520px at 50% -120px,#24448c66,transparent 65%),
+  radial-gradient(700px 340px at 88% 6%,#c9a22717,transparent 60%),
+  radial-gradient(560px 300px at 8% 20%,#c9a2270d,transparent 60%),
+  linear-gradient(180deg,#0a1226,var(--ink) 88%)}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(115deg,#ffffff05 0 1px,transparent 1px 90px)}
+.hero-title{font-size:clamp(3.1rem,10.5vw,7.6rem);line-height:.92;text-transform:uppercase;margin:.18em 0 .1em}
+.gold-text{background:linear-gradient(100deg,var(--gold2) 10%,var(--gold) 48%,var(--gold-deep) 95%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-crest{filter:drop-shadow(0 14px 34px #c9a22730)}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.rise{animation:rise .8s cubic-bezier(.2,.7,.2,1) both}
+.rise-1{animation-delay:.08s}.rise-2{animation-delay:.18s}.rise-3{animation-delay:.3s}.rise-4{animation-delay:.44s}
+
+/* — Ticker strip — */
+.ticker{overflow:hidden;border-top:1px solid var(--line-gold);border-bottom:1px solid var(--line-gold);background:#0a0f1f;padding:12px 0;white-space:nowrap}
+.ticker-track{display:inline-block;animation:tick 30s linear infinite;font-family:var(--font-display);letter-spacing:.3em;text-transform:uppercase;font-size:.8rem;color:#d8c98a}
+.ticker-track span{margin:0 26px}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* — Stats strip — */
+.stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stat-strip>div{padding:26px 14px;text-align:center;border-left:1px solid var(--line)}
+.stat-strip>div:first-child{border-left:none}
+.stat-strip strong{font-family:var(--font-display);font-size:clamp(1.9rem,4vw,2.7rem);display:block;line-height:1}
+.stat-strip span{color:var(--muted);text-transform:uppercase;letter-spacing:.18em;font-size:.68rem;font-weight:700}
+
+/* — Trading-card squad grid: fixed card width so a lone player in a position group never stretches full-width — */
+.squad-grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(228px,258px));justify-content:start}
 @media (max-width:560px){.squad-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}}
-.player-card{position:relative;overflow:hidden;text-align:center;padding:14px;transition:transform .18s ease,border-color .18s ease}
-.player-card:hover{transform:translateY(-4px);border-color:var(--gold)}
+.player-card{position:relative;overflow:hidden;text-align:center;padding:14px;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+.player-card:hover{transform:translateY(-6px);border-color:var(--gold);box-shadow:0 18px 40px #00000055,0 0 0 1px var(--line-gold)}
 .player-card .photo{position:relative;width:100%;aspect-ratio:4/5;border-radius:12px;overflow:hidden;background:#0a1633}
+.player-card .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,#06060acc 100%)}
 .player-card .photo img{object-fit:cover}
-.player-card .num{position:absolute;top:6px;right:12px;font-family:var(--font-display);font-size:44px;font-weight:700;color:#ffffff2e;line-height:1}
-.hero{background:radial-gradient(900px 480px at 50% -80px,#1b326e88,transparent 65%),radial-gradient(600px 300px at 85% 0%,#c9a22714,transparent 60%)}
+.player-card .num{position:absolute;top:2px;right:10px;z-index:2;font-family:var(--font-display);font-size:52px;font-weight:700;line-height:1;background:linear-gradient(180deg,#ffffffd9,#ffffff2e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.player-card::before{content:"";position:absolute;top:0;left:-80%;width:55%;height:100%;z-index:3;background:linear-gradient(100deg,transparent,#ffffff14,transparent);transform:skewX(-18deg);transition:left .6s ease;pointer-events:none}
+.player-card:hover::before{left:130%}
+
+/* — Footer watermark — */
+.footer-mark{font-family:var(--font-display);font-weight:700;text-transform:uppercase;line-height:.85;font-size:clamp(3rem,11.5vw,9.5rem);color:transparent;-webkit-text-stroke:1px #ffffff17;text-align:center;user-select:none;white-space:nowrap;overflow:hidden}

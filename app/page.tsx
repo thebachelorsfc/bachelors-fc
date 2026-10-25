@@ -10,17 +10,30 @@ import FacebookFeed from "@/components/FacebookFeed";
 export default async function Home(){
   const players:any[] = (await getPlayers()) ?? SEED_PLAYERS; const next:any = await getNextSession();
   return(<main>
-    <section className="wrap hero" style={{textAlign:"center"}}>
-      <Image src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={150} height={177} style={{objectFit:"contain"}} priority/>
-      <p className="eyebrow">{SITE.motto} · {SITE.mottoAlt}</p>
-      <h1>Forged in Brotherhood</h1>
-      <p style={{maxWidth:640,margin:"0 auto",color:"var(--muted)"}}>An apolitical, non-profit football club in Khulshi, Chittagong — built for bachelor youth who chose purpose over loneliness.</p>
-      <p style={{display:"flex",gap:12,justifyContent:"center",marginTop:20}}><Link className="btn" href="/join">Join the Squad</Link><Link className="btn ghost" href="/about">Our Story</Link></p>
-      <div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",marginTop:36}}>
-        <div className="card"><strong style={{fontSize:28}}><Counter to={players.length + OPEN_NUMBERS.length}/></strong><br/><span style={{color:"var(--muted)"}}>Squad shirts</span></div>
-        <div className="card"><strong style={{fontSize:28}}><Counter to={players.length}/></strong><br/><span style={{color:"var(--muted)"}}>Active players</span></div>
-        <div className="card"><strong style={{fontSize:28}}><Counter to={2026}/></strong><br/><span style={{color:"var(--muted)"}}>Founded</span></div>
-        <div className="card"><strong style={{fontSize:28}}>Next Session</strong><br/><span style={{color:"var(--muted)"}}>{next ? `${next.title}${next.session_date?` · ${next.session_date}`:""}${next.session_time?` · ${next.session_time}`:""}${next.ground?` · ${next.ground}`:""}${next.opponent?` · vs ${next.opponent}`:""}` : "No upcoming session scheduled yet — check back soon."}</span></div>
+    <section className="hero" style={{textAlign:"center"}}>
+      <div className="wrap" style={{position:"relative",zIndex:1}}>
+        <p className="eyebrow rise" style={{justifyContent:"center"}}>Khulshi · Chittagong — Est. 2026</p>
+        <div className="rise rise-1"><Image className="hero-crest" src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={168} height={198} style={{objectFit:"contain"}} priority/></div>
+        <h1 className="hero-title rise rise-2">Forged in<br/><span className="gold-text">Brotherhood</span></h1>
+        <p className="rise rise-3" style={{letterSpacing:".28em",textTransform:"uppercase",fontSize:".78rem",color:"var(--gold2)",fontWeight:700,margin:0}}>{SITE.motto} · {SITE.mottoAlt}</p>
+        <p className="rise rise-3" style={{maxWidth:640,margin:"14px auto 0",color:"var(--muted)"}}>An apolitical, non-profit football club in Khulshi, Chittagong — built for bachelor youth who chose purpose over loneliness.</p>
+        <p className="rise rise-4" style={{display:"flex",gap:12,justifyContent:"center",marginTop:26,flexWrap:"wrap"}}><Link className="btn" href="/join">Join the Squad</Link><Link className="btn ghost" href="/squad">Meet the Squad</Link></p>
+      </div>
+    </section>
+
+    <div className="ticker" aria-hidden="true"><div className="ticker-track">{[0,1].map(k=><span key={k}>Forged in Brotherhood ✦ United, Not Alone ✦ Khulshi · Chittagong ✦ Est. 2026 ✦ No Sponsors · No Stadium · Just Us ✦ Forged in Brotherhood ✦ United, Not Alone ✦ Khulshi · Chittagong ✦ Est. 2026 ✦ </span>)}</div></div>
+
+    <section className="wrap" style={{paddingTop:54,paddingBottom:0}}>
+      <div className="stat-strip">
+        <div><strong><Counter to={players.length + OPEN_NUMBERS.length}/></strong><span>Squad shirts</span></div>
+        <div><strong><Counter to={players.length}/></strong><span>Active players</span></div>
+        <div><strong><Counter to={2026}/></strong><span>Founded</span></div>
+        <div><strong>100%</strong><span>Brotherhood</span></div>
+      </div>
+      <div className="card" style={{marginTop:22,display:"flex",gap:16,alignItems:"center",flexWrap:"wrap"}}>
+        <span className="eyebrow">Next Session</span>
+        <span style={{fontSize:17}}>{next ? <><strong>{next.title}</strong>{next.session_date?` · ${next.session_date}`:""}{next.session_time?` · ${next.session_time}`:""}{next.ground?` · ${next.ground}`:""}{next.opponent?` · vs ${next.opponent}`:""}</> : "No upcoming session scheduled yet — check back soon."}</span>
+        <Link className="btn ghost" href="/join" style={{marginLeft:"auto",padding:".55rem 1.1rem"}}>Join Us</Link>
       </div>
     </section>
 
