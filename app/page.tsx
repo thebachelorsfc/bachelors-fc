@@ -22,10 +22,10 @@ export default async function Home(){
 
     <section className="wrap">
       <div className="stat-grid">
-        <div className="stat-card"><div className="stat-ico"><svg viewBox="0 0 24 24"><path d="M9 3 3 6l2 5 2-1v11h10V10l2 1 2-5-6-3a3 3 0 0 1-6 0Z"/></svg></div><strong><Counter to={players.length + OPEN_NUMBERS.length}/></strong><span>Squad shirts</span></div>
-        <div className="stat-card"><div className="stat-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5"/><path d="M16 5.4a3.2 3.2 0 0 1 0 5.9M17.8 14.9c1.7.6 2.7 1.9 3 4.1"/></svg></div><strong><Counter to={players.length}/></strong><span>Active players</span></div>
-        <div className="stat-card"><div className="stat-ico"><svg viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/></svg></div><strong><Counter to={2026}/></strong><span>Founded</span></div>
-        <div className="stat-card"><div className="stat-ico"><svg viewBox="0 0 24 24"><path d="M12 20.5C7 16.5 3.5 13.3 3.5 9.6A4.6 4.6 0 0 1 12 6.7a4.6 4.6 0 0 1 8.5 2.9c0 3.7-3.5 6.9-8.5 10.9Z"/></svg></div><strong>100%</strong><span>Brotherhood</span></div>
+        <div className="stat-card"><div className="stat-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5"/><path d="M16 5.4a3.2 3.2 0 0 1 0 5.9M17.8 14.9c1.7.6 2.7 1.9 3 4.1"/></svg></div><strong><Counter to={16}/></strong><span className="stat-label">Total Members</span></div>
+        <div className="stat-card"><div className="stat-ico"><svg viewBox="0 0 24 24"><path d="M9 3 3 6l2 5 2-1v11h10V10l2 1 2-5-6-3a3 3 0 0 1-6 0Z"/></svg></div><strong><Counter to={players.length}/></strong><span className="stat-label">Active players</span></div>
+        <div className="stat-card"><div className="stat-ico"><svg viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/></svg></div><strong><Counter to={2026}/></strong><span className="stat-label">Founded</span></div>
+        <div className="stat-card"><div className="stat-ico"><svg viewBox="0 0 24 24"><path d="M12 20.5C7 16.5 3.5 13.3 3.5 9.6A4.6 4.6 0 0 1 12 6.7a4.6 4.6 0 0 1 8.5 2.9c0 3.7-3.5 6.9-8.5 10.9Z"/></svg></div><strong>100%</strong><span className="stat-label">Brotherhood</span></div>
       </div>
     </section>
 
