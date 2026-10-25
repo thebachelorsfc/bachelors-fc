@@ -36,7 +36,7 @@ export default async function Home(){
     </section>
 
     <section className="wrap"><p className="eyebrow">Why we exist</p><h2>Character over trophies</h2>
-      <p style={{color:"var(--muted)",maxWidth:720}}>Success here is measured by character, discipline and brotherhood — football is the vehicle, not the destination. — {SITE.founder}, Founder &amp; Bot Player of BFC</p>
+      <p style={{color:"var(--muted)",maxWidth:720}}>Bachelor life is its own quiet battle. No partner, no family of your own yet — just time, energy, and choices that can go either way. We built The Bachelors FC because that energy deserved a better outlet than loneliness, comparison, and the habits that follow. Through real football, we grow discipline. Through brotherhood, we grow leadership. Every session, every match, every story — documented, so it never stays confined to just us.</p>
       <div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))"}}>{PILLARS.map(p=><div className="card" key={p.no}><div className="eyebrow">{p.no} / {p.title}</div><h3>{p.sub}</h3><p style={{color:"var(--muted)"}}>{p.text}</p></div>)}</div>
     </section>
 
