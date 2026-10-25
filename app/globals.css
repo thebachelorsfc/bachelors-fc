@@ -157,9 +157,9 @@ footer a:hover{color:var(--gold2)}
 ::-webkit-scrollbar-track{background:transparent}
 :root[data-theme="light"] ::-webkit-scrollbar-thumb{background:#c9bfa4}
 
-/* — Premium footer social chips — */
-.social-row{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
-.social-chip{display:inline-flex;align-items:center;gap:9px;padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:#ffffff06;color:var(--paper);text-decoration:none;font-size:13.5px;font-weight:600;letter-spacing:.02em;transition:transform .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease}
-.social-chip svg{width:16px;height:16px;stroke:var(--gold2);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;color:var(--gold2)}
-.social-chip:hover{border-color:var(--gold);color:var(--gold2);transform:translateY(-2px);box-shadow:0 10px 22px #c9a22722}
+/* — Premium footer social chips: compact icon circles, one line — */
+.social-row{margin-left:auto;display:flex;gap:10px;flex-wrap:nowrap}
+.social-chip{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;flex:none;border-radius:50%;border:1px solid var(--line);background:#ffffff06;color:var(--gold2);text-decoration:none;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease}
+.social-chip svg{width:18px;height:18px;stroke:var(--gold2);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;color:var(--gold2)}
+.social-chip:hover{border-color:var(--gold);background:#c9a22714;transform:translateY(-2px);box-shadow:0 10px 22px #c9a22726}
 @media (max-width:560px){.social-row{margin-left:0}}
