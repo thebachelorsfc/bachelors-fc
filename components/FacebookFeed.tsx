@@ -1,6 +1,4 @@
 "use client";
-import { useState } from "react";
-import Image from "next/image";
 import { SITE } from "@/lib/site";
 
 // Club's public page URL — username matches the m.me/TheBachelorsFC link on the original site.
@@ -8,61 +6,91 @@ const PAGE_URL = "https://www.facebook.com/TheBachelorsFC";
 const PLUGIN_SRC =
   "https://www.facebook.com/plugins/page.php?href=" +
   encodeURIComponent(PAGE_URL) +
-  "&tabs=timeline&width=500&height=640&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=false";
+  "&tabs=timeline&width=500&height=560&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=false";
 
 export default function FacebookFeed() {
-  const [loaded, setLoaded] = useState(false);
   return (
     <section className="wrap" id="facebook">
-      <p className="eyebrow">Stay Connected</p>
-      <h2>From our Facebook</h2>
+      <p className="eyebrow">On Social</p>
+      <h2>Latest from the club</h2>
+      <p style={{ color: "var(--muted)", maxWidth: 620, marginTop: 6 }}>
+        Matchday moments, training and announcements — straight from our Facebook page. New posts
+        appear here on their own.
+      </p>
+      <p style={{ marginTop: 18 }}>
+        <a className="btn" href={SITE.contacts.facebook} target="_blank" rel="noreferrer">
+          <span
+            aria-hidden
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 22,
+              height: 22,
+              borderRadius: "50%",
+              background: "rgba(0,0,0,.28)",
+              fontWeight: 800,
+              fontSize: 15,
+              marginRight: 9,
+              lineHeight: 1,
+            }}
+          >
+            f
+          </span>
+          Follow on Facebook
+        </a>
+      </p>
+
       <div
-        className="grid"
-        style={{ gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", alignItems: "start" }}
+        className="card"
+        style={{ marginTop: 30, padding: 0, overflow: "hidden", maxWidth: 580, marginLeft: "auto", marginRight: "auto" }}
       >
-        <div className="card" style={{ textAlign: "center" }}>
-          <Image
-            src="/assets/logo-transparent.png"
-            alt="The Bachelors FC crest"
-            width={92}
-            height={109}
-            style={{ objectFit: "contain", margin: "6px auto 10px" }}
-          />
-          <h3 style={{ margin: "4px 0" }}>The Bachelors FC</h3>
-          <p style={{ color: "var(--muted)", maxWidth: 380, margin: "0 auto 14px" }}>
-            Match updates, training moments and brotherhood — straight from the club&apos;s Facebook
-            page. New posts appear here on their own.
-          </p>
-          <a className="btn" href={SITE.contacts.facebook} target="_blank" rel="noreferrer">
-            Follow on Facebook
-          </a>
-          {!loaded && (
-            <p style={{ color: "var(--muted)", fontSize: 14, marginTop: 14 }}>
-              Feed loading… if it stays blank on your phone, tap the button above to see the page
-              directly.
-            </p>
-          )}
-        </div>
         <div
           style={{
-            background: "#fff",
-            borderRadius: 16,
-            overflow: "hidden",
-            maxWidth: 520,
-            width: "100%",
-            margin: "0 auto",
-            lineHeight: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            padding: "13px 18px",
+            borderBottom: "1px solid var(--line)",
           }}
         >
+          <span
+            aria-hidden
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 30,
+              height: 30,
+              borderRadius: "50%",
+              background: "var(--gold)",
+              color: "#0a0f1e",
+              fontWeight: 800,
+              fontSize: 19,
+              lineHeight: 1,
+            }}
+          >
+            f
+          </span>
+          <strong style={{ fontSize: 17 }}>Facebook</strong>
+          <a
+            href={PAGE_URL}
+            target="_blank"
+            rel="noreferrer"
+            style={{ marginLeft: "auto", color: "var(--gold2)", fontWeight: 600 }}
+          >
+            Open ↗
+          </a>
+        </div>
+        <div style={{ background: "#fff", height: 560, overflow: "hidden", lineHeight: 0 }}>
           <iframe
             title="The Bachelors FC on Facebook"
             src={PLUGIN_SRC}
             width="500"
-            height="640"
-            style={{ border: "none", overflow: "hidden", width: "100%", maxWidth: 500 }}
+            height="560"
+            style={{ border: "none", overflow: "hidden", width: "100%", maxWidth: 500, display: "block", margin: "0 auto" }}
             loading="lazy"
             allow="encrypted-media"
-            onLoad={() => setLoaded(true)}
           />
         </div>
       </div>

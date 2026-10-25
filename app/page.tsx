@@ -54,7 +54,7 @@ export default async function Home(){
 
     <FacebookFeed/>
 
-    <section className="wrap" style={{paddingTop:0}}>
+    <section className="wrap">
       <div className="card" style={{display:"flex",gap:16,alignItems:"center",flexWrap:"wrap"}}>
         <span className="eyebrow">Next Session</span>
         <span style={{fontSize:17}}>{next ? <><strong>{next.title}</strong>{next.session_date?` · ${next.session_date}`:""}{next.session_time?` · ${next.session_time}`:""}{next.ground?` · ${next.ground}`:""}{next.opponent?` · vs ${next.opponent}`:""}</> : "No upcoming session scheduled yet — check back soon."}</span>
