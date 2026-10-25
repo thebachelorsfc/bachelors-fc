@@ -8,3 +8,6 @@ export function videoEmbed(url: string): { kind: "youtube" | "facebook" | "link"
   return { kind: "link", embed: u };
 }
 export const isVideoUrl = (url: string) => /youtube\.com|youtu\.be|facebook\.com|fb\.watch/.test(url || "");
+// Facebook "share" links (facebook.com/share/...) open fine in a browser but the
+// embed player refuses them — it needs the address the share link lands on.
+export const isFbShareLink = (url: string) => /facebook\.com\/share\//.test(url || "");
