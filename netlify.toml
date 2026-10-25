@@ -1,9 +1,9 @@
+# As of the owner's 2026-10-25 decision, the club's main site lives on Vercel
+# (https://bachelors-fc.vercel.app). Netlify must NOT serve the full site anymore:
+# this config makes any Netlify deploy publish only a tiny redirect site that
+# forwards every address to Vercel with a permanent (301) redirect.
+# Planned use: trigger one deploy after the 2026-11-04 credit reset, keep the
+# redirect alive 1-2 months, then delete the Netlify site.
 [build]
-  command = "npm run build"
-  publish = ".next"
-
-[build.environment]
-  NODE_VERSION = "20"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+  command = "echo 'Redirect-only deploy: main site is on Vercel'"
+  publish = "netlify-redirect"

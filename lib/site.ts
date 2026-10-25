@@ -1,14 +1,14 @@
-// Single source of truth — values copied EXACTLY from the live site head on 2026-10-24.
-// Do NOT change title/description/canonical/verification without owner approval: SEO + Search Console depend on them.
+// Single source of truth — title/description/verification copied EXACTLY from the original live site head (2026-10-24).
+// Primary address switched Netlify → Vercel by owner decision on 2026-10-25 (Netlify gets a redirect on 2026-11-04, then deletion).
 export const SITE = {
   name: "The Bachelors FC",
-  url: "https://thebachelorsfc.netlify.app",
+  url: "https://bachelors-fc.vercel.app",
   title: "The Bachelors FC | Football Club in Khulshi, Chittagong",
   description:
     "The Bachelors FC is an apolitical, non-profit football club in Khulshi, Chittagong, built around brotherhood, discipline, leadership, and purpose.",
   ogDescription:
     "An apolitical, non-profit football club in Khulshi, Chittagong — forged in brotherhood and driven by purpose.",
-  ogImage: "https://thebachelorsfc.netlify.app/assets/logo.jpeg",
+  ogImage: "https://bachelors-fc.vercel.app/assets/logo.jpeg",
   // Both Search Console properties must stay verified: token 1 = Netlify property, token 2 = Vercel property (added 2026-10-25). Do not remove either.
   googleVerification: ["1reD33YYQMrbRRaTtMv-YZRiSowRPgZX9n1Vwu8q-xs", "Hj5PCmlLSlq7k6kHIZOJJuNlt6MvjqhNcByL2nD_rqI"] as string[],
   motto: "Forged in Brotherhood, Driven by Purpose",
