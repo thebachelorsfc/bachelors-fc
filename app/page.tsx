@@ -1,14 +1,15 @@
 import Link from "next/link"; import Image from "next/image";
 import { SITE, PILLARS, TOUR, KIT } from "@/lib/site";
 import { SEED_PLAYERS, OPEN_NUMBERS } from "@/lib/players";
-import { getPlayers, getNextSession } from "@/lib/data";
+import { getPlayers, getNextSession, getHighlights } from "@/lib/data";
+import HighlightCard from "@/components/HighlightCard";
 export const dynamic = "force-dynamic";
 import PlayerCard, { OpenShirt } from "@/components/PlayerCard";
 import Counter from "@/components/Counter";
 import FacebookFeed from "@/components/FacebookFeed";
 
 export default async function Home(){
-  const players:any[] = (await getPlayers()) ?? SEED_PLAYERS; const next:any = await getNextSession();
+  const players:any[] = (await getPlayers()) ?? SEED_PLAYERS; const next:any = await getNextSession(); const highlights:any[] = await getHighlights();
   return(<main>
     <section className="hero" style={{textAlign:"center"}}>
       <div className="wrap" style={{position:"relative",zIndex:1}}>
@@ -51,6 +52,11 @@ export default async function Home(){
       <div className="squad-grid">{players.map((p:any)=><PlayerCard key={p.jersey_no} p={p}/> )}{OPEN_NUMBERS.slice(0,3).map(n=><OpenShirt key={n} n={n}/>)}</div>
       <p style={{marginTop:16}}><Link className="btn ghost" href="/squad">Full squad →</Link></p>
     </section>
+
+    {highlights.length>0 && (<section className="wrap"><p className="eyebrow">Watch</p><h2>Highlights</h2>
+      <div className="grid" style={{gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))"}}>{highlights.slice(0,3).map((h:any)=><HighlightCard key={h.id} h={h}/>)}</div>
+      <p style={{marginTop:16}}><Link className="btn ghost" href="/gallery">Gallery & all highlights →</Link></p>
+    </section>)}
 
     <FacebookFeed/>
   </main>);

@@ -6,10 +6,12 @@ const FILE = path.join(process.cwd(), "data", "store.json");
 export type Application = { id:string; full_name:string; location:string; email:string; mobile:string; whatsapp?:string; educational_background:string; marital_status?:string; age:number; occupation?:string; why_join?:string; preferred_position?:string; blood_group?:string; photo_url?:string; status:"pending"|"trial"|"approved"|"rejected"; created_at:string };
 export type Session = { id:string; title:string; session_date?:string; session_time?:string; ground?:string; opponent?:string; created_at:string };
 export type Ground = { id:string; name:string; area?:string; maps_url?:string };
-type Store = { players:(Player&{id:string})[]; applications:Application[]; sessions:Session[]; grounds:Ground[] };
+export type GalleryItem = { id:string; photo_url:string; caption?:string; category:"match"|"training"|"tour"|"team"; taken_on?:string; created_at:string };
+export type Highlight = { id:string; title:string; video_url:string; played_on?:string; created_at:string };
+type Store = { players:(Player&{id:string})[]; applications:Application[]; sessions:Session[]; grounds:Ground[]; gallery:GalleryItem[]; highlights:Highlight[] };
 async function read(): Promise<Store> {
-  try { return JSON.parse(await fs.readFile(FILE, "utf8")); }
-  catch { const seed: Store = { players: SEED_PLAYERS.map((p,i)=>({ ...p, id:`seed-${i+1}` })), applications: [], sessions: [], grounds: [] }; await write(seed); return seed; }
+  try { const s = JSON.parse(await fs.readFile(FILE, "utf8")) as Store; s.gallery ??= []; s.highlights ??= []; return s; }
+  catch { const seed: Store = { players: SEED_PLAYERS.map((p,i)=>({ ...p, id:`seed-${i+1}` })), applications: [], sessions: [], grounds: [], gallery: [], highlights: [] }; await write(seed); return seed; }
 }
 async function write(s: Store) { await fs.mkdir(path.dirname(FILE), { recursive:true }); await fs.writeFile(FILE, JSON.stringify(s, null, 2)); }
 export const store = {
@@ -23,5 +25,11 @@ export const store = {
   async sessions() { return (await read()).sessions; },
   async addSession(x: Session) { const s=await read(); s.sessions.unshift(x); await write(s); return x; },
   async grounds() { return (await read()).grounds; },
+  async gallery() { return (await read()).gallery; },
+  async addGalleryItem(g: GalleryItem) { const s=await read(); s.gallery.unshift(g); await write(s); return g; },
+  async deleteGalleryItem(id:string) { const s=await read(); s.gallery=s.gallery.filter(x=>x.id!==id); await write(s); },
+  async highlights() { return (await read()).highlights; },
+  async addHighlight(h: Highlight) { const s=await read(); s.highlights.unshift(h); await write(s); return h; },
+  async deleteHighlight(id:string) { const s=await read(); s.highlights=s.highlights.filter(x=>x.id!==id); await write(s); },
 };
 export const newId = () => Math.random().toString(36).slice(2,10) + Date.now().toString(36);

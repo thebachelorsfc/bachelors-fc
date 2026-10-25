@@ -6,17 +6,24 @@ export default function AdminApp(){
   const [apps,setApps]=useState<any[]>([]); const [players,setPlayers]=useState<any[]>([]); const [msg,setMsg]=useState("");
   const [np,setNp]=useState({name:"",jersey_no:"",position:"",position_code:"FWD",joined_year:"2026"});
   const [ns,setNs]=useState({title:"",session_date:"",session_time:"",ground:"",opponent:""});
-  const load=useCallback(async()=>{ const a=await fetch("/api/applications"); if(a.status===401){ setAuthed(false); return; } setAuthed(true); setApps(await a.json()); const p=await fetch("/api/players"); setPlayers(await p.json()); },[]);
+  const [gal,setGal]=useState<any[]>([]); const [hls,setHls]=useState<any[]>([]);
+  const [gf,setGf]=useState<{caption:string;category:string;taken_on:string;file:File|null}>({caption:"",category:"team",taken_on:"",file:null});
+  const [hf,setHf]=useState({title:"",video_url:"",played_on:""});
+  const load=useCallback(async()=>{ const a=await fetch("/api/applications"); if(a.status===401){ setAuthed(false); return; } setAuthed(true); setApps(await a.json()); const p=await fetch("/api/players"); setPlayers(await p.json()); const g=await fetch("/api/gallery"); setGal(await g.json()); const h=await fetch("/api/highlights"); setHls(await h.json()); },[]);
   useEffect(()=>{ load(); },[load]);
   async function login(){ const r=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})}); if(r.ok){ setMsg(""); load(); } else setMsg("Wrong password"); }
   async function setStatus(id:string,status:string){ await fetch(`/api/applications/${id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status})}); load(); }
   async function addPlayer(){ const r=await fetch("/api/players",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...np,jersey_no:Number(np.jersey_no),joined_year:Number(np.joined_year)})}); const j=await r.json(); setMsg(r.ok?`Player added: ${j.name} #${j.jersey_no}`:(j.error||"Failed")); if(r.ok){ setNp({name:"",jersey_no:"",position:"",position_code:"FWD",joined_year:"2026"}); load(); } }
   async function delPlayer(id:string){ if(!confirm("Delete this player?")) return; await fetch(`/api/players/${id}`,{method:"DELETE"}); load(); }
   async function addSession(){ const r=await fetch("/api/sessions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(ns)}); setMsg(r.ok?"Session saved — it now shows as Next Session on the homepage.":"Failed to save session"); if(r.ok) setNs({title:"",session_date:"",session_time:"",ground:"",opponent:""}); }
+  async function uploadPhoto(){ if(!gf.file){ setMsg("Choose a photo first"); return; } const fd=new FormData(); fd.set("photo",gf.file); fd.set("caption",gf.caption); fd.set("category",gf.category); fd.set("taken_on",gf.taken_on); const r=await fetch("/api/gallery",{method:"POST",body:fd}); const j=await r.json().catch(()=>({})); setMsg(r.ok?"Photo added to the gallery":(j.error||"Upload failed")); if(r.ok){ setGf({caption:"",category:"team",taken_on:"",file:null}); load(); } }
+  async function delPhoto(id:string){ if(!confirm("Delete this photo?")) return; await fetch(`/api/gallery/${id}`,{method:"DELETE"}); load(); }
+  async function addHighlight(){ const r=await fetch("/api/highlights",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(hf)}); const j=await r.json().catch(()=>({})); setMsg(r.ok?"Highlight added":(j.error||"Failed")); if(r.ok){ setHf({title:"",video_url:"",played_on:""}); load(); } }
+  async function delHighlight(id:string){ if(!confirm("Delete this highlight?")) return; await fetch(`/api/highlights/${id}`,{method:"DELETE"}); load(); }
   if(authed===null) return <p style={{color:"var(--muted)"}}>Loading…</p>;
   if(!authed) return <div className="card" style={{maxWidth:420}}><h3>Admin Login</h3>{msg&&<p style={{color:"#ff9d9d"}}>{msg}</p>}<input style={input} type="password" placeholder="Admin password" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&login()}/><button className="btn" style={{marginTop:12}} onClick={login}>Log in</button></div>;
   return(<div>
-    <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>{["applications","players","sessions"].map(t=><button key={t} className="btn" style={tab===t?{}:{background:"transparent",color:"#f7f5ef",border:"1px solid #ffffff33"}} onClick={()=>setTab(t)}>{t[0].toUpperCase()+t.slice(1)} {t==="applications"&&apps.length?`(${apps.length})`:""}</button>)}
+    <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>{["applications","players","sessions","gallery","highlights"].map(t=><button key={t} className="btn" style={tab===t?{}:{background:"transparent",color:"#f7f5ef",border:"1px solid #ffffff33"}} onClick={()=>setTab(t)}>{t[0].toUpperCase()+t.slice(1)} {t==="applications"&&apps.length?`(${apps.length})`:""}</button>)}
     <button className="btn ghost" style={{marginLeft:"auto"}} onClick={async()=>{await fetch("/api/admin/login",{method:"DELETE"}); setAuthed(false);}}>Log out</button></div>
     {msg&&<p style={{color:"var(--gold)"}}>{msg}</p>}
     {tab==="applications" && (apps.length===0 ? <div className="card">No applications yet. New applications from the Join form will appear here as Pending.</div> :
@@ -39,5 +46,20 @@ export default function AdminApp(){
       <input style={input} placeholder="Ground / turf" value={ns.ground} onChange={e=>setNs({...ns,ground:e.target.value})}/>
       <input style={input} placeholder="Opponent (optional)" value={ns.opponent} onChange={e=>setNs({...ns,opponent:e.target.value})}/></div>
       <button className="btn" style={{marginTop:12}} onClick={addSession}>Save session</button></div>}
+    {tab==="gallery" && <div><div className="grid" style={{gridTemplateColumns:"repeat(auto-fill,minmax(150px,1fr))",marginBottom:16}}>{gal.map(g=><div className="card" key={g.id} style={{padding:10}}><img src={g.photo_url} alt={g.caption||"Gallery photo"} style={{width:"100%",aspectRatio:"4/3",objectFit:"cover",borderRadius:10}}/><p style={{fontSize:13,color:"var(--muted)",margin:"8px 0"}}>{g.caption||"(no caption)"} · {g.category}{g.taken_on?` · ${g.taken_on}`:""}</p><button className="btn ghost" style={{padding:".4rem .8rem"}} onClick={()=>delPhoto(g.id)}>Delete</button></div>)}</div>
+      {gal.length===0 && <div className="card" style={{marginBottom:16}}>No photos yet. Upload the first one below — it appears on /gallery right away.</div>}
+      <div className="card"><h3>Add photo</h3><div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))"}}>
+      <input style={input} type="file" accept="image/*" onChange={e=>setGf({...gf,file:e.target.files?.[0]||null})}/>
+      <input style={input} placeholder="Caption (optional)" value={gf.caption} onChange={e=>setGf({...gf,caption:e.target.value})}/>
+      <select style={input} value={gf.category} onChange={e=>setGf({...gf,category:e.target.value})}><option value="match">Match Day</option><option value="training">Training</option><option value="tour">On Tour</option><option value="team">Team</option></select>
+      <input style={input} type="date" value={gf.taken_on} onChange={e=>setGf({...gf,taken_on:e.target.value})}/></div>
+      <button className="btn" style={{marginTop:12}} onClick={uploadPhoto}>Upload photo</button></div></div>}
+    {tab==="highlights" && <div><div className="grid" style={{marginBottom:16}}>{hls.map(h=><div className="card" key={h.id} style={{display:"flex",gap:10,alignItems:"center"}}><strong>{h.title}</strong><span style={{color:"var(--muted)",fontSize:13}}>{h.played_on||""}</span><a href={h.video_url} target="_blank" rel="noreferrer" style={{fontSize:13}}>Open video</a><button className="btn ghost" style={{marginLeft:"auto",padding:".4rem .8rem"}} onClick={()=>delHighlight(h.id)}>Delete</button></div>)}</div>
+      {hls.length===0 && <div className="card" style={{marginBottom:16}}>No highlights yet. Paste a YouTube or Facebook video link below.</div>}
+      <div className="card"><h3>Add highlight</h3><div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))"}}>
+      <input style={input} placeholder="Title (e.g. BFC vs United — Match Highlights)" value={hf.title} onChange={e=>setHf({...hf,title:e.target.value})}/>
+      <input style={input} placeholder="YouTube / Facebook video link" value={hf.video_url} onChange={e=>setHf({...hf,video_url:e.target.value})}/>
+      <input style={input} type="date" value={hf.played_on} onChange={e=>setHf({...hf,played_on:e.target.value})}/></div>
+      <button className="btn" style={{marginTop:12}} onClick={addHighlight}>Add highlight</button></div></div>}
   </div>);
 }
