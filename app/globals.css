@@ -163,3 +163,19 @@ footer a:hover{color:var(--gold2)}
 .social-chip svg{width:18px;height:18px;stroke:var(--gold2);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;color:var(--gold2)}
 .social-chip:hover{border-color:var(--gold);background:#c9a22714;transform:translateY(-2px);box-shadow:0 10px 22px #c9a22726}
 @media (max-width:560px){.social-row{margin-left:0}}
+
+/* — Social posts carousel (Brotherhood-style) — */
+.soc-wrap{position:relative}
+.soc-track{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px 14px;scrollbar-width:none}
+.soc-track::-webkit-scrollbar{display:none}
+.soc-card{flex:0 0 min(500px,88%);scroll-snap-align:center;border:1px solid #c9a2272e;border-radius:22px;background:linear-gradient(180deg,#101a36,#0a1130);box-shadow:0 18px 44px #00000059;overflow:hidden}
+.soc-card .fb-panel-head{display:flex;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid var(--line)}
+.soc-body{height:560px;overflow:hidden;background:#fff;line-height:0}
+.soc-body iframe{width:100%;height:640px;border:none;display:block}
+.soc-arrow{position:absolute;top:42%;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:#0a1130e6;color:var(--paper);font-size:26px;line-height:1;cursor:pointer;z-index:3;box-shadow:0 10px 24px #00000066}
+.soc-prev{left:-6px}
+.soc-next{right:-6px}
+.soc-dots{display:flex;gap:7px;justify-content:center;margin-top:4px}
+.soc-dots button{width:8px;height:8px;border-radius:99px;border:none;background:#c9a22740;cursor:pointer;padding:0;transition:all .2s ease}
+.soc-dots button.on{width:26px;background:var(--gold)}
+@media (max-width:640px){.soc-arrow{display:none}.soc-body{height:520px}}

@@ -9,10 +9,11 @@ export default function AdminApp(){
   const [gal,setGal]=useState<any[]>([]); const [hls,setHls]=useState<any[]>([]);
   const [gf,setGf]=useState<{caption:string;category:string;taken_on:string;file:File|null}>({caption:"",category:"team",taken_on:"",file:null});
   const [hf,setHf]=useState({title:"",video_url:"",played_on:""});
+  const [posts,setPosts]=useState<any[]>([]); const [spUrl,setSpUrl]=useState("");
   const [prods,setProds]=useState<any[]>([]); const [pf,setPf]=useState({name:"",photo_url:"",description:"",price_bdt:"",stock:""});
   const [ords,setOrds]=useState<any[]>([]);
   const [accs,setAccs]=useState<any[]>([]); const [rsvpList,setRsvpList]=useState<any[]>([]);
-  const load=useCallback(async()=>{ const a=await fetch("/api/applications"); if(a.status===401){ setAuthed(false); return; } setAuthed(true); setApps(await a.json()); const p=await fetch("/api/players"); setPlayers(await p.json()); const g=await fetch("/api/gallery"); setGal(await g.json()); const h=await fetch("/api/highlights"); setHls(await h.json()); const pr=await fetch("/api/products"); setProds(await pr.json()); const or=await fetch("/api/orders"); setOrds(or.ok?await or.json():[]); const ac=await fetch("/api/admin/player-accounts"); setAccs(ac.ok?await ac.json():[]); const rv=await fetch("/api/admin/rsvps"); setRsvpList(rv.ok?await rv.json():[]); },[]);
+  const load=useCallback(async()=>{ const a=await fetch("/api/applications"); if(a.status===401){ setAuthed(false); return; } setAuthed(true); setApps(await a.json()); const p=await fetch("/api/players"); setPlayers(await p.json()); const g=await fetch("/api/gallery"); setGal(await g.json()); const h=await fetch("/api/highlights"); setHls(await h.json()); const sp=await fetch("/api/social-posts"); setPosts(sp.ok?await sp.json():[]); const pr=await fetch("/api/products"); setProds(await pr.json()); const or=await fetch("/api/orders"); setOrds(or.ok?await or.json():[]); const ac=await fetch("/api/admin/player-accounts"); setAccs(ac.ok?await ac.json():[]); const rv=await fetch("/api/admin/rsvps"); setRsvpList(rv.ok?await rv.json():[]); },[]);
   useEffect(()=>{ load(); },[load]);
   async function login(){ const r=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})}); if(r.ok){ setMsg(""); load(); } else setMsg("Wrong password"); }
   async function setStatus(id:string,status:string){ await fetch(`/api/applications/${id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status})}); load(); }
@@ -23,6 +24,8 @@ export default function AdminApp(){
   async function delPhoto(id:string){ if(!confirm("Delete this photo?")) return; await fetch(`/api/gallery/${id}`,{method:"DELETE"}); load(); }
   async function addHighlight(){ const r=await fetch("/api/highlights",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(hf)}); const j=await r.json().catch(()=>({})); setMsg(r.ok?"Highlight added":(j.error||"Failed")); if(r.ok){ setHf({title:"",video_url:"",played_on:""}); load(); } }
   async function delHighlight(id:string){ if(!confirm("Delete this highlight?")) return; await fetch(`/api/highlights/${id}`,{method:"DELETE"}); load(); }
+  async function addPost(){ const r=await fetch("/api/social-posts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({post_url:spUrl})}); const j=await r.json().catch(()=>({})); setMsg(r.ok?"Post added — it now shows in the homepage carousel":(j.error||"Failed")); if(r.ok){ setSpUrl(""); load(); } }
+  async function delPost(id:string){ if(!confirm("Remove this post from the carousel?")) return; await fetch(`/api/social-posts/${id}`,{method:"DELETE"}); load(); }
   async function saveProduct(p:any){ const r=await fetch(`/api/products/${p.id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({price_bdt:p.price_bdt,stock:p.stock,is_available:p.is_available})}); setMsg(r.ok?`Saved: ${p.name}${p.price_bdt?" — now on sale at ৳"+p.price_bdt:" — showcase mode (no price)"}`:"Save failed"); if(r.ok) load(); }
   async function delProduct(id:string){ if(!confirm("Delete this product?")) return; await fetch(`/api/products/${id}`,{method:"DELETE"}); load(); }
   async function patchAccount(id:string,patch:any){ const r=await fetch(`/api/admin/player-accounts/${id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(patch)}); setMsg(r.ok?"Account updated":"Account update failed"); if(r.ok) load(); }
@@ -31,7 +34,7 @@ export default function AdminApp(){
   if(authed===null) return <p style={{color:"var(--muted)"}}>Loading…</p>;
   if(!authed) return <div className="card" style={{maxWidth:420}}><h3>Admin Login</h3>{msg&&<p style={{color:"#ff9d9d"}}>{msg}</p>}<input style={input} type="password" placeholder="Admin password" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&login()}/><button className="btn" style={{marginTop:12}} onClick={login}>Log in</button></div>;
   return(<div>
-    <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>{["applications","players","sessions","accounts","gallery","highlights","store","orders"].map(t=><button key={t} className="btn" style={tab===t?{}:{background:"transparent",color:"#f7f5ef",border:"1px solid #ffffff33"}} onClick={()=>setTab(t)}>{t[0].toUpperCase()+t.slice(1)} {t==="applications"&&apps.length?`(${apps.length})`:""}</button>)}
+    <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>{["applications","players","sessions","accounts","gallery","highlights","social","store","orders"].map(t=><button key={t} className="btn" style={tab===t?{}:{background:"transparent",color:"#f7f5ef",border:"1px solid #ffffff33"}} onClick={()=>setTab(t)}>{t[0].toUpperCase()+t.slice(1)} {t==="applications"&&apps.length?`(${apps.length})`:""}</button>)}
     <button className="btn ghost" style={{marginLeft:"auto"}} onClick={async()=>{await fetch("/api/admin/login",{method:"DELETE"}); setAuthed(false);}}>Log out</button></div>
     {msg&&<p style={{color:"var(--gold)"}}>{msg}</p>}
     {tab==="applications" && (apps.length===0 ? <div className="card">No applications yet. New applications from the Join form will appear here as Pending.</div> :
@@ -85,6 +88,11 @@ export default function AdminApp(){
       <input style={input} placeholder="YouTube / Facebook video link" value={hf.video_url} onChange={e=>setHf({...hf,video_url:e.target.value})}/>
       <input style={input} type="date" value={hf.played_on} onChange={e=>setHf({...hf,played_on:e.target.value})}/></div>
       <button className="btn" style={{marginTop:12}} onClick={addHighlight}>Add highlight</button></div></div>}
+    {tab==="social" && <div><div className="grid" style={{marginBottom:16}}>{posts.map(p=><div className="card" key={p.id} style={{display:"flex",gap:10,alignItems:"center"}}><strong>Facebook post</strong><a href={p.post_url} target="_blank" rel="noreferrer" style={{fontSize:13,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:340}}>{p.post_url}</a><button className="btn ghost" style={{marginLeft:"auto",padding:".4rem .8rem"}} onClick={()=>delPost(p.id)}>Remove</button></div>)}</div>
+      {posts.length===0 && <div className="card" style={{marginBottom:16}}>No posts in the carousel yet. On Facebook, open a post → Share → Copy link → paste it below. The newest post shows first.</div>}
+      <div className="card"><h3>Add a Facebook post</h3><div className="grid" style={{gridTemplateColumns:"1fr"}}>
+      <input style={input} placeholder="Facebook post link (facebook.com/.../posts/...)" value={spUrl} onChange={e=>setSpUrl(e.target.value)}/></div>
+      <button className="btn" style={{marginTop:12}} onClick={addPost}>Add to carousel</button></div></div>}
     {tab==="store" && <div><div className="grid" style={{marginBottom:16}}>{prods.map((p,i)=><div className="card" key={p.id}><div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}><strong>{p.name}</strong>{p.price_bdt?<span className="eyebrow">On sale · ৳{p.price_bdt}</span>:<span className="eyebrow">Showcase</span>}</div>
       <div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",marginTop:12}}>
       <label style={{fontSize:13,color:"var(--muted)"}}>Price ৳ (blank = showcase)<input style={input} type="number" value={p.price_bdt??""} onChange={e=>{const c=[...prods]; c[i]={...c[i],price_bdt:e.target.value===""?"":Number(e.target.value)}; setProds(c);}}/></label>

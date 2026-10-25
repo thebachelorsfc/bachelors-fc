@@ -30,4 +30,9 @@ export async function getHighlights() {
   if (sb) { const { data, error } = await sb.from("highlights").select("*").order("created_at", { ascending:false }); if (!error && data) return data; }
   return store.highlights();
 }
+export async function getSocialPosts() {
+  const sb = supabase();
+  if (sb) { const { data, error } = await sb.from("social_posts").select("*").order("created_at", { ascending:false }); if (!error && data) return data; }
+  return store.socialPosts();
+}
 export const usingSupabase = () => !!supabase();

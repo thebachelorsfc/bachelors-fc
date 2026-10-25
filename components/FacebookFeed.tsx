@@ -1,5 +1,4 @@
-"use client";
-import { SITE } from "@/lib/site";
+import { SITE } from "@/lib/site"; import { getSocialPosts } from "@/lib/data"; import SocialCarousel from "@/components/SocialCarousel";
 
 // Club's public page URL — username matches the m.me/TheBachelorsFC link on the original site.
 const PAGE_URL = "https://www.facebook.com/TheBachelorsFC";
@@ -8,14 +7,14 @@ const PLUGIN_SRC =
   encodeURIComponent(PAGE_URL) +
   "&tabs=timeline&width=500&height=560&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=false";
 
-export default function FacebookFeed() {
+export default async function FacebookFeed() {
+  const posts = await getSocialPosts();
   return (
     <section className="wrap" id="facebook">
       <p className="eyebrow">On Social</p>
       <h2>Latest from the club</h2>
       <p style={{ color: "var(--muted)", maxWidth: 620, marginTop: 6 }}>
-        Matchday moments, training and announcements — straight from our Facebook page. New posts
-        appear here on their own.
+        Matchday moments, results and announcements — straight from our Facebook page.
       </p>
       <p style={{ marginTop: 18 }}>
         <a className="btn" href={SITE.contacts.facebook} target="_blank" rel="noreferrer">
@@ -41,6 +40,9 @@ export default function FacebookFeed() {
         </a>
       </p>
 
+      {posts.length > 0 ? (
+        <div style={{ marginTop: 30 }}><SocialCarousel posts={posts} /></div>
+      ) : (
       <div
         className="card"
         style={{ marginTop: 30, padding: 0, overflow: "hidden", maxWidth: 580, marginLeft: "auto", marginRight: "auto" }}
@@ -94,6 +96,7 @@ export default function FacebookFeed() {
           />
         </div>
       </div>
+      )}
     </section>
   );
 }
