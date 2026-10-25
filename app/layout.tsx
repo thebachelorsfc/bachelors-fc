@@ -25,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${display.variable} ${body.variable}`}>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
+        <div className="ticker" aria-hidden="true"><div className="ticker-track">{[0,1].map(k=><span key={k}>Forged in Brotherhood ✦ Driven by Purpose ✦ United, Not Alone ✦ Khulshi · Chittagong ✦ Est. 2026 ✦ No Sponsors · No Stadium · Just Us ✦ Forged in Brotherhood ✦ Driven by Purpose ✦ United, Not Alone ✦ Khulshi · Chittagong ✦ Est. 2026 ✦ </span>)}</div></div>
         <Header />{children}<Footer />
       </body>
     </html>

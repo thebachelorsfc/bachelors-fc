@@ -15,13 +15,10 @@ export default async function Home(){
         <p className="eyebrow rise" style={{justifyContent:"center"}}>Khulshi · Chittagong — Est. 2026</p>
         <div className="rise rise-1"><Image className="hero-crest" src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={168} height={198} style={{objectFit:"contain"}} priority/></div>
         <h1 className="hero-title rise rise-2">Forged in<br/><span className="gold-text">Brotherhood</span></h1>
-        <p className="rise rise-3" style={{letterSpacing:".28em",textTransform:"uppercase",fontSize:".78rem",color:"var(--gold2)",fontWeight:700,margin:0}}>{SITE.motto} · {SITE.mottoAlt}</p>
-        <p className="rise rise-3" style={{maxWidth:640,margin:"14px auto 0",color:"var(--muted)"}}>An apolitical, non-profit football club in Khulshi, Chittagong — built for bachelor youth who chose purpose over loneliness.</p>
+        <p className="rise rise-3" style={{maxWidth:640,margin:"16px auto 0",color:"var(--muted)"}}>An apolitical, non-profit football club in Khulshi, Chittagong — built for bachelor youth who chose purpose over loneliness.</p>
         <p className="rise rise-4" style={{display:"flex",gap:12,justifyContent:"center",marginTop:26,flexWrap:"wrap"}}><Link className="btn" href="/join">Join the Squad</Link><Link className="btn ghost" href="/squad">Meet the Squad</Link></p>
       </div>
     </section>
-
-    <div className="ticker" aria-hidden="true"><div className="ticker-track">{[0,1].map(k=><span key={k}>Forged in Brotherhood ✦ United, Not Alone ✦ Khulshi · Chittagong ✦ Est. 2026 ✦ No Sponsors · No Stadium · Just Us ✦ Forged in Brotherhood ✦ United, Not Alone ✦ Khulshi · Chittagong ✦ Est. 2026 ✦ </span>)}</div></div>
 
     <section className="wrap" style={{paddingTop:54,paddingBottom:0}}>
       <div className="stat-strip">
