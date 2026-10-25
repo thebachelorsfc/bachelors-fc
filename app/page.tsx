@@ -1,7 +1,7 @@
 import Link from "next/link"; import Image from "next/image";
 import { SITE, PILLARS, TOUR, KIT } from "@/lib/site";
 import { SEED_PLAYERS, OPEN_NUMBERS } from "@/lib/players";
-import { getPlayers, getNextSession, getHighlights } from "@/lib/data";
+import { getPlayers, getHighlights } from "@/lib/data";
 import HighlightCard from "@/components/HighlightCard";
 export const dynamic = "force-dynamic";
 import PlayerCard, { OpenShirt } from "@/components/PlayerCard";
@@ -9,7 +9,7 @@ import Counter from "@/components/Counter";
 import FacebookFeed from "@/components/FacebookFeed";
 
 export default async function Home(){
-  const players:any[] = (await getPlayers()) ?? SEED_PLAYERS; const next:any = await getNextSession(); const highlights:any[] = await getHighlights();
+  const players:any[] = (await getPlayers()) ?? SEED_PLAYERS; const highlights:any[] = await getHighlights();
   return(<main>
     <section className="hero" style={{textAlign:"center"}}>
       <div className="wrap" style={{position:"relative",zIndex:1}}>
@@ -53,13 +53,5 @@ export default async function Home(){
     </section>)}
 
     <FacebookFeed/>
-
-    <section className="wrap">
-      <div className="card" style={{display:"flex",gap:16,alignItems:"center",flexWrap:"wrap"}}>
-        <span className="eyebrow">Next Session</span>
-        <span style={{fontSize:17}}>{next ? <><strong>{next.title}</strong>{next.session_date?` · ${next.session_date}`:""}{next.session_time?` · ${next.session_time}`:""}{next.ground?` · ${next.ground}`:""}{next.opponent?` · vs ${next.opponent}`:""}</> : "No upcoming session scheduled yet — check back soon."}</span>
-        <Link className="btn ghost" href="/join" style={{marginLeft:"auto",padding:".55rem 1.1rem"}}>Join Us</Link>
-      </div>
-    </section>
   </main>);
 }
