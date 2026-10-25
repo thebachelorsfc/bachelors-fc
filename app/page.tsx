@@ -13,7 +13,6 @@ export default async function Home(){
   return(<main>
     <section className="hero" style={{textAlign:"center"}}>
       <div className="wrap" style={{position:"relative",zIndex:1}}>
-        <p className="eyebrow rise" style={{justifyContent:"center"}}>Khulshi · Chittagong — Est. 2026</p>
         <div className="rise rise-1"><Image className="hero-crest" src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={168} height={198} style={{objectFit:"contain"}} priority/></div>
         <h1 className="hero-title rise rise-2">Forged in<br/><span className="gold-text">Brotherhood</span></h1>
         <p className="rise rise-3" style={{maxWidth:640,margin:"16px auto 0",color:"var(--muted)"}}>An apolitical, non-profit football club in Khulshi, Chittagong — built for bachelor youth who chose purpose over loneliness.</p>
