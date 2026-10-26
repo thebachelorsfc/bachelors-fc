@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import HighlightCard, { type HighlightLike } from "@/components/HighlightCard";
+import CardCarousel from "@/components/CardCarousel";
 
 export type GalleryLike = { id: string; photo_url: string; caption?: string | null; category: string; taken_on?: string | null };
 const CATS: [string, string][] = [["all", "All"], ["match", "Match Day"], ["training", "Training"], ["tour", "On Tour"], ["team", "Team"]];
@@ -51,9 +52,9 @@ export default function GalleryClient({ items, highlights }: { items: GalleryLik
           <p style={{ color: "var(--muted)", margin: 0 }}>The first match video will appear here as soon as the club shares it.</p>
         </div>
       ) : (
-        <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))" }}>
+        <CardCarousel slide="min(560px,92%)">
           {highlights.map((h) => <HighlightCard key={h.id} h={h} />)}
-        </div>
+        </CardCarousel>
       )}
 
       {open !== null && shown[open] && (

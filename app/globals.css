@@ -211,6 +211,23 @@ footer a:hover{color:var(--gold2)}
 :root[data-theme="light"] .sqd-arrow{background:#fffdf4ee;color:var(--ink)}
 @media (max-width:640px){.sqd-arrow{display:none}}
 
+/* — Generic card carousel (site-wide rule: 2+ cards in a section = carousel) — */
+.cc-single{max-width:640px;margin:0 auto}
+.cc-wrap{position:relative}
+.cc-track{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px 14px;scrollbar-width:none}
+.cc-track::-webkit-scrollbar{display:none}
+.cc-slide{scroll-snap-align:center;display:flex}
+.cc-slide>*{flex:1;width:100%}
+.cc-arrow{position:absolute;top:42%;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:#0a1130e6;color:var(--paper);font-size:26px;line-height:1;cursor:pointer;z-index:3;box-shadow:0 10px 24px #00000066;transition:transform .2s ease}
+.cc-arrow:active{transform:scale(.92)}
+.cc-prev{left:-6px}
+.cc-next{right:-6px}
+.cc-dots{display:flex;gap:7px;justify-content:center;margin-top:4px}
+.cc-dots button{width:8px;height:8px;border-radius:99px;border:none;background:#c9a22740;cursor:pointer;padding:0;transition:all .2s ease}
+.cc-dots button.on{width:26px;background:var(--gold)}
+:root[data-theme="light"] .cc-arrow{background:#fffdf4ee;color:var(--ink)}
+@media (max-width:640px){.cc-arrow{display:none}}
+
 /* ═══ Premium Pass 2 — site-wide smoothness, depth & touch polish ═══ */
 html{-webkit-text-size-adjust:100%}
 body{text-rendering:optimizeLegibility}

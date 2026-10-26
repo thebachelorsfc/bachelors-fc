@@ -8,6 +8,7 @@ import PlayerCard, { OpenShirt } from "@/components/PlayerCard";
 import Counter from "@/components/Counter";
 import FacebookFeed from "@/components/FacebookFeed";
 import SquadCarousel from "@/components/SquadCarousel";
+import CardCarousel from "@/components/CardCarousel";
 
 export default async function Home(){
   const players:any[] = (await getPlayers()) ?? SEED_PLAYERS; const highlights:any[] = await getHighlights();
@@ -33,7 +34,7 @@ export default async function Home(){
 
     <section className="wrap"><p className="eyebrow">Why we exist</p><h2>Character over trophies</h2>
       <p style={{color:"var(--muted)",maxWidth:720}}>Bachelor life is its own quiet battle. No partner, no family of your own yet — just time, energy, and choices that can go either way. We built The Bachelors FC because that energy deserved a better outlet than loneliness, comparison, and the habits that follow. Through real football, we grow discipline. Through brotherhood, we grow leadership. Every session, every match, every story — documented, so it never stays confined to just us.</p>
-      <div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))"}}>{PILLARS.map(p=><div className="card" key={p.no}><div className="eyebrow">{p.no} / {p.title}</div><h3>{p.sub}</h3><p style={{color:"var(--muted)"}}>{p.text}</p></div>)}</div>
+      <CardCarousel slide="min(320px,84%)">{PILLARS.map(p=><div className="card" key={p.no}><div className="eyebrow">{p.no} / {p.title}</div><h3>{p.sub}</h3><p style={{color:"var(--muted)"}}>{p.text}</p></div>)}</CardCarousel>
     </section>
 
     <section className="wrap" id="kit"><p className="eyebrow">Home Kit</p><h2>Our colors, our identity</h2>
@@ -41,7 +42,7 @@ export default async function Home(){
     </section>
 
     <section className="wrap" id="tour"><p className="eyebrow">Off the pitch</p><h2>The Bachelors on Tour</h2>
-      <div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))"}}>{TOUR.map(t=><div className="card" key={t.stop}><div className="eyebrow">Stop {t.stop}</div><h3>{t.name}</h3><p style={{color:"var(--muted)"}}>{t.note}</p></div>)}</div>
+      <CardCarousel slide="min(320px,84%)">{TOUR.map(t=><div className="card" key={t.stop}><div className="eyebrow">Stop {t.stop}</div><h3>{t.name}</h3><p style={{color:"var(--muted)"}}>{t.note}</p></div>)}</CardCarousel>
     </section>
 
     <section className="wrap"><p className="eyebrow">The Lineup</p><h2>Meet the Squad</h2>
@@ -50,7 +51,7 @@ export default async function Home(){
     </section>
 
     {highlights.length>0 && (<section className="wrap"><p className="eyebrow">Watch</p><h2>Highlights</h2>
-      <div className="grid" style={{gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))"}}>{highlights.slice(0,3).map((h:any)=><HighlightCard key={h.id} h={h}/>)}</div>
+      <CardCarousel slide="min(560px,92%)">{highlights.map((h:any)=><HighlightCard key={h.id} h={h}/>)}</CardCarousel>
       <p style={{marginTop:16}}><Link className="btn ghost" href="/gallery">Gallery & all highlights →</Link></p>
     </section>)}
 

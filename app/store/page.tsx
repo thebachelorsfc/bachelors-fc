@@ -2,6 +2,7 @@ import Image from "next/image";
 import { getProducts } from "@/lib/data";
 import { KIT } from "@/lib/site";
 import ProductCard from "./ProductCard";
+import CardCarousel from "@/components/CardCarousel";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Store | The Bachelors FC" };
 export default async function StorePage() {
@@ -41,8 +42,10 @@ export default async function StorePage() {
               </figcaption>
             </figure>
             {rest.length > 0 && (
-              <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", marginTop: 18 }}>
-                {rest.map((p: any) => <ProductCard key={p.id} p={p} />)}
+              <div style={{ marginTop: 18 }}>
+                <CardCarousel slide="min(340px,88%)">
+                  {rest.map((p: any) => <ProductCard key={p.id} p={p} />)}
+                </CardCarousel>
               </div>
             )}
           </>
