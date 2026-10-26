@@ -5,7 +5,7 @@ import { promises as fs } from "fs"; import path from "path"; import { SEED_PLAY
 const FILE = path.join(process.cwd(), "data", "store.json");
 export type Application = { id:string; full_name:string; location:string; email:string; mobile:string; whatsapp?:string; educational_background:string; marital_status?:string; age:number; occupation?:string; why_join?:string; preferred_position?:string; blood_group?:string; photo_url?:string; status:"pending"|"trial"|"approved"|"rejected"; created_at:string };
 export type Session = { id:string; title:string; session_date?:string; session_time?:string; ground?:string; opponent?:string; created_at:string };
-export type Ground = { id:string; name:string; area?:string; maps_url?:string };
+export type Ground = { id:string; name:string; area?:string; address?:string; maps_url?:string; photo_url?:string; matches_played?:number; last_played?:string };
 export type GalleryItem = { id:string; photo_url:string; caption?:string; category:"match"|"training"|"tour"|"team"; taken_on?:string; created_at:string };
 export type Highlight = { id:string; title:string; video_url:string; played_on?:string; created_at:string };
 export type SocialPost = { id:string; post_url:string; created_at:string };

@@ -209,3 +209,14 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 .top-btn:hover{border-color:var(--gold)}
 :root[data-theme="light"] .top-btn{background:#fffdf4ee}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}html{scroll-behavior:auto}}
+
+/* grounds — Brotherhood-style ground cards */
+.gcard{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--sh)}
+.gcard-photo img{width:100%;height:230px;object-fit:cover;display:block}
+.gcard-map iframe{width:100%;height:200px;border:0;display:block}
+.gcard-body{padding:20px}
+.gstats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.gstat{border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center;background:var(--card2)}
+.gstat b{display:block;font-family:Oswald,sans-serif;font-size:20px;color:var(--ink)}
+.gstat span{font-size:10.5px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.gnext{border:1.5px dashed var(--line-gold);border-radius:14px;padding:12px 14px;color:var(--muted);font-size:14px;text-align:center;margin-bottom:16px}
