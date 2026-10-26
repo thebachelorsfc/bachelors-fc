@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata } from "next"; import CardCarousel from "@/components/CardCarousel";
 export const metadata: Metadata = { title: "Rules | The Bachelors FC", alternates: { canonical: "/rules" } };
 // Official club rules & policy — owner's own text, supplied 2026-10-26. Keep verbatim.
 // NOTE: section 3 has one line still to come from the owner — the fee amount + payment method.
@@ -38,10 +38,10 @@ const SECTIONS: { no: string; title: string; points: string[] }[] = [
 export default function Rules() {
   return (<main className="wrap"><section><p className="eyebrow">Rules &amp; Policy</p><h1>Club Rules</h1>
     <p style={{ color: "var(--muted)", maxWidth: 720 }}>Every great club runs on rules. Ours are few, fair and slightly funny. Read them once, follow them always, and the Managing Dictator will have very little to dictate.</p>
-    {SECTIONS.map(s => (<div className="card rule-sec" key={s.no}>
+    <div style={{ marginTop: 24 }}><CardCarousel slide="min(560px,94%)">{SECTIONS.map(s => (<div className="card rule-sec" key={s.no}>
       <div className="rule-head"><span className="rule-no">{s.no}</span><h2>{s.title}</h2></div>
       <ul className="rule-list">{s.points.map(pt => <li key={pt.slice(0, 24)}>{pt}</li>)}</ul>
-    </div>))}
+    </div>))}</CardCarousel></div>
     <div className="rule-final">
       <div className="rule-head"><span className="rule-no">✦</span><h2>The Final Word</h2></div>
       <p style={{ color: "var(--muted)", margin: 0 }}>Club management may update these rules when needed. Questions? Contact us, and the Managing Dictator will reply after he finishes his biryani.</p>
