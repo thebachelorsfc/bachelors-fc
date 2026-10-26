@@ -23,7 +23,7 @@
 :root[data-theme="light"] .stat-card{color:#f7f5ef}
 :root[data-theme="light"] .stat-card .stat-label{color:#9aa3b2}
 :root[data-theme="light"] footer{background:linear-gradient(180deg,transparent,#e6dec6) !important}
-:root[data-theme="light"] .footer-mark{-webkit-text-stroke:1px #15223817}
+:root[data-theme="light"] .footer-mark{filter:drop-shadow(0 6px 18px #c9a22726)}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-body),system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
@@ -138,7 +138,7 @@ h2{font-size:clamp(2rem,4.6vw,3.2rem);line-height:1;text-transform:uppercase;mar
 .lb-next{right:14px;top:50%;transform:translateY(-50%);font-size:28px}
 
 /* — Footer watermark — */
-.footer-mark{font-family:var(--font-display);font-weight:700;text-transform:uppercase;line-height:.85;font-size:clamp(3rem,11.5vw,9.5rem);color:transparent;-webkit-text-stroke:1px #ffffff17;text-align:center;user-select:none;white-space:nowrap;overflow:hidden}
+.footer-mark{font-family:var(--font-display);font-weight:700;text-transform:uppercase;line-height:.9;letter-spacing:.03em;font-size:clamp(2.4rem,9.6vw,8.2rem);text-align:center;user-select:none;white-space:nowrap;background:linear-gradient(180deg,#f3d27a 0%,#c9a227 55%,#8a6d15 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 22px #c9a22730)}
 
 /* — Premium polish pass (2026-10-25): typography refinement + surface sheen — */
 body{font-size:16.5px;line-height:1.65}
