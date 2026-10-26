@@ -4,14 +4,14 @@
   --ink:#06060a; --ink2:#0b0b12;
   --paper:#f7f5ef; --muted:#9aa3b2;
   --line:#ffffff1a; --line-gold:#c9a22755;
-  --head-bg:#06060ad9;
+  --head-bg:#06060ae8;
   color-scheme:dark;
 }
 /* — Light theme (Brotherhood-style toggle): hero, ticker, drawer & stat cards stay dark as accents — */
 :root[data-theme="light"]{
   --ink:#f3efe3; --ink2:#eae3cf; --paper:#151a28; --muted:#5b6373;
   --line:#15223824; --navy:#eee8d6; --navy2:#fbf8ef; --navy3:#e2dac2;
-  --head-bg:#f7f4eacc; color-scheme:light;
+  --head-bg:#f7f4eaeb; color-scheme:light;
 }
 :root[data-theme="light"] .btn.ghost{border-color:#15223845}
 :root[data-theme="light"] .hero{background:
@@ -274,7 +274,7 @@ a,button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .btn:active{transform:translateY(0) scale(.97)}
 .card{transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease}
 .card:hover{box-shadow:0 22px 46px #00000045}
-.site-head{box-shadow:0 12px 34px #00000030;backdrop-filter:blur(16px) saturate(1.25);-webkit-backdrop-filter:blur(16px) saturate(1.25)}
+.site-head{box-shadow:0 12px 34px #00000030;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
 .ticker-track:hover{animation-play-state:paused}
 .hero-crest{animation:crestFloat 7s ease-in-out infinite}
 @keyframes crestFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
@@ -306,3 +306,25 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 .gstat span{font-size:10px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
 .gnext{border:1.5px dashed var(--line-gold);border-radius:12px;padding:9px 12px;color:var(--muted);font-size:13.5px;text-align:center;margin-bottom:12px}
 .gcard .btn{padding:.55rem 1.1rem}
+
+/* — Premium carousel system + smoothness pass (2026-10-26) — */
+/* Signature controls: gold counter chip + gradient progress bar (transform-only fill = no repaints) */
+.c-row{display:flex;align-items:center;gap:14px;margin:14px auto 0;max-width:520px;padding:0 8px}
+.c-count{font-family:var(--font-display);letter-spacing:.14em;color:var(--gold2);font-size:.82rem;border:1px solid var(--line-gold);padding:5px 12px;border-radius:99px;background:#c9a2270d;white-space:nowrap}
+.c-progress{position:relative;height:3px;border-radius:99px;background:#c9a22722;overflow:hidden;flex:1}
+.c-progress i{position:absolute;inset:0;border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--gold2));transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.22,1,.36,1)}
+.cc-controls{gap:14px}
+.cc-controls .c-progress{flex:1}
+/* Edge fade: cards melt into the page at both ends of every track */
+.cc-track,.sqd-track,.grd-track,.soc-track{-webkit-mask-image:linear-gradient(90deg,transparent,#000 30px,#000 calc(100% - 30px),transparent);mask-image:linear-gradient(90deg,transparent,#000 30px,#000 calc(100% - 30px),transparent)}
+/* Focus: the active card is full & sharp, neighbours rest slightly back */
+.cc-slide>*,.sqd-slide>*,.grd-track .gcard,.soc-track .soc-card{transition:transform .45s cubic-bezier(.22,1,.36,1),opacity .45s ease}
+.cc-slide:not(.on)>*,.sqd-slide:not(.on)>*{opacity:.6;transform:scale(.965)}
+.grd-track .gcard:not(.on),.soc-track .soc-card:not(.on){opacity:.62;transform:scale(.98)}
+/* Arrows get a gold-glow hover so the controls feel tactile */
+.cc-arrow,.sqd-arrow,.grd-arrow,.soc-arrow{transition:transform .25s cubic-bezier(.22,1,.36,1),box-shadow .25s,border-color .25s}
+.cc-arrow:hover,.sqd-arrow:hover,.grd-arrow:hover,.soc-arrow:hover{transform:scale(1.1);box-shadow:0 10px 26px #c9a22733;border-color:var(--gold)}
+.cc-arrow:active,.sqd-arrow:active,.grd-arrow:active,.soc-arrow:active{transform:scale(.96)}
+.sqd-arrow,.grd-arrow,.soc-arrow{z-index:5}
+/* The ticker rides its own layer so it never steals scroll frames */
+.tick-track{will-change:transform}

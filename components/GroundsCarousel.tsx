@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 export type GroundSlide = { id: string; name: string; address: string; photo_url?: string | null; played: number; lastLabel: string; nextLabel?: string | null; directions: string };
 export default function GroundsCarousel({ grounds }: { grounds: GroundSlide[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const visible = useRef(true);
   const [idx, setIdx] = useState(0);
   const idxRef = useRef(0); idxRef.current = idx;
   const pauseUntil = useRef(0);
@@ -12,17 +14,22 @@ export default function GroundsCarousel({ grounds }: { grounds: GroundSlide[] })
   // Gentle auto-slide: drifts to the next ground every few seconds, loops back
   // to the first, and pauses whenever the visitor is touching/reading.
   useEffect(() => {
+    const el = wrapRef.current; if (!el || typeof IntersectionObserver === "undefined") return;
+    const ob = new IntersectionObserver((e) => { visible.current = e[0].isIntersecting; }, { rootMargin: "60px" });
+    ob.observe(el); return () => ob.disconnect();
+  }, []);
+  useEffect(() => {
     if (grounds.length < 2) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => { if (Date.now() < pauseUntil.current || document.hidden) return; go((idxRef.current + 1) % grounds.length); }, 4200);
+    const t = setInterval(() => { if (!visible.current || Date.now() < pauseUntil.current || document.hidden) return; go((idxRef.current + 1) % grounds.length); }, 4200);
     return () => clearInterval(t);
   }, [grounds.length]);
   return (
-    <div className="grd-wrap" onPointerDown={hold} onTouchStart={hold}>
+    <div className="grd-wrap" ref={wrapRef} onPointerDown={hold} onTouchStart={hold}>
       <div className="grd-track" ref={trackRef} onScroll={onScroll}>
-        {grounds.map((g) => (
-          <article className="gcard" key={g.id}>
-            {g.photo_url && <div className="gcard-photo"><img src={g.photo_url} alt={g.name} /></div>}
+        {grounds.map((g, gi) => (
+          <article className={gi === idx ? "gcard on" : "gcard"} key={g.id}>
+            {g.photo_url && <div className="gcard-photo"><img src={g.photo_url} alt={g.name} loading={gi === 0 ? "eager" : "lazy"} decoding="async" /></div>}
             <div className="gcard-body">
               <h2 style={{ margin: "0 0 4px", fontSize: 22 }}>{g.name}</h2>
               <p style={{ color: "var(--muted)", margin: 0 }}>📍 {g.address}</p>
@@ -41,7 +48,7 @@ export default function GroundsCarousel({ grounds }: { grounds: GroundSlide[] })
       {grounds.length > 1 && (<>
         <button className="grd-arrow grd-prev" aria-label="Previous ground" onClick={() => { hold(); go(idx - 1); }}>‹</button>
         <button className="grd-arrow grd-next" aria-label="Next ground" onClick={() => { hold(); go(idx + 1); }}>›</button>
-        <div className="grd-dots">{grounds.map((g, i) => (<button key={g.id} className={i === idx ? "on" : ""} aria-label={`Go to ground ${i + 1}`} onClick={() => { hold(); go(i); }} />))}</div>
+        <div className="c-row"><span className="c-count">{String(idx + 1).padStart(2, "0")} / {String(grounds.length).padStart(2, "0")}</span><div className="c-progress"><i style={{ transform: `scaleX(${(idx + 1) / grounds.length})` }} /></div></div>
       </>)}
     </div>
   );
