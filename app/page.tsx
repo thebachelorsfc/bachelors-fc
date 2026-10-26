@@ -1,7 +1,10 @@
 import Link from "next/link"; import Image from "next/image";
 import { SITE, PILLARS, TOUR, KIT } from "@/lib/site";
 import { SEED_PLAYERS, OPEN_NUMBERS } from "@/lib/players";
-import { getPlayers, getHighlights, getPeople } from "@/lib/data";
+import { getPlayers, getHighlights, getPeople, getGrounds, getAllSessions, getGalleryItems } from "@/lib/data";
+import { buildGroundSlides } from "@/lib/groundSlides";
+import GroundsCarousel from "@/components/GroundsCarousel";
+import GalleryPreview from "@/components/GalleryPreview";
 import HighlightCard from "@/components/HighlightCard";
 export const dynamic = "force-dynamic";
 import PlayerCard, { OpenShirt } from "@/components/PlayerCard";
@@ -13,6 +16,7 @@ import PersonCard from "@/components/PersonCard";
 
 export default async function Home(){
   const players:any[] = (await getPlayers()) ?? SEED_PLAYERS; const highlights:any[] = await getHighlights(); const people:any[] = await getPeople();
+  const groundSlides = buildGroundSlides(await getGrounds(), await getAllSessions()); const galleryItems:any[] = await getGalleryItems();
   const order:Record<string,number>={FWD:0,MID:1,DEF:2,GK:3}; const sortedPlayers=[...players].sort((a:any,b:any)=>((order[a.position_code]??9)-(order[b.position_code]??9))||(a.jersey_no-b.jersey_no));
   return(<main>
     <section className="hero" style={{textAlign:"center"}}>
@@ -50,6 +54,18 @@ export default async function Home(){
       <SquadCarousel>{sortedPlayers.map((p:any)=><PlayerCard key={p.jersey_no} p={p}/>)}{OPEN_NUMBERS.slice(0,3).map(n=><OpenShirt key={n} n={n}/>)}</SquadCarousel>
       <p style={{marginTop:16}}><Link className="btn ghost" href="/squad">Full squad →</Link></p>
     </section>
+
+    {groundSlides.length>0 && (<section className="wrap"><p className="eyebrow">Our Grounds</p><h2>Where we play</h2>
+      <p style={{color:"var(--muted)",maxWidth:720}}>No stadium of our own — these are the turfs and fields around Chittagong where the brotherhood shows up, session after session.</p>
+      <GroundsCarousel grounds={groundSlides}/>
+      <p style={{marginTop:16}}><Link className="btn ghost" href="/grounds">All grounds →</Link></p>
+    </section>)}
+
+    {galleryItems.length>0 && (<section className="wrap"><p className="eyebrow">The Club Album</p><h2>Gallery</h2>
+      <p style={{color:"var(--muted)",maxWidth:680}}>Legacy: documented, not forgotten. The brotherhood, in frames — tap any photo to view it full screen.</p>
+      <GalleryPreview items={galleryItems.slice(0,8)}/>
+      <p style={{marginTop:16}}><Link className="btn ghost" href="/gallery">Full gallery →</Link></p>
+    </section>)}
 
     {people.length>0 && (<section className="wrap people-band"><p className="eyebrow">The People</p><h2>Founders &amp; Leadership</h2>
       <CardCarousel slide="min(560px,94%)">{people.map((p:any)=><PersonCard key={p.id} p={p}/>)}</CardCarousel>
