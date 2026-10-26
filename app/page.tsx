@@ -51,7 +51,7 @@ export default async function Home(){
       <p style={{marginTop:16}}><Link className="btn ghost" href="/squad">Full squad →</Link></p>
     </section>
 
-    {people.length>0 && (<section className="wrap people-band"><p className="eyebrow">The People</p><div className="sec-head"><h2>Founders &amp; Leadership</h2><Link className="more" href="/people">All people →</Link></div>
+    {people.length>0 && (<section className="wrap people-band"><p className="eyebrow">The People</p><h2>Founders &amp; Leadership</h2>
       <CardCarousel slide="min(560px,94%)">{people.map((p:any)=><PersonCard key={p.id} p={p}/>)}</CardCarousel>
     </section>)}
     {highlights.length>0 && (<section className="wrap"><p className="eyebrow">Watch</p><h2>Highlights</h2>

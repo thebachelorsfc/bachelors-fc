@@ -32,11 +32,10 @@ a{color:inherit}
 .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
 
 /* — Eyebrow: small gold label with a leading rule, elite-club style — */
-.eyebrow{display:flex;align-items:center;gap:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-size:.72rem;font-weight:700}
-.eyebrow::before{content:"";width:34px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
-section .eyebrow{margin-bottom:10px}
-.player-card .eyebrow{justify-content:center}
-.player-card .eyebrow::before{display:none}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold2);font-size:.72rem;font-weight:700;background:#c9a22712;border:1px solid #c9a22730;border-radius:999px;padding:7px 14px 7px 12px;box-shadow:inset 0 1px 0 #ffffff10}
+.eyebrow::before{content:"";width:7px;height:7px;background:var(--gold);transform:rotate(45deg);border-radius:1.5px;flex:none;box-shadow:0 0 8px #c9a22790}
+section .eyebrow{margin-bottom:14px}
+.player-card .eyebrow{display:flex;width:fit-content;margin-left:auto;margin-right:auto;justify-content:center}
 
 /* — Buttons — */
 .btn{display:inline-block;background:linear-gradient(120deg,var(--gold2),var(--gold) 55%,var(--gold-deep));color:#14100a;padding:.85rem 1.7rem;border-radius:999px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;font-size:.8rem;text-decoration:none;transition:transform .18s ease,box-shadow .18s ease;box-shadow:0 4px 18px #c9a22726}
@@ -48,7 +47,10 @@ section .eyebrow{margin-bottom:10px}
 .grid{display:grid;gap:16px}
 .card{background:linear-gradient(160deg,var(--navy2),var(--navy) 70%);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px #00000030;transition:transform .2s ease,border-color .2s ease}
 .card:hover{transform:translateY(-3px);border-color:var(--line-gold)}
-section{padding:54px 0}
+section{padding:70px 0}
+@media(min-width:900px){section{padding:92px 0}}
+section h2{position:relative}
+section h2::after{content:"";display:block;width:54px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--gold),#c9a22708);margin-top:12px}
 h1{font-size:clamp(2.6rem,6.5vw,4.8rem);line-height:.96;text-transform:uppercase;margin:.2em 0}
 h2{font-size:clamp(2rem,4.6vw,3.2rem);line-height:1;text-transform:uppercase;margin:.15em 0 .4em}
 
