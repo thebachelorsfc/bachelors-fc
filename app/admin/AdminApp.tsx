@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 const input: React.CSSProperties = { width:"100%", padding:"10px 12px", borderRadius:10, border:"1px solid #ffffff2a", background:"#0a1633", color:"#f7f5ef" };
 export default function AdminApp(){
   const [authed,setAuthed]=useState<boolean|null>(null); const [pw,setPw]=useState(""); const [tab,setTab]=useState("applications");
-  const [apps,setApps]=useState<any[]>([]); const [players,setPlayers]=useState<any[]>([]); const [msg,setMsg]=useState("");
+  const [apps,setApps]=useState<any[]>([]); const [players,setPlayers]=useState<any[]>([]); const [msg,setMsg]=useState(""); const [grs,setGrs]=useState<any[]>([]);
   const [np,setNp]=useState({name:"",jersey_no:"",position:"",position_code:"FWD",joined_year:"2026"});
   const [ns,setNs]=useState({title:"",session_date:"",session_time:"",ground:"",opponent:""});
   const [gal,setGal]=useState<any[]>([]); const [hls,setHls]=useState<any[]>([]);
@@ -13,7 +13,12 @@ export default function AdminApp(){
   const [prods,setProds]=useState<any[]>([]); const [pf,setPf]=useState({name:"",photo_url:"",description:"",price_bdt:"",stock:""});
   const [ords,setOrds]=useState<any[]>([]);
   const [accs,setAccs]=useState<any[]>([]); const [rsvpList,setRsvpList]=useState<any[]>([]);
-  const load=useCallback(async()=>{ const a=await fetch("/api/applications"); if(a.status===401){ setAuthed(false); return; } setAuthed(true); setApps(await a.json()); const p=await fetch("/api/players"); setPlayers(await p.json()); const g=await fetch("/api/gallery"); setGal(await g.json()); const h=await fetch("/api/highlights"); setHls(await h.json()); const sp=await fetch("/api/social-posts"); setPosts(sp.ok?await sp.json():[]); const pr=await fetch("/api/products"); setProds(await pr.json()); const or=await fetch("/api/orders"); setOrds(or.ok?await or.json():[]); const ac=await fetch("/api/admin/player-accounts"); setAccs(ac.ok?await ac.json():[]); const rv=await fetch("/api/admin/rsvps"); setRsvpList(rv.ok?await rv.json():[]); },[]);
+  const load=useCallback(async()=>{ const a=await fetch("/api/applications"); if(a.status===401){ setAuthed(false); return; } setAuthed(true); setApps(await a.json()); const p=await fetch("/api/players"); setPlayers(await p.json()); const g=await fetch("/api/gallery"); setGal(await g.json()); const h=await fetch("/api/highlights"); setHls(await h.json()); const sp=await fetch("/api/social-posts"); setPosts(sp.ok?await sp.json():[]); const pr=await fetch("/api/products"); setProds(await pr.json()); const or=await fetch("/api/orders"); setOrds(or.ok?await or.json():[]); const ac=await fetch("/api/admin/player-accounts"); setAccs(ac.ok?await ac.json():[]); const rv=await fetch("/api/admin/rsvps"); setRsvpList(rv.ok?await rv.json():[]); const gr=await fetch("/api/admin/grounds"); setGrs(gr.ok?await gr.json():[]); },[]);
+  const gv=(id:string)=>(document.getElementById(id) as HTMLInputElement)?.value.trim()||"";
+  const createGround=async()=>{ const body={name:gv("ng-name"),area:gv("ng-area"),address:gv("ng-address"),maps_url:gv("ng-maps"),matches_played:Number(gv("ng-matches")||0),last_played:gv("ng-last")||null}; if(!body.name){ setMsg("Ground name is required"); return; } const r=await fetch("/api/admin/grounds",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); const j=await r.json().catch(()=>({})); setMsg(r.ok?`Ground added: ${body.name}`:(j.error||"Failed")); if(r.ok) load(); };
+  const saveGround=async(g:any)=>{ const body={name:gv(`g-name-${g.id}`),area:gv(`g-area-${g.id}`),address:gv(`g-address-${g.id}`),maps_url:gv(`g-maps-${g.id}`),photo_url:gv(`g-photo-${g.id}`),matches_played:Number(gv(`g-matches-${g.id}`)||0),last_played:gv(`g-last-${g.id}`)||null}; const r=await fetch(`/api/admin/grounds/${g.id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); setMsg(r.ok?`Saved: ${body.name||g.name}`:"Save failed"); if(r.ok) load(); };
+  const delGround=async(g:any)=>{ if(!confirm(`Delete ground "${g.name}"?`)) return; await fetch(`/api/admin/grounds/${g.id}`,{method:"DELETE"}); setMsg(`Deleted: ${g.name}`); load(); };
+  const upGroundPhoto=async(id:string,file:File)=>{ const fd=new FormData(); fd.append("photo",file); const r=await fetch(`/api/admin/grounds/${id}`,{method:"POST",body:fd}); setMsg(r.ok?"Ground photo updated":"Photo upload failed"); if(r.ok) load(); };
   useEffect(()=>{ load(); },[load]);
   async function login(){ const r=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})}); if(r.ok){ setMsg(""); load(); } else setMsg("Wrong password"); }
   async function setStatus(id:string,status:string){ await fetch(`/api/applications/${id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status})}); load(); }
@@ -34,7 +39,7 @@ export default function AdminApp(){
   if(authed===null) return <p style={{color:"var(--muted)"}}>Loading…</p>;
   if(!authed) return <div className="card" style={{maxWidth:420}}><h3>Admin Login</h3>{msg&&<p style={{color:"#ff9d9d"}}>{msg}</p>}<input style={input} type="password" placeholder="Admin password" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&login()}/><button className="btn" style={{marginTop:12}} onClick={login}>Log in</button></div>;
   return(<div>
-    <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>{["applications","players","sessions","accounts","gallery","highlights","social","store","orders"].map(t=><button key={t} className="btn" style={tab===t?{}:{background:"transparent",color:"#f7f5ef",border:"1px solid #ffffff33"}} onClick={()=>setTab(t)}>{t[0].toUpperCase()+t.slice(1)} {t==="applications"&&apps.length?`(${apps.length})`:""}</button>)}
+    <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>{["applications","players","sessions","grounds","accounts","gallery","highlights","social","store","orders"].map(t=><button key={t} className="btn" style={tab===t?{}:{background:"transparent",color:"#f7f5ef",border:"1px solid #ffffff33"}} onClick={()=>setTab(t)}>{t[0].toUpperCase()+t.slice(1)} {t==="applications"&&apps.length?`(${apps.length})`:""}</button>)}
     <button className="btn ghost" style={{marginLeft:"auto"}} onClick={async()=>{await fetch("/api/admin/login",{method:"DELETE"}); setAuthed(false);}}>Log out</button></div>
     {msg&&<p style={{color:"var(--gold)"}}>{msg}</p>}
     {tab==="applications" && (apps.length===0 ? <div className="card">No applications yet. New applications from the Join form will appear here as Pending.</div> :
@@ -54,6 +59,37 @@ export default function AdminApp(){
       <select style={input} value={np.position_code} onChange={e=>setNp({...np,position_code:e.target.value})}><option>FWD</option><option>MID</option><option>DEF</option><option>GK</option></select>
       <input style={input} placeholder="Joined year" type="number" value={np.joined_year} onChange={e=>setNp({...np,joined_year:e.target.value})}/></div>
       <button className="btn" style={{marginTop:12}} onClick={addPlayer}>Add player</button></div></div>}
+    {tab==="grounds" && <div>
+      <div className="card"><h3>⛳ Add a ground</h3>
+        <div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))"}}>
+          <input style={input} id="ng-name" placeholder="Ground name * (e.g. Stadium X)"/>
+          <input style={input} id="ng-area" placeholder="Area (e.g. Khulshi)"/>
+          <input style={input} id="ng-address" placeholder="Full address"/>
+          <input style={input} id="ng-maps" placeholder="Google Maps link"/>
+          <input style={input} id="ng-matches" type="number" placeholder="Matches played so far"/>
+          <input style={input} id="ng-last" type="date" aria-label="Last played date"/>
+        </div>
+        <button className="btn" style={{marginTop:12}} onClick={createGround}>Add ground</button>
+        <p style={{color:"var(--muted)",fontSize:13,marginTop:10}}>“Matches played” and “Last played” here are the ground&apos;s starting record. Sessions you create later (with this ground&apos;s name) add on top automatically — dates that pass increase the count and update Last played by themselves.</p>
+      </div>
+      {grs.length===0 ? <div className="card">No grounds yet.</div> : grs.map(g=><div className="card" key={g.id}>
+        {g.photo_url && <img src={g.photo_url} alt={g.name} style={{width:"100%",height:130,objectFit:"cover",borderRadius:12,marginBottom:10}}/>}
+        <div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))"}}>
+          <input style={input} id={`g-name-${g.id}`} defaultValue={g.name||""} placeholder="Ground name"/>
+          <input style={input} id={`g-area-${g.id}`} defaultValue={g.area||""} placeholder="Area"/>
+          <input style={input} id={`g-address-${g.id}`} defaultValue={g.address||""} placeholder="Full address"/>
+          <input style={input} id={`g-maps-${g.id}`} defaultValue={g.maps_url||""} placeholder="Google Maps link"/>
+          <input style={input} id={`g-matches-${g.id}`} type="number" defaultValue={g.matches_played??0} placeholder="Matches played (starting record)"/>
+          <input style={input} id={`g-last-${g.id}`} type="date" defaultValue={g.last_played?String(g.last_played).slice(0,10):""} aria-label="Last played date"/>
+          <input style={input} id={`g-photo-${g.id}`} defaultValue={g.photo_url||""} placeholder="Photo URL (or upload below)"/>
+        </div>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:10,alignItems:"center"}}>
+          <label className="btn ghost" style={{cursor:"pointer"}}>⬆ Upload photo<input type="file" accept="image/*" style={{display:"none"}} onChange={e=>{ const fl=e.target.files?.[0]; if(fl) upGroundPhoto(g.id,fl); e.target.value=""; }}/></label>
+          <button className="btn" onClick={()=>saveGround(g)}>Save changes</button>
+          <button className="btn ghost" onClick={()=>delGround(g)}>Delete</button>
+        </div>
+      </div>)}
+    </div>}
     {tab==="sessions" && <div className="card"><h3>Set Next Session</h3><div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))"}}>
       <input style={input} placeholder="Title (e.g. Training Session)" value={ns.title} onChange={e=>setNs({...ns,title:e.target.value})}/>
       <input style={input} type="date" value={ns.session_date} onChange={e=>setNs({...ns,session_date:e.target.value})}/>
