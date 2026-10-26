@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata } from "next"; import CardCarousel from "@/components/CardCarousel";
 export const metadata: Metadata = { title: "History | The Bachelors FC", alternates:{canonical:"/history"} };
 // Only verified events. Add real match results here as the owner supplies them — do not invent results.
 const EVENTS=[{date:"2026",title:"The club is founded",text:"The Bachelors FC is founded in Khulshi, Chittagong."},{date:"2026",title:"First squad named",text:"Atikur Jr. (#10), Parvez (#18) and Chowdhury (#99) are the first named players on the official site."},{date:"2026",title:"The Bachelors on Tour",text:"One day, three destinations — Suptodhara Falls, Sohosrodhara Falls and Guliakhali Beach."}];
-export default function History(){return(<main className="wrap"><section><p className="eyebrow">Club History</p><h1>Our timeline</h1><div className="grid">{EVENTS.map(e=><div className="card" key={e.title}><div className="eyebrow">{e.date}</div><h3>{e.title}</h3><p style={{color:"var(--muted)"}}>{e.text}</p></div>)}</div></section></main>)}
+export default function History(){return(<main className="wrap"><section><p className="eyebrow">Club History</p><h1>Our timeline</h1><CardCarousel slide="min(340px,86%)">{EVENTS.map(e=><div className="card" key={e.title}><div className="eyebrow">{e.date}</div><h3>{e.title}</h3><p style={{color:"var(--muted)"}}>{e.text}</p></div>)}</CardCarousel></section></main>)}
