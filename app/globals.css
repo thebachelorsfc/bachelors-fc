@@ -211,12 +211,14 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}html{scroll-behavior:auto}}
 
 /* grounds — Brotherhood-style ground cards */
-.gcard{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--sh)}
-.gcard-photo img{width:100%;height:230px;object-fit:cover;display:block}
-.gcard-map iframe{width:100%;height:200px;border:0;display:block}
-.gcard-body{padding:20px}
-.gstats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
-.gstat{border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center;background:var(--card2)}
-.gstat b{display:block;font-family:Oswald,sans-serif;font-size:20px;color:var(--ink)}
-.gstat span{font-size:10.5px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
-.gnext{border:1.5px dashed var(--line-gold);border-radius:14px;padding:12px 14px;color:var(--muted);font-size:14px;text-align:center;margin-bottom:16px}
+.gcard{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--sh)}
+.gcard-photo{position:relative}
+.gcard-photo::after{content:"";position:absolute;inset:auto 0 0 0;height:44px;background:linear-gradient(180deg,transparent,var(--card))}
+.gcard-photo img{width:100%;height:168px;object-fit:cover;display:block}
+.gcard-body{padding:14px 16px 16px}
+.gstats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.gstat{border:1px solid var(--line);border-radius:12px;padding:8px 6px;text-align:center;background:var(--card2)}
+.gstat b{display:block;font-family:Oswald,sans-serif;font-size:19px;color:var(--gold2)}
+.gstat span{font-size:10px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.gnext{border:1.5px dashed var(--line-gold);border-radius:12px;padding:9px 12px;color:var(--muted);font-size:13.5px;text-align:center;margin-bottom:12px}
+.gcard .btn{padding:.55rem 1.1rem}

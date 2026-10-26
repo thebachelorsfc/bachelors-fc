@@ -16,18 +16,17 @@ export default async function Grounds() {
   return (<main className="wrap"><section><p className="eyebrow">Our Grounds</p><h1>Where we play</h1>
     <p style={{ color: "var(--muted)", maxWidth: 720 }}>The Bachelors FC has no stadium of its own — these are the turfs and fields around Chittagong where the brotherhood shows up, session after session.</p>
     {grounds.length === 0 ? <div className="card"><p style={{ color: "var(--muted)" }}>Grounds will be listed here as the club confirms them.</p></div> :
-    <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,400px),1fr))", alignItems: "start" }}>{grounds.map(g => {
+    <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,360px),1fr))", alignItems: "start" }}>{grounds.map(g => {
       const mine = sessions.filter(s => match(s, g) && s.session_date);
       const past = mine.filter(s => s.session_date < today);
       const played = (g.matches_played || 0) + past.length;
       const last = [g.last_played || null, past[0]?.session_date || null].filter(Boolean).sort().pop() || null;
       const next = mine.filter(s => s.session_date >= today).sort((a, b) => String(a.session_date).localeCompare(String(b.session_date)))[0];
       const q = encodeURIComponent(`${g.name}, ${g.address || (g.area ? g.area + ", Chittagong" : "Chittagong")}`);
-      const mapFrame = <div className="gcard-map"><iframe title={`Map — ${g.name}`} src={`https://www.google.com/maps?q=${q}&z=16&output=embed`} loading="lazy" /></div>;
       return (<article className="gcard" key={g.id}>
-        {g.photo_url ? <><div className="gcard-photo"><img src={g.photo_url} alt={g.name} /></div>{mapFrame}</> : mapFrame}
+        {g.photo_url && <div className="gcard-photo"><img src={g.photo_url} alt={g.name} /></div>}
         <div className="gcard-body">
-          <h2 style={{ margin: "0 0 4px", fontSize: 26 }}>{g.name}</h2>
+          <h2 style={{ margin: "0 0 4px", fontSize: 22 }}>{g.name}</h2>
           <p style={{ color: "var(--muted)", margin: 0 }}>📍 {g.address || g.area || "Chittagong"}</p>
           <div className="gstats">
             <div className="gstat"><b>{played}</b><span>Matches played</span></div>
