@@ -180,6 +180,21 @@ footer a:hover{color:var(--gold2)}
 .soc-dots button.on{width:26px;background:var(--gold)}
 @media (max-width:640px){.soc-arrow{display:none}.soc-body{height:520px}}
 
+/* — Grounds carousel (same premium motion as the social carousel) — */
+.grd-wrap{position:relative}
+.grd-track{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px 14px;scrollbar-width:none}
+.grd-track::-webkit-scrollbar{display:none}
+.grd-track .gcard{flex:0 0 min(400px,88%);scroll-snap-align:center}
+.grd-arrow{position:absolute;top:42%;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:#0a1130e6;color:var(--paper);font-size:26px;line-height:1;cursor:pointer;z-index:3;box-shadow:0 10px 24px #00000066;transition:transform .2s ease}
+.grd-arrow:active{transform:scale(.92)}
+.grd-prev{left:-6px}
+.grd-next{right:-6px}
+.grd-dots{display:flex;gap:7px;justify-content:center;margin-top:4px}
+.grd-dots button{width:8px;height:8px;border-radius:99px;border:none;background:#c9a22740;cursor:pointer;padding:0;transition:all .2s ease}
+.grd-dots button.on{width:26px;background:var(--gold)}
+:root[data-theme="light"] .grd-arrow{background:#fffdf4ee;color:var(--ink)}
+@media (max-width:640px){.grd-arrow{display:none}}
+
 /* ═══ Premium Pass 2 — site-wide smoothness, depth & touch polish ═══ */
 html{-webkit-text-size-adjust:100%}
 body{text-rendering:optimizeLegibility}
