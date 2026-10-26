@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getProducts } from "@/lib/data";
 import { KIT } from "@/lib/site";
 import ProductCard from "./ProductCard";
@@ -32,6 +33,13 @@ export default async function StorePage() {
                 <li>Base: {KIT.base}</li><li>Trim: {KIT.trim}</li><li>Crest: {KIT.crest}</li>
               </ul>
             </div>
+            <figure style={{ margin: "20px 0 0", position: "relative", borderRadius: 20, overflow: "hidden", border: "1px solid var(--line)", boxShadow: "0 22px 50px #0000004d", lineHeight: 0 }}>
+              <Image src="/assets/kit-worn.jpg" alt="The Bachelors FC 2026 home kit worn on the pitch" width={1200} height={1200} sizes="(max-width:900px) 100vw, 900px" style={{ width: "100%", height: "auto" }} />
+              <figcaption style={{ position: "absolute", left: 0, right: 0, bottom: 0, lineHeight: 1.5, padding: "52px 22px 18px", background: "linear-gradient(180deg,transparent,#06060acc)", color: "#f7f5ef" }}>
+                <span className="eyebrow" style={{ display: "block", marginBottom: 4 }}>See it worn</span>
+                <span style={{ fontSize: 15.5 }}>The 2026 home kit under the lights — white pinstripes, navy shoulders and trim, the gold crest on the chest. This is how it looks on the pitch, before you make it yours.</span>
+              </figcaption>
+            </figure>
             {rest.length > 0 && (
               <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", marginTop: 18 }}>
                 {rest.map((p: any) => <ProductCard key={p.id} p={p} />)}
