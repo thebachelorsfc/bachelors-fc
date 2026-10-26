@@ -116,7 +116,9 @@ h2{font-size:clamp(2rem,4.6vw,3.2rem);line-height:1;text-transform:uppercase;mar
 .dico{width:34px;height:34px;flex:none;border-radius:11px;background:#c9a22717;border:1px solid #c9a2272b;display:inline-flex;align-items:center;justify-content:center}
 .dico svg{width:19px;height:19px;stroke:var(--gold2);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .dchev{margin-left:auto;color:#8b93a5;font-size:22px;line-height:1}
-@media (max-width:560px){.brand strong{font-size:14.5px}.head-join{padding:.5rem .85rem;font-size:.72rem}}
+@media (max-width:560px){.brand strong{font-size:13.5px;letter-spacing:.07em}.brand{gap:8px}.brand img{width:29px;height:34px}.head-row{gap:8px;padding:10px 14px}.head-join{padding:.45rem .7rem;font-size:.68rem}.icon-btn{width:36px;height:36px}}
+@media (max-width:420px){.brand strong{font-size:12.5px}.head-row{padding:10px 12px}.head-join{padding:.42rem .6rem;font-size:.64rem}}
+html,body{overflow-x:clip}
 
 /* — Gallery grid + lightbox — */
 .gallery-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}

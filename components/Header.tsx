@@ -41,7 +41,7 @@ export default function Header() {
   return (<>
     <header className="site-head"><div className="head-row">
       <Link href="/" className="brand"><Image src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={34} height={40} style={{objectFit:"contain"}}/><strong>THE BACHELORS <span style={{color:"var(--gold)"}}>FC</span></strong></Link>
-      <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:10}}>
+      <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:8}}>
         <button type="button" className="icon-btn" onClick={toggleTheme} aria-label="Switch dark / light theme">{light ? <Sun/> : <Moon/>}</button>
         <Link href="/join" className="btn head-join">Join Us</Link>
         <button type="button" className="icon-btn" onClick={() => setOpen(true)} aria-label="Open menu"><Burger/></button>
