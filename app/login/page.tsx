@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 const inp: React.CSSProperties = { width: "100%", padding: "12px 14px", borderRadius: 10, border: "1px solid #ffffff2a", background: "#0a1633", color: "#f7f5ef", marginTop: 10 };
@@ -37,7 +38,8 @@ export default function LoginPage() {
       <section style={{ maxWidth: 460, margin: "0 auto", paddingBottom: 40 }}>
         <p className="eyebrow">Players Only</p>
         <h1>{mode === "login" ? "Player login" : "Create player account"}</h1>
-        <p style={{ color: "var(--muted)" }}>Squad members: log in to RSVP for sessions — IN, OUT or MAYBE — and see who&apos;s playing. New here? Create an account; the club admin will approve it and link it to your squad profile.</p>
+        <p style={{ color: "var(--muted)" }}>Squad members: log in to RSVP for sessions — IN, OUT or MAYBE — and see who&apos;s playing.</p>
+        <p style={{ color: "var(--muted)", border: "1px solid var(--line-gold)", borderRadius: 12, padding: "10px 14px" }}>New to the club? Don&apos;t sign up here — joining starts on the <Link href="/join" style={{ color: "var(--gold2)", fontWeight: 700 }}>Join page</Link>, where your application and this account are created together in one single form.</p>
         <div className="card">
           <div style={{ display: "flex", gap: 8 }}>
             {(["login", "signup"] as const).map((m) => (
