@@ -5,6 +5,8 @@ import { Children, useEffect, useRef, useState } from "react";
 // (peek + arrows + the signature gold progress bar & counter), so new cards
 // join the carousel automatically. Perf: auto-slide runs ONLY while the
 // carousel is on screen (IntersectionObserver), never in the background.
+// (A fancier progress-bar/fade redesign was tried 2026-10-26 and reverted
+// the same day at the owner's request — keep the classic dots look.)
 export default function CardCarousel({ children, slide = "min(340px,86%)", auto = false }: { children: React.ReactNode; slide?: string; auto?: boolean }) {
   const slides = Children.toArray(children);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -31,11 +33,10 @@ export default function CardCarousel({ children, slide = "min(340px,86%)", auto 
   return (
     <div className="cc-wrap" ref={wrapRef} onPointerDown={hold} onTouchStart={hold}>
       <div className="cc-track" ref={trackRef} onScroll={onScroll} style={{ ["--slide" as string]: slide }}>
-        {slides.map((s, i) => (<div className={i === idx ? "cc-slide on" : "cc-slide"} key={i}>{s}</div>))}
+        {slides.map((s, i) => (<div className="cc-slide" key={i}>{s}</div>))}
       </div>
       <div className="cc-controls">
-        <span className="c-count">{String(idx + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}</span>
-        <div className="c-progress"><i style={{ transform: `scaleX(${(idx + 1) / slides.length})` }} /></div>
+        <div className="cc-dots">{slides.map((_, i) => (<button key={i} className={i === idx ? "on" : ""} aria-label={`Go to card ${i + 1}`} onClick={() => { hold(); go(i); }} />))}</div>
         <div className="cc-arrows">
           <button className="cc-arrow" aria-label="Previous" onClick={() => { hold(); go(idx - 1); }}>‹</button>
           <button className="cc-arrow" aria-label="Next" onClick={() => { hold(); go(idx + 1); }}>›</button>

@@ -10,7 +10,7 @@ export default function SocialCarousel({ posts }: { posts: SocialPostLike[] }) {
     <div className="soc-wrap">
       <div className="soc-track" ref={trackRef} onScroll={onScroll}>
         {posts.map((p, i) => (
-          <article key={p.id} className={i === idx ? "soc-card on" : "soc-card"}>
+          <article key={p.id} className="soc-card">
             <div className="fb-panel-head"><span className="fb-f">f</span><strong>Facebook</strong><a href={p.post_url} target="_blank" rel="noreferrer" style={{ marginLeft: "auto", color: "var(--muted)", fontSize: 13.5, textDecoration: "none" }}>Open ↗</a></div>
             <div className="soc-body"><iframe title="The Bachelors FC on Facebook" loading="lazy" src={`https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(p.post_url)}&show_text=true&width=500`} width="500" height="640" scrolling="no" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" /></div>
           </article>
@@ -19,7 +19,7 @@ export default function SocialCarousel({ posts }: { posts: SocialPostLike[] }) {
       {posts.length > 1 && (<>
         <button className="soc-arrow soc-prev" aria-label="Previous post" onClick={() => go(idx - 1)}>‹</button>
         <button className="soc-arrow soc-next" aria-label="Next post" onClick={() => go(idx + 1)}>›</button>
-        <div className="c-row"><span className="c-count">{String(idx + 1).padStart(2, "0")} / {String(posts.length).padStart(2, "0")}</span><div className="c-progress"><i style={{ transform: `scaleX(${(idx + 1) / posts.length})` }} /></div></div>
+        <div className="soc-dots">{posts.map((p, i) => (<button key={p.id} className={i === idx ? "on" : ""} aria-label={`Go to post ${i + 1}`} onClick={() => go(i)} />))}</div>
       </>)}
     </div>
   );

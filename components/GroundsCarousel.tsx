@@ -28,7 +28,7 @@ export default function GroundsCarousel({ grounds }: { grounds: GroundSlide[] })
     <div className="grd-wrap" ref={wrapRef} onPointerDown={hold} onTouchStart={hold}>
       <div className="grd-track" ref={trackRef} onScroll={onScroll}>
         {grounds.map((g, gi) => (
-          <article className={gi === idx ? "gcard on" : "gcard"} key={g.id}>
+          <article className="gcard" key={g.id}>
             {g.photo_url && <div className="gcard-photo"><img src={g.photo_url} alt={g.name} loading={gi === 0 ? "eager" : "lazy"} decoding="async" /></div>}
             <div className="gcard-body">
               <h2 style={{ margin: "0 0 4px", fontSize: 22 }}>{g.name}</h2>
@@ -48,7 +48,7 @@ export default function GroundsCarousel({ grounds }: { grounds: GroundSlide[] })
       {grounds.length > 1 && (<>
         <button className="grd-arrow grd-prev" aria-label="Previous ground" onClick={() => { hold(); go(idx - 1); }}>‹</button>
         <button className="grd-arrow grd-next" aria-label="Next ground" onClick={() => { hold(); go(idx + 1); }}>›</button>
-        <div className="c-row"><span className="c-count">{String(idx + 1).padStart(2, "0")} / {String(grounds.length).padStart(2, "0")}</span><div className="c-progress"><i style={{ transform: `scaleX(${(idx + 1) / grounds.length})` }} /></div></div>
+        <div className="grd-dots">{grounds.map((g, i) => (<button key={g.id} className={i === idx ? "on" : ""} aria-label={`Go to ground ${i + 1}`} onClick={() => { hold(); go(i); }} />))}</div>
       </>)}
     </div>
   );

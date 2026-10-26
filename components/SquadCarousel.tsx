@@ -27,12 +27,12 @@ export default function SquadCarousel({ children, auto = true }: { children: Rea
   return (
     <div className="sqd-wrap" ref={wrapRef} onPointerDown={hold} onTouchStart={hold}>
       <div className="sqd-track" ref={trackRef} onScroll={onScroll}>
-        {slides.map((s, i) => (<div className={i === idx ? "sqd-slide on" : "sqd-slide"} key={i}>{s}</div>))}
+        {slides.map((s, i) => (<div className="sqd-slide" key={i}>{s}</div>))}
       </div>
       {slides.length > 1 && (<>
         <button className="sqd-arrow sqd-prev" aria-label="Previous player" onClick={() => { hold(); go(idx - 1); }}>‹</button>
         <button className="sqd-arrow sqd-next" aria-label="Next player" onClick={() => { hold(); go(idx + 1); }}>›</button>
-        <div className="c-row"><span className="c-count">{String(idx + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}</span><div className="c-progress"><i style={{ transform: `scaleX(${(idx + 1) / slides.length})` }} /></div></div>
+        <div className="sqd-dots">{slides.map((_, i) => (<button key={i} className={i === idx ? "on" : ""} aria-label={`Go to card ${i + 1}`} onClick={() => { hold(); go(i); }} />))}</div>
       </>)}
     </div>
   );
