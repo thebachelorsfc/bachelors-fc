@@ -1,7 +1,7 @@
 import Link from "next/link"; import Image from "next/image";
 import { SITE, PILLARS, TOUR, KIT } from "@/lib/site";
 import { SEED_PLAYERS, OPEN_NUMBERS } from "@/lib/players";
-import { getPlayers, getHighlights } from "@/lib/data";
+import { getPlayers, getHighlights, getPeople } from "@/lib/data";
 import HighlightCard from "@/components/HighlightCard";
 export const dynamic = "force-dynamic";
 import PlayerCard, { OpenShirt } from "@/components/PlayerCard";
@@ -9,9 +9,10 @@ import Counter from "@/components/Counter";
 import FacebookFeed from "@/components/FacebookFeed";
 import SquadCarousel from "@/components/SquadCarousel";
 import CardCarousel from "@/components/CardCarousel";
+import PersonCard from "@/components/PersonCard";
 
 export default async function Home(){
-  const players:any[] = (await getPlayers()) ?? SEED_PLAYERS; const highlights:any[] = await getHighlights();
+  const players:any[] = (await getPlayers()) ?? SEED_PLAYERS; const highlights:any[] = await getHighlights(); const people:any[] = await getPeople();
   const order:Record<string,number>={FWD:0,MID:1,DEF:2,GK:3}; const sortedPlayers=[...players].sort((a:any,b:any)=>((order[a.position_code]??9)-(order[b.position_code]??9))||(a.jersey_no-b.jersey_no));
   return(<main>
     <section className="hero" style={{textAlign:"center"}}>
@@ -50,6 +51,9 @@ export default async function Home(){
       <p style={{marginTop:16}}><Link className="btn ghost" href="/squad">Full squad →</Link></p>
     </section>
 
+    {people.length>0 && (<section className="wrap people-band"><p className="eyebrow">The People</p><div className="sec-head"><h2>Founders &amp; Leadership</h2><Link className="more" href="/people">All people →</Link></div>
+      <CardCarousel slide="min(560px,94%)">{people.map((p:any)=><PersonCard key={p.id} p={p}/>)}</CardCarousel>
+    </section>)}
     {highlights.length>0 && (<section className="wrap"><p className="eyebrow">Watch</p><h2>Highlights</h2>
       <CardCarousel slide="min(560px,92%)">{highlights.map((h:any)=><HighlightCard key={h.id} h={h}/>)}</CardCarousel>
       <p style={{marginTop:16}}><Link className="btn ghost" href="/gallery">Gallery & all highlights →</Link></p>

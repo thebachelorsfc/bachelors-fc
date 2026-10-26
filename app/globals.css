@@ -229,10 +229,11 @@ footer a:hover{color:var(--gold2)}
 @media (max-width:640px){.cc-arrow{display:none}}
 
 /* — People (Founders & Leadership) — */
+.people-band{background:radial-gradient(720px 320px at 50% 0%,#c9a22714,transparent 70%);border-top:1px solid #c9a2271c;border-bottom:1px solid #c9a2271c}
 .person-card{overflow:hidden;padding:0}
-.person-photo{position:relative}
+.person-photo{position:relative;overflow:hidden}
 .person-photo::after{content:"";position:absolute;inset:auto 0 0 0;height:56px;background:linear-gradient(180deg,transparent,var(--card))}
-.person-photo img{width:100%;height:300px;object-fit:cover;display:block}
+.person-photo .person-img{width:100%;height:300px;object-fit:cover;display:block}
 .person-noimg{height:190px;display:grid;place-items:center;background:radial-gradient(520px 230px at 50% 0%,#c9a22716,transparent 70%)}
 .person-body{padding:4px 22px 22px}
 .person-body h3{font-size:27px;margin:2px 0 6px}

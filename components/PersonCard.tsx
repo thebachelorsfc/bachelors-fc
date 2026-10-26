@@ -3,11 +3,11 @@ const waLink = (n?: string | null) => { if (!n) return null; let d = String(n).r
 export default function PersonCard({ p }: { p: any }) {
   const wa = waLink(p.whatsapp);
   return (<article className="card person-card">
-    {p.photo_url ? (<div className="person-photo"><img src={p.photo_url} alt={p.name} /></div>) : (<div className="person-photo person-noimg"><Image src="/assets/logo-transparent.png" alt="" width={84} height={99} style={{ objectFit: "contain", opacity: 0.9 }} /></div>)}
+    {p.photo_url ? (<div className="person-photo"><img className="person-img" src={p.photo_url} alt={p.name} /></div>) : (<div className="person-photo person-noimg"><Image src="/assets/logo-transparent.png" alt="" width={84} height={99} style={{ objectFit: "contain", opacity: 0.9 }} /></div>)}
     <div className="person-body">
       {p.role && <div className="eyebrow">{p.role}</div>}
       <h3>{p.name}</h3>
-      {p.quote && <blockquote className="person-quote">&ldquo;{p.quote}&rdquo;</blockquote>}
+      {p.quote && <blockquote className="person-quote">&ldquo;{String(p.quote).trim().replace(/^["“”]+|["“”]+$/g, "")}&rdquo;</blockquote>}
       {p.speech && <p className="person-speech">{p.speech}</p>}
       {(p.facebook_url || p.instagram_url || p.linkedin_url || wa) && (<div className="person-socials">
         {p.facebook_url && <a className="person-soc" href={p.facebook_url} target="_blank" rel="noreferrer" title={`${p.name} on Facebook`} aria-label={`${p.name} on Facebook`}>f</a>}
