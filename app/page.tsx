@@ -7,9 +7,11 @@ export const dynamic = "force-dynamic";
 import PlayerCard, { OpenShirt } from "@/components/PlayerCard";
 import Counter from "@/components/Counter";
 import FacebookFeed from "@/components/FacebookFeed";
+import SquadCarousel from "@/components/SquadCarousel";
 
 export default async function Home(){
   const players:any[] = (await getPlayers()) ?? SEED_PLAYERS; const highlights:any[] = await getHighlights();
+  const order:Record<string,number>={FWD:0,MID:1,DEF:2,GK:3}; const sortedPlayers=[...players].sort((a:any,b:any)=>((order[a.position_code]??9)-(order[b.position_code]??9))||(a.jersey_no-b.jersey_no));
   return(<main>
     <section className="hero" style={{textAlign:"center"}}>
       <div className="wrap" style={{position:"relative",zIndex:1}}>
@@ -43,7 +45,7 @@ export default async function Home(){
     </section>
 
     <section className="wrap"><p className="eyebrow">The Lineup</p><h2>Meet the Squad</h2>
-      <div className="squad-grid">{players.map((p:any)=><PlayerCard key={p.jersey_no} p={p}/> )}{OPEN_NUMBERS.slice(0,3).map(n=><OpenShirt key={n} n={n}/>)}</div>
+      <SquadCarousel>{sortedPlayers.map((p:any)=><PlayerCard key={p.jersey_no} p={p}/>)}{OPEN_NUMBERS.slice(0,3).map(n=><OpenShirt key={n} n={n}/>)}</SquadCarousel>
       <p style={{marginTop:16}}><Link className="btn ghost" href="/squad">Full squad →</Link></p>
     </section>
 
