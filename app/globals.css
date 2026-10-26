@@ -230,6 +230,18 @@ footer a:hover{color:var(--gold2)}
 :root[data-theme="light"] .cc-arrow{background:#fffdf4ee;color:var(--ink)}
 @media (max-width:640px){.cc-arrow{display:none}}
 
+/* — Club Rules page — */
+.rule-sec{margin-top:22px}
+.rule-head{display:flex;align-items:center;gap:13px;margin-bottom:12px}
+.rule-no{font-family:var(--font-display);font-size:24px;line-height:1;color:var(--gold);border:1px solid var(--line-gold);background:#c9a22712;border-radius:12px;width:44px;height:44px;display:grid;place-items:center;flex:none}
+.rule-head h2{font-size:clamp(1.25rem,3.4vw,1.65rem);margin:0}
+.rule-head h2::after{display:none}
+.rule-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.rule-list li{position:relative;padding-left:24px;color:var(--muted)}
+.rule-list li::before{content:"";position:absolute;left:3px;top:.5em;width:7px;height:7px;transform:rotate(45deg);background:var(--gold);border-radius:1.5px}
+.rule-final{margin-top:22px;border:1px solid var(--line-gold);border-radius:20px;padding:22px;background:radial-gradient(520px 220px at 18% 0%,#c9a22714,transparent 70%),var(--card)}
+.rule-sign{text-align:center;font-family:var(--font-display);letter-spacing:.14em;color:var(--gold2);margin-top:28px;font-size:1.05rem}
+
 /* — How to Join (homepage steps) — */
 .join-card{position:relative;overflow:hidden}
 .join-card .step-no{position:absolute;top:8px;right:16px;font-family:var(--font-display);font-size:54px;line-height:1;color:#c9a22716;pointer-events:none}
