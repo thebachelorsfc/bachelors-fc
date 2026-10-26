@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useDragScroll } from "@/components/useDragScroll";
 export type GroundSlide = { id: string; name: string; address: string; photo_url?: string | null; played: number; lastLabel: string; nextLabel?: string | null; directions: string };
 export default function GroundsCarousel({ grounds }: { grounds: GroundSlide[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -11,6 +12,7 @@ export default function GroundsCarousel({ grounds }: { grounds: GroundSlide[] })
   const go = (i: number) => { const el = trackRef.current; if (!el) return; const c = Math.max(0, Math.min(grounds.length - 1, i)); const card = el.children[c] as HTMLElement | undefined; if (card) el.scrollTo({ left: card.offsetLeft - (el.clientWidth - card.clientWidth) / 2, behavior: "smooth" }); };
   const onScroll = () => { const el = trackRef.current; if (!el) return; let best = 0, bd = Infinity; Array.from(el.children).forEach((c, i) => { const card = c as HTMLElement; const d = Math.abs(card.offsetLeft - (el.clientWidth - card.clientWidth) / 2 - el.scrollLeft); if (d < bd) { bd = d; best = i; } }); setIdx(best); };
   const hold = () => { pauseUntil.current = Date.now() + 9000; };
+  const drag = useDragScroll(trackRef);
   // Gentle auto-slide: drifts to the next ground every few seconds, loops back
   // to the first, and pauses whenever the visitor is touching/reading.
   useEffect(() => {
@@ -25,8 +27,8 @@ export default function GroundsCarousel({ grounds }: { grounds: GroundSlide[] })
     return () => clearInterval(t);
   }, [grounds.length]);
   return (
-    <div className="grd-wrap" ref={wrapRef} onPointerDown={hold} onTouchStart={hold}>
-      <div className="grd-track" ref={trackRef} onScroll={onScroll}>
+    <div className="grd-wrap" ref={wrapRef} onPointerDown={hold} onTouchStart={hold} onClickCapture={drag.onClickCapture}>
+      <div className="grd-track" ref={trackRef} onScroll={onScroll} {...drag}>
         {grounds.map((g, gi) => (
           <article className="gcard" key={g.id}>
             {g.photo_url && <div className="gcard-photo"><img src={g.photo_url} alt={g.name} loading={gi === 0 ? "eager" : "lazy"} decoding="async" /></div>}

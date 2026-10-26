@@ -1,5 +1,6 @@
 "use client";
 import { Children, useEffect, useRef, useState } from "react";
+import { useDragScroll } from "@/components/useDragScroll";
 // The site-wide card rule: a section with ONE card shows it centered on its
 // own; a section with TWO OR MORE cards becomes a side-by-side carousel
 // (peek + arrows + the signature gold progress bar & counter), so new cards
@@ -18,6 +19,7 @@ export default function CardCarousel({ children, slide = "min(340px,86%)", auto 
   const go = (i: number) => { const el = trackRef.current; if (!el) return; const c = Math.max(0, Math.min(slides.length - 1, i)); const card = el.children[c] as HTMLElement | undefined; if (card) el.scrollTo({ left: card.offsetLeft - (el.clientWidth - card.clientWidth) / 2, behavior: "smooth" }); };
   const onScroll = () => { const el = trackRef.current; if (!el) return; let best = 0, bd = Infinity; Array.from(el.children).forEach((c, i) => { const card = c as HTMLElement; const d = Math.abs(card.offsetLeft - (el.clientWidth - card.clientWidth) / 2 - el.scrollLeft); if (d < bd) { bd = d; best = i; } }); setIdx(best); };
   const hold = () => { pauseUntil.current = Date.now() + 9000; };
+  const drag = useDragScroll(trackRef);
   useEffect(() => {
     const el = wrapRef.current; if (!el || typeof IntersectionObserver === "undefined") return;
     const ob = new IntersectionObserver((e) => { visible.current = e[0].isIntersecting; }, { rootMargin: "60px" });
@@ -31,8 +33,8 @@ export default function CardCarousel({ children, slide = "min(340px,86%)", auto 
   }, [auto, slides.length]);
   if (slides.length === 1) return <div className="cc-single">{slides[0]}</div>;
   return (
-    <div className="cc-wrap" ref={wrapRef} onPointerDown={hold} onTouchStart={hold}>
-      <div className="cc-track" ref={trackRef} onScroll={onScroll} style={{ ["--slide" as string]: slide }}>
+    <div className="cc-wrap" ref={wrapRef} onPointerDown={hold} onTouchStart={hold} onClickCapture={drag.onClickCapture}>
+      <div className="cc-track" ref={trackRef} onScroll={onScroll} style={{ ["--slide" as string]: slide }} {...drag}>
         {slides.map((s, i) => (<div className="cc-slide" key={i}>{s}</div>))}
       </div>
       <div className="cc-controls">

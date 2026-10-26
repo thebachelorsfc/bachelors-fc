@@ -309,3 +309,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 
 /* Smoothness: the ticker rides its own layer so it never steals scroll frames */
 .tick-track{will-change:transform}
+
+/* Desktop affordance: carousel tracks show a grab cursor (mouse drag-to-scroll) */
+@media (hover:hover){.cc-track,.sqd-track,.grd-track{cursor:grab}}
+.cc-track img,.sqd-track img,.grd-track img{-webkit-user-drag:none;user-select:none}
