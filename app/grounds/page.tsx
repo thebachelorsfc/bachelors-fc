@@ -35,7 +35,6 @@ export default async function Grounds() {
           <div className="gnext">{next ? <>Next here: <strong style={{ color: "var(--ink)" }}>{next.title}</strong> · {fmt(next.session_date)}{next.session_time ? ` · ${String(next.session_time).slice(0, 5)}` : ""}</> : "No session scheduled here right now."}</div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <a className="btn" href={`https://www.google.com/maps/dir/?api=1&destination=${q}`} target="_blank">Get directions</a>
-            {g.maps_url && <a className="btn ghost" href={g.maps_url} target="_blank">Open in Maps</a>}
           </div>
         </div>
       </article>);
