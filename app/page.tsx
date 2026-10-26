@@ -50,6 +50,16 @@ export default async function Home(){
       <CardCarousel slide="min(320px,84%)">{TOUR.map(t=><div className="card" key={t.stop}><div className="eyebrow">Stop {t.stop}</div><h3>{t.name}</h3><p style={{color:"var(--muted)"}}>{t.note}</p></div>)}</CardCarousel>
     </section>
 
+    <section className="wrap"><p className="eyebrow">Join Us</p><h2>How to Join</h2>
+      <p style={{color:"var(--muted)",maxWidth:680}}>Three steps between you and the shirt — no trials by fire, no politics. Just football, brotherhood and purpose.</p>
+      <CardCarousel slide="min(320px,84%)">
+        <div className="card join-card"><span className="step-no">01</span><div className="step-ico"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5a3 3 0 0 1 6 0"/><path d="M9 12h6M9 16h4"/></svg></div><h3>Apply in 3 minutes</h3><p style={{color:"var(--muted)"}}>Fill the Join form with your details and a photo — and set a password. Your player account is created with the same application; no separate sign-up.</p></div>
+        <div className="card join-card"><span className="step-no">02</span><div className="step-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5"/><path d="M16 5.4a3.2 3.2 0 0 1 0 5.9M17.8 14.9c1.7.6 2.7 1.9 3 4.1"/></svg></div><h3>Review &amp; trial</h3><p style={{color:"var(--muted)"}}>Every application is reviewed by hand. If it fits the club, you are invited to a trial session — show up, play your game and meet the brotherhood.</p></div>
+        <div className="card join-card"><span className="step-no">03</span><div className="step-ico"><svg viewBox="0 0 24 24"><path d="M9 3 3 6l2 5 2-1v11h10V10l2 1 2-5-6-3a3 3 0 0 1-6 0Z"/></svg></div><h3>Get your shirt</h3><p style={{color:"var(--muted)"}}>Once approved, your account unlocks the player dashboard — RSVP for sessions, follow the squad, and your name joins the squad list.</p></div>
+      </CardCarousel>
+      <p style={{marginTop:16}}><Link className="btn" href="/join">Start your application →</Link></p>
+    </section>
+
     <section className="wrap"><p className="eyebrow">The Lineup</p><h2>Meet the Squad</h2>
       <SquadCarousel>{sortedPlayers.map((p:any)=><PlayerCard key={p.jersey_no} p={p}/>)}{OPEN_NUMBERS.slice(0,3).map(n=><OpenShirt key={n} n={n}/>)}</SquadCarousel>
       <p style={{marginTop:16}}><Link className="btn ghost" href="/squad">Full squad →</Link></p>

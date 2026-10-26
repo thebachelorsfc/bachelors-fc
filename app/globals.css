@@ -230,6 +230,12 @@ footer a:hover{color:var(--gold2)}
 :root[data-theme="light"] .cc-arrow{background:#fffdf4ee;color:var(--ink)}
 @media (max-width:640px){.cc-arrow{display:none}}
 
+/* — How to Join (homepage steps) — */
+.join-card{position:relative;overflow:hidden}
+.join-card .step-no{position:absolute;top:8px;right:16px;font-family:var(--font-display);font-size:54px;line-height:1;color:#c9a22716;pointer-events:none}
+.step-ico{width:52px;height:52px;border-radius:50%;background:#c9a2271a;border:1px solid #c9a22730;box-shadow:0 8px 20px #c9a22714;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.step-ico svg{width:25px;height:25px;stroke:var(--gold2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
 /* — People (Founders & Leadership) — */
 .people-band{background:radial-gradient(720px 320px at 50% 0%,#c9a22714,transparent 70%);border-top:1px solid #c9a2271c;border-bottom:1px solid #c9a2271c}
 .person-card{overflow:hidden;padding:0}
