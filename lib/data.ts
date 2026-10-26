@@ -20,6 +20,11 @@ export async function getGrounds() {
   if (sb) { const { data } = await sb.from("grounds").select("*"); if (data) return data; }
   return store.grounds();
 }
+export async function getPeople() {
+  const sb = supabase();
+  if (sb) { const { data, error } = await sb.from("people").select("*").order("sort_order", { ascending: true }).order("created_at", { ascending: true }); if (!error && data) return data; }
+  return (await store.people()).slice().sort((a: any, b: any) => ((a.sort_order || 0) - (b.sort_order || 0)) || String(a.created_at).localeCompare(String(b.created_at)));
+}
 export async function getGalleryItems() {
   const sb = supabase();
   if (sb) { const { data, error } = await sb.from("gallery_items").select("*").order("created_at", { ascending:false }); if (!error && data) return data; }

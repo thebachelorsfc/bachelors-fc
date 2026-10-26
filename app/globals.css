@@ -228,6 +228,21 @@ footer a:hover{color:var(--gold2)}
 :root[data-theme="light"] .cc-arrow{background:#fffdf4ee;color:var(--ink)}
 @media (max-width:640px){.cc-arrow{display:none}}
 
+/* — People (Founders & Leadership) — */
+.person-card{overflow:hidden;padding:0}
+.person-photo{position:relative}
+.person-photo::after{content:"";position:absolute;inset:auto 0 0 0;height:56px;background:linear-gradient(180deg,transparent,var(--card))}
+.person-photo img{width:100%;height:300px;object-fit:cover;display:block}
+.person-noimg{height:190px;display:grid;place-items:center;background:radial-gradient(520px 230px at 50% 0%,#c9a22716,transparent 70%)}
+.person-body{padding:4px 22px 22px}
+.person-body h3{font-size:27px;margin:2px 0 6px}
+.person-quote{margin:12px 0 0;padding:2px 0 2px 14px;border-left:3px solid var(--gold);font-family:var(--font-display);font-size:20px;line-height:1.35;color:var(--ink)}
+.person-speech{color:var(--muted);white-space:pre-wrap;margin:12px 0 0}
+.person-socials{display:flex;gap:9px;margin-top:18px;flex-wrap:wrap}
+.person-soc{width:42px;height:42px;border-radius:50%;border:1px solid var(--line-gold);display:grid;place-items:center;color:var(--gold2);text-decoration:none;font-weight:800;font-size:17px;background:#c9a2270d;transition:all .2s ease}
+.person-soc:hover{background:var(--gold);color:#141414;transform:translateY(-2px)}
+.person-soc svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
 /* ═══ Premium Pass 2 — site-wide smoothness, depth & touch polish ═══ */
 html{-webkit-text-size-adjust:100%}
 body{text-rendering:optimizeLegibility}

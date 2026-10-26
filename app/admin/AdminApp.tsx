@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 const input: React.CSSProperties = { width:"100%", padding:"10px 12px", borderRadius:10, border:"1px solid #ffffff2a", background:"#0a1633", color:"#f7f5ef" };
 export default function AdminApp(){
   const [authed,setAuthed]=useState<boolean|null>(null); const [pw,setPw]=useState(""); const [tab,setTab]=useState("applications");
-  const [apps,setApps]=useState<any[]>([]); const [players,setPlayers]=useState<any[]>([]); const [msg,setMsg]=useState(""); const [grs,setGrs]=useState<any[]>([]);
+  const [apps,setApps]=useState<any[]>([]); const [players,setPlayers]=useState<any[]>([]); const [msg,setMsg]=useState(""); const [grs,setGrs]=useState<any[]>([]); const [ppl,setPpl]=useState<any[]>([]);
   const [np,setNp]=useState({name:"",jersey_no:"",position:"",position_code:"FWD",joined_year:"2026"});
   const [ns,setNs]=useState({title:"",session_date:"",session_time:"",ground:"",opponent:""});
   const [gal,setGal]=useState<any[]>([]); const [hls,setHls]=useState<any[]>([]);
@@ -13,11 +13,16 @@ export default function AdminApp(){
   const [prods,setProds]=useState<any[]>([]); const [pf,setPf]=useState({name:"",photo_url:"",description:"",price_bdt:"",stock:""});
   const [ords,setOrds]=useState<any[]>([]);
   const [accs,setAccs]=useState<any[]>([]); const [rsvpList,setRsvpList]=useState<any[]>([]);
-  const load=useCallback(async()=>{ const a=await fetch("/api/applications"); if(a.status===401){ setAuthed(false); return; } setAuthed(true); setApps(await a.json()); const p=await fetch("/api/players"); setPlayers(await p.json()); const g=await fetch("/api/gallery"); setGal(await g.json()); const h=await fetch("/api/highlights"); setHls(await h.json()); const sp=await fetch("/api/social-posts"); setPosts(sp.ok?await sp.json():[]); const pr=await fetch("/api/products"); setProds(await pr.json()); const or=await fetch("/api/orders"); setOrds(or.ok?await or.json():[]); const ac=await fetch("/api/admin/player-accounts"); setAccs(ac.ok?await ac.json():[]); const rv=await fetch("/api/admin/rsvps"); setRsvpList(rv.ok?await rv.json():[]); const gr=await fetch("/api/admin/grounds"); setGrs(gr.ok?await gr.json():[]); },[]);
+  const load=useCallback(async()=>{ const a=await fetch("/api/applications"); if(a.status===401){ setAuthed(false); return; } setAuthed(true); setApps(await a.json()); const p=await fetch("/api/players"); setPlayers(await p.json()); const g=await fetch("/api/gallery"); setGal(await g.json()); const h=await fetch("/api/highlights"); setHls(await h.json()); const sp=await fetch("/api/social-posts"); setPosts(sp.ok?await sp.json():[]); const pr=await fetch("/api/products"); setProds(await pr.json()); const or=await fetch("/api/orders"); setOrds(or.ok?await or.json():[]); const ac=await fetch("/api/admin/player-accounts"); setAccs(ac.ok?await ac.json():[]); const rv=await fetch("/api/admin/rsvps"); setRsvpList(rv.ok?await rv.json():[]); const gr=await fetch("/api/admin/grounds"); setGrs(gr.ok?await gr.json():[]); const pp=await fetch("/api/admin/people"); setPpl(pp.ok?await pp.json():[]); },[]);
   const gv=(id:string)=>(document.getElementById(id) as HTMLInputElement)?.value.trim()||"";
   const createGround=async()=>{ const body={name:gv("ng-name"),area:gv("ng-area"),address:gv("ng-address"),maps_url:gv("ng-maps"),matches_played:Number(gv("ng-matches")||0),last_played:gv("ng-last")||null}; if(!body.name){ setMsg("Ground name is required"); return; } const r=await fetch("/api/admin/grounds",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); const j=await r.json().catch(()=>({})); setMsg(r.ok?`Ground added: ${body.name}`:(j.error||"Failed")); if(r.ok) load(); };
   const saveGround=async(g:any)=>{ const body={name:gv(`g-name-${g.id}`),area:gv(`g-area-${g.id}`),address:gv(`g-address-${g.id}`),maps_url:gv(`g-maps-${g.id}`),photo_url:gv(`g-photo-${g.id}`),matches_played:Number(gv(`g-matches-${g.id}`)||0),last_played:gv(`g-last-${g.id}`)||null}; const r=await fetch(`/api/admin/grounds/${g.id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); setMsg(r.ok?`Saved: ${body.name||g.name}`:"Save failed"); if(r.ok) load(); };
   const delGround=async(g:any)=>{ if(!confirm(`Delete ground "${g.name}"?`)) return; await fetch(`/api/admin/grounds/${g.id}`,{method:"DELETE"}); setMsg(`Deleted: ${g.name}`); load(); };
+  const PF=["name","role","quote","speech","photo_url","facebook_url","instagram_url","linkedin_url","whatsapp"];
+  const createPerson=async()=>{ const body:any={}; for(const k of PF) body[k]=gv(`np-${k}`); body.sort_order=Number(gv("np-sort")||0); if(!body.name){ setMsg("Person name is required"); return; } const r=await fetch("/api/admin/people",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); const j=await r.json().catch(()=>({})); setMsg(r.ok?`Person added: ${body.name} — live on the People page`:(j.error||"Failed")); if(r.ok) load(); };
+  const savePerson=async(p:any)=>{ const body:any={}; for(const k of PF) body[k]=gv(`pp-${k}-${p.id}`); body.sort_order=Number(gv(`pp-sort-${p.id}`)||0); const r=await fetch(`/api/admin/people/${p.id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); setMsg(r.ok?`Saved: ${body.name||p.name}`:"Save failed"); if(r.ok) load(); };
+  const delPerson=async(p:any)=>{ if(!confirm(`Delete "${p.name}" from the People page?`)) return; await fetch(`/api/admin/people/${p.id}`,{method:"DELETE"}); setMsg(`Deleted: ${p.name}`); load(); };
+  const upPersonPhoto=async(p:any,file:File|null)=>{ if(!file) return; const fd=new FormData(); fd.set("photo",file); const r=await fetch(`/api/admin/people/${p.id}`,{method:"POST",body:fd}); const j=await r.json().catch(()=>({})); setMsg(r.ok?`Photo updated — ${p.name}`:(j.error||"Upload failed")); if(r.ok) load(); };
   const upGroundPhoto=async(id:string,file:File)=>{ const fd=new FormData(); fd.append("photo",file); const r=await fetch(`/api/admin/grounds/${id}`,{method:"POST",body:fd}); setMsg(r.ok?"Ground photo updated":"Photo upload failed"); if(r.ok) load(); };
   useEffect(()=>{ load(); },[load]);
   async function login(){ const r=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})}); if(r.ok){ setMsg(""); load(); } else setMsg("Wrong password"); }
@@ -39,7 +44,7 @@ export default function AdminApp(){
   if(authed===null) return <p style={{color:"var(--muted)"}}>Loading…</p>;
   if(!authed) return <div className="card" style={{maxWidth:420}}><h3>Admin Login</h3>{msg&&<p style={{color:"#ff9d9d"}}>{msg}</p>}<input style={input} type="password" placeholder="Admin password" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&login()}/><button className="btn" style={{marginTop:12}} onClick={login}>Log in</button></div>;
   return(<div>
-    <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>{["applications","players","sessions","grounds","accounts","gallery","highlights","social","store","orders"].map(t=><button key={t} className="btn" style={tab===t?{}:{background:"transparent",color:"#f7f5ef",border:"1px solid #ffffff33"}} onClick={()=>setTab(t)}>{t[0].toUpperCase()+t.slice(1)} {t==="applications"&&apps.length?`(${apps.length})`:""}</button>)}
+    <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>{["applications","players","sessions","grounds","people","accounts","gallery","highlights","social","store","orders"].map(t=><button key={t} className="btn" style={tab===t?{}:{background:"transparent",color:"#f7f5ef",border:"1px solid #ffffff33"}} onClick={()=>setTab(t)}>{t[0].toUpperCase()+t.slice(1)} {t==="applications"&&apps.length?`(${apps.length})`:""}</button>)}
     <button className="btn ghost" style={{marginLeft:"auto"}} onClick={async()=>{await fetch("/api/admin/login",{method:"DELETE"}); setAuthed(false);}}>Log out</button></div>
     {msg&&<p style={{color:"var(--gold)"}}>{msg}</p>}
     {tab==="applications" && (apps.length===0 ? <div className="card">No applications yet. New applications from the Join form will appear here as Pending.</div> :
@@ -100,6 +105,45 @@ export default function AdminApp(){
       <button className="btn" style={{marginTop:12}} onClick={addSession}>Save session</button>
       {rsvpList.length>0 && <div style={{marginTop:18}}><h3>Who&apos;s playing — RSVPs</h3>{rsvpList.map((s:any)=><div key={s.id} style={{borderTop:"1px solid #ffffff1f",padding:"10px 0"}}><strong>{s.title}</strong> <span style={{color:"var(--muted)",fontSize:13}}>{s.session_date||""}</span>
       {s.list.length===0 ? <p style={{color:"var(--muted)",fontSize:14,margin:"4px 0"}}>No RSVPs yet.</p> : <p style={{fontSize:14,margin:"4px 0",lineHeight:1.7}}>{["in","maybe","out"].map(st=>(<span key={st} style={{display:"block"}}><strong style={{color:st==="in"?"#7be3a0":st==="out"?"#ff9d9d":"var(--gold2)"}}>{st.toUpperCase()}:</strong> <span style={{color:"var(--muted)"}}>{s.list.filter((r:any)=>r.status===st).map((r:any)=>r.name).join(", ")||"—"}</span></span>))}</p>}</div>)}</div>}</div>}
+    {tab==="people" && <div>
+      <div className="card" style={{marginBottom:14}}><strong>👥 People — Founders &amp; Leadership.</strong> <span style={{color:"var(--muted)"}}>These profiles appear on the People page as sliding cards: photo, role, quote, their own message, and social links so visitors can reach them directly. Sort order 0 shows first. If saving fails with a database error, the People SQL (migration 008) has not been run in Supabase yet.</span></div>
+      <div className="card"><h3>👤 Add a person</h3>
+        <div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))"}}>
+          <input style={input} id="np-name" placeholder="Full name *"/>
+          <input style={input} id="np-role" placeholder="Role — Founder / Manager / Coach / Player / Well-wisher"/>
+          <input style={input} id="np-sort" type="number" placeholder="Sort order (0 = first)"/>
+          <input style={input} id="np-photo_url" placeholder="Photo URL (or add first, then upload below)"/>
+        </div>
+        <input style={{...input,marginTop:10}} id="np-quote" placeholder="Quote — one line, e.g. Never Give Up"/>
+        <textarea style={{...input,marginTop:10,minHeight:90}} id="np-speech" placeholder="Their message / speech — a few lines in their own words"/>
+        <div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",marginTop:10}}>
+          <input style={input} id="np-facebook_url" placeholder="Facebook profile link"/>
+          <input style={input} id="np-instagram_url" placeholder="Instagram profile link"/>
+          <input style={input} id="np-linkedin_url" placeholder="LinkedIn profile link"/>
+          <input style={input} id="np-whatsapp" placeholder="WhatsApp number (01…) — optional chat button"/>
+        </div>
+        <button style={{marginTop:12}} onClick={createPerson}>Add person</button>
+      </div>
+      <div className="grid">{ppl.length===0 && <div className="card">No people yet. Add the founder first — name, role, quote, message, photo and social links.</div>}
+      {ppl.map((p:any)=><div className="card" key={p.id}><div style={{display:"flex",gap:12,alignItems:"center",marginBottom:10,flexWrap:"wrap"}}>{p.photo_url ? <img src={p.photo_url} alt="" style={{width:64,height:64,objectFit:"cover",borderRadius:"50%",border:"1px solid #c9a22755"}}/> : <span style={{width:64,height:64,borderRadius:"50%",background:"#101a33",display:"grid",placeItems:"center",fontSize:24}}>👤</span>}<div><strong style={{fontSize:17}}>{p.name}</strong><div style={{color:"var(--muted)",fontSize:13.5}}>{p.role||"—"} · order {p.sort_order??0}</div></div><label className="btn ghost" style={{marginLeft:"auto",cursor:"pointer"}}>⬆ Upload photo<input type="file" accept="image/*" style={{display:"none"}} onChange={e=>upPersonPhoto(p,e.target.files?.[0]||null)}/></label></div>
+        <div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))"}}>
+          <input style={input} id={`pp-name-${p.id}`} defaultValue={p.name||""} placeholder="Full name"/>
+          <input style={input} id={`pp-role-${p.id}`} defaultValue={p.role||""} placeholder="Role"/>
+          <input style={input} id={`pp-sort-${p.id}`} type="number" defaultValue={p.sort_order??0} placeholder="Sort order"/>
+          <input style={input} id={`pp-photo_url-${p.id}`} defaultValue={p.photo_url||""} placeholder="Photo URL"/>
+        </div>
+        <input style={{...input,marginTop:10}} id={`pp-quote-${p.id}`} defaultValue={p.quote||""} placeholder="Quote"/>
+        <textarea style={{...input,marginTop:10,minHeight:80}} id={`pp-speech-${p.id}`} defaultValue={p.speech||""} placeholder="Their message / speech"/>
+        <div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",marginTop:10}}>
+          <input style={input} id={`pp-facebook_url-${p.id}`} defaultValue={p.facebook_url||""} placeholder="Facebook profile link"/>
+          <input style={input} id={`pp-instagram_url-${p.id}`} defaultValue={p.instagram_url||""} placeholder="Instagram profile link"/>
+          <input style={input} id={`pp-linkedin_url-${p.id}`} defaultValue={p.linkedin_url||""} placeholder="LinkedIn profile link"/>
+          <input style={input} id={`pp-whatsapp-${p.id}`} defaultValue={p.whatsapp||""} placeholder="WhatsApp number (01…)"/>
+        </div>
+        <div style={{display:"flex",gap:8,marginTop:12,flexWrap:"wrap"}}><button onClick={()=>savePerson(p)}>Save</button><button className="danger" onClick={()=>delPerson(p)}>Delete</button></div>
+      </div>)}
+      </div>
+    </div>}
     {tab==="accounts" && <div className="grid">{accs.length===0 && <div className="card">No player accounts yet. When a player signs up at /login, their account appears here — link it to a squad player, then Approve.</div>}
       {accs.map((a:any)=><div className="card" key={a.id}><div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}><strong>{a.email}</strong><span className="eyebrow" style={{color:a.status==="approved"?"#7be3a0":a.status==="rejected"?"#ff9d9d":"var(--gold2)"}}>{a.status}</span>{a.player_name&&<span className="eyebrow">→ {a.player_name}</span>}</div>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:12,alignItems:"center"}}>
