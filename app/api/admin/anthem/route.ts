@@ -11,10 +11,9 @@ export async function GET() { if (!isAdmin()) return NextResponse.json({ error: 
 // Vercel's ~4.5 MB function payload cap and failed for full-size songs.)
 export async function POST() { if (!isAdmin()) return NextResponse.json({ error: "Admin login required" }, { status: 401 });
   const w = supabaseWrite(); if (!w) return NextResponse.json({ error: "Storage is not set up yet" }, { status: 501 });
-  await w.storage.from("gallery").remove([PATH]).catch(() => {});
-  const { data, error } = await w.storage.from("gallery").createSignedUploadUrl(PATH);
-  if (error || !data?.signedUrl) return NextResponse.json({ error: "Could not start the upload — please try again" }, { status: 500 });
-  return NextResponse.json({ signedUrl: data.signedUrl }); }
+  const { data, error } = await w.storage.from("gallery").createSignedUploadUrl(PATH, { upsert: true });
+  if (error || !data?.token) return NextResponse.json({ error: "Could not start the upload — please try again" }, { status: 500 });
+  return NextResponse.json({ token: data.token }); }
 // Reset: delete the uploaded copy — the built-in anthem takes over again.
 export async function DELETE() { if (!isAdmin()) return NextResponse.json({ error: "Admin login required" }, { status: 401 });
   const w = supabaseWrite(); if (!w) return NextResponse.json({ error: "Storage is not set up yet" }, { status: 501 });
