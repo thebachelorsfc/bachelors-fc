@@ -16,7 +16,6 @@ export default function PlayerCard({ p }: { p: Player }) {
   const cleanSheets = p.clean_sheets || 0, saves = p.saves || 0;
   const passing = Math.max(0, Math.min(100, p.passing || 0));
   const passion = Math.max(0, Math.min(100, p.passion || 0));
-  const hasSocials = !!(p.facebook_url || p.instagram_url);
   return (
     <div className={flip ? "flip on" : "flip"}>
       <div className="flip-in">
@@ -39,14 +38,14 @@ export default function PlayerCard({ p }: { p: Player }) {
             <div className="pb-bar"><span className="pb-bar-label">Passing</span><div className="pb-track"><i style={{ width: `${passing}%` }} /></div><b>{passing}</b></div>
             <div className="pb-bar"><span className="pb-bar-label">Passion</span><div className="pb-track"><i style={{ width: `${passion}%` }} /></div><b>{passion}</b></div>
           </div>
-          <div className="pb-mid" aria-hidden="true"><Image src="/assets/logo-transparent.png" alt="" width={72} height={85} style={{ objectFit: "contain", opacity: 0.92 }} /><span>The Bachelors FC</span></div>
-          {hasSocials && (<div className="pb-socials">
-            <span className="pb-connect">Connect</span>
-            <div className="pb-soc-row">
-              {p.facebook_url && <a className="person-soc" href={p.facebook_url} target="_blank" rel="noreferrer" title={`${p.name} on Facebook`} aria-label={`${p.name} on Facebook`} onClick={(e) => e.stopPropagation()}>f</a>}
-              {p.instagram_url && <a className="person-soc" href={p.instagram_url} target="_blank" rel="noreferrer" title={`${p.name} on Instagram`} aria-label={`${p.name} on Instagram`} onClick={(e) => e.stopPropagation()}><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5" /><circle cx="12" cy="12" r="3.8" /><circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none" /></svg></a>}
+          <div className="pb-mid">
+            <div className="pb-mid-row">
+              {p.facebook_url ? <a className="person-soc" href={p.facebook_url} target="_blank" rel="noreferrer" title={`${p.name} on Facebook`} aria-label={`${p.name} on Facebook`} onClick={(e) => e.stopPropagation()}>f</a> : <span className="pb-soc-sp" />}
+              <Image src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={72} height={85} style={{ objectFit: "contain", opacity: 0.92 }} />
+              {p.instagram_url ? <a className="person-soc" href={p.instagram_url} target="_blank" rel="noreferrer" title={`${p.name} on Instagram`} aria-label={`${p.name} on Instagram`} onClick={(e) => e.stopPropagation()}><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5" /><circle cx="12" cy="12" r="3.8" /><circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none" /></svg></a> : <span className="pb-soc-sp" />}
             </div>
-          </div>)}
+            <span>The Bachelors FC</span>
+          </div>
           <p className="pb-flipback">↩ Tap to flip back</p>
         </article>
       </div>
