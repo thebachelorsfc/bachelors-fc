@@ -33,6 +33,15 @@ export default function LoginPage() {
     }
   }
 
+  async function forgot() {
+    if (!sb) { setMsg("Player login is being set up — please try again shortly."); return; }
+    if (!email) { setMsg("Type your email address above first, then tap Forgot password — the reset link will be sent to that email."); return; }
+    setBusy(true); setMsg("");
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
+    setBusy(false);
+    setMsg(error ? error.message : "Reset email sent ✓ — open your email inbox (check the spam folder too) and tap the link within an hour to set a new password.");
+  }
+
   return (
     <main className="wrap">
       <section style={{ maxWidth: 460, margin: "0 auto", paddingBottom: 40 }}>
@@ -50,6 +59,7 @@ export default function LoginPage() {
           <input style={inp} type="password" placeholder="Password (min. 6 characters)" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete={mode === "login" ? "current-password" : "new-password"} />
           {msg && <p style={{ color: "#ffd97a", fontSize: 14, marginTop: 12 }}>{msg}</p>}
           <button className="btn" style={{ width: "100%", marginTop: 14 }} disabled={busy || !email || pw.length < 6} onClick={submit}>{busy ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}</button>
+          {mode === "login" && <button onClick={forgot} disabled={busy} style={{ width: "100%", marginTop: 8, background: "none", border: "none", color: "var(--gold2)", fontWeight: 600, cursor: "pointer", fontSize: 14.5, padding: 8 }}>Forgot password?</button>}
         </div>
       </section>
     </main>
