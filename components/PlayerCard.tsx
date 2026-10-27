@@ -27,6 +27,7 @@ export default function PlayerCard({ p }: { p: Player }) {
           <p style={{ color: "var(--muted)", margin: 0, fontSize: 14 }}>{p.position} · Joined {p.joined_year} · Active Member</p>
         </article>
         <article className="card player-card flip-face flip-back" onClick={() => setFlip(false)} role="button" tabIndex={0} aria-label={`Flip ${p.name}'s card back`} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFlip(false); } }}>
+          <span className="pb-ghost" aria-hidden="true">#{p.jersey_no}</span>
           <div className="pb-top"><span className="pb-chip">{p.position_code} · #{p.jersey_no}</span><span className="pb-season">Season 2026</span></div>
           <h3 className="pb-name">{p.name}</h3>
           <p className="pb-pos">{p.position}</p>
@@ -38,7 +39,7 @@ export default function PlayerCard({ p }: { p: Player }) {
             <div className="pb-bar"><span className="pb-bar-label">Passing</span><div className="pb-track"><i style={{ width: `${passing}%` }} /></div><b>{passing}</b></div>
             <div className="pb-bar"><span className="pb-bar-label">Passion</span><div className="pb-track"><i style={{ width: `${passion}%` }} /></div><b>{passion}</b></div>
           </div>
-          <div className="pb-spacer" />
+          <div className="pb-mid" aria-hidden="true"><Image src="/assets/logo-transparent.png" alt="" width={72} height={85} style={{ objectFit: "contain", opacity: 0.92 }} /><span>The Bachelors FC</span></div>
           {hasSocials && (<div className="pb-socials">
             <span className="pb-connect">Connect</span>
             <div className="pb-soc-row">
