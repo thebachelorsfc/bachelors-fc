@@ -12,6 +12,10 @@ export const SITE = {
   // Both Search Console properties must stay verified: token 1 = Netlify property, token 2 = Vercel property (added 2026-10-25). Do not remove either.
   googleVerification: ["1reD33YYQMrbRRaTtMv-YZRiSowRPgZX9n1Vwu8q-xs", "Hj5PCmlLSlq7k6kHIZOJJuNlt6MvjqhNcByL2nD_rqI"] as string[],
   motto: "Forged in Brotherhood, Driven by Purpose",
+  // Club anthem (Option A, 2026-10-27): drop the MP3 at public/assets/anthem.mp3
+  // and set this to "/assets/anthem.mp3" — the Our Anthem section + player on
+  // the homepage render only while this is non-empty.
+  anthemSrc: "",
   mottoAlt: "United, Not Alone",
   location: "Khulshi, Chittagong",
   founded: 2026,
