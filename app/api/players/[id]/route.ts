@@ -26,7 +26,7 @@ export async function DELETE(_: Request, { params }: { params:{ id:string } }) {
 export async function PATCH(req: Request, { params }: { params:{ id:string } }) { if (!isAdmin()) return NextResponse.json({ error:"Admin login required" }, { status:401 });
   const raw = await req.json();
   // Allowlist: photo + card-back stats/socials (migration 009) only.
-  const ALLOW = ["photo_url","matches_played","goals","assists","passing","passion","clean_sheets","saves"];
+  const ALLOW = ["photo_url","matches_played","goals","assists","passing","passion","clean_sheets","saves","motm","yellow_cards","red_cards","penalties_saved","speed","preferred_foot"];
   const patch: Record<string, unknown> = {}; for (const k of ALLOW) if (k in raw) patch[k] = raw[k];
   const sb = supabaseWrite();
   if (sb) { const { error } = await sb.from("players").update(patch).eq("id", params.id); if (error) return NextResponse.json({ error:"Update failed" }, { status:500 }); return NextResponse.json({ ok:true }); }

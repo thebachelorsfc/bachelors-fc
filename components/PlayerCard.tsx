@@ -15,6 +15,8 @@ export default function PlayerCard({ p }: { p: Player }) {
   const matches = p.matches_played || 0, goals = p.goals || 0, assists = p.assists || 0;
   const isGK = p.position_code === "GK"; // GK card back: Clean Sheets / Saves instead of Goals / Assists
   const cleanSheets = p.clean_sheets || 0, saves = p.saves || 0;
+  const motm = p.motm || 0, yc = p.yellow_cards || 0, rc = p.red_cards || 0, pens = p.penalties_saved || 0;
+  const speed = Math.max(0, Math.min(100, p.speed || 0));
   const passing = Math.max(0, Math.min(100, p.passing || 0));
   const passion = Math.max(0, Math.min(100, p.passion || 0));
   return (
@@ -30,16 +32,21 @@ export default function PlayerCard({ p }: { p: Player }) {
           <span className="pb-ghost" aria-hidden="true">#{p.jersey_no}</span>
           <div className="pb-top"><span className="pb-chip">{p.position_code} · #{p.jersey_no}</span><span className="pb-season">Season 2026</span></div>
           <h3 className="pb-name">{p.name}</h3>
-          <p className="pb-pos">{p.position}</p>
+          <p className="pb-pos">{p.position}{p.preferred_foot ? ` · ${p.preferred_foot} foot` : ""}</p>
           <div className="pb-stats">
             <div className="pb-stat"><b>{matches}</b><span>Matches</span></div>
             {isGK ? (<><div className="pb-stat"><b>{cleanSheets}</b><span>Clean Sheets</span></div><div className="pb-stat"><b>{saves}</b><span>Saves</span></div></>) : (<><div className="pb-stat"><b>{goals}</b><span>Goals</span></div><div className="pb-stat"><b>{assists}</b><span>Assists</span></div></>)}
           </div>
+          <div className="pb-stats pb-stats2">
+            <div className="pb-stat"><b>{motm}</b><span>MOTM 🏆</span></div>
+            {isGK ? (<><div className="pb-stat"><b>{pens}</b><span>Pen. Saved</span></div><div className="pb-stat"><b>{yc}</b><span>Yellow 🟨</span></div></>) : (<><div className="pb-stat"><b>{yc}</b><span>Yellow 🟨</span></div><div className="pb-stat"><b>{rc}</b><span>Red 🟥</span></div></>)}
+          </div>
           <div className="pb-bars">
             <div className="pb-bar"><span className="pb-bar-label">Passing</span><div className="pb-track"><i style={{ width: `${passing}%` }} /></div><b>{passing}</b></div>
             <div className="pb-bar"><span className="pb-bar-label">Passion</span><div className="pb-track"><i style={{ width: `${passion}%` }} /></div><b>{passion}</b></div>
+            <div className="pb-bar"><span className="pb-bar-label">Speed</span><div className="pb-track"><i style={{ width: `${speed}%` }} /></div><b>{speed}</b></div>
           </div>
-          <div className="pb-mid" aria-hidden="true"><Image src="/assets/logo-transparent.png" alt="" width={72} height={85} style={{ objectFit: "contain", opacity: 0.92 }} /><span>The Bachelors FC</span></div>
+          <div className="pb-mid" aria-hidden="true"><Image src="/assets/logo-transparent.png" alt="" width={58} height={69} style={{ objectFit: "contain", opacity: 0.92 }} /><span>The Bachelors FC</span></div>
           <p className="pb-flipback">↩ Tap to flip back</p>
         </article>
       </div>
