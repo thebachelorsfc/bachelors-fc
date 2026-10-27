@@ -12,6 +12,8 @@ import type { Player } from "@/lib/players";
 export default function PlayerCard({ p }: { p: Player }) {
   const [flip, setFlip] = useState(false);
   const matches = p.matches_played || 0, goals = p.goals || 0, assists = p.assists || 0;
+  const isGK = p.position_code === "GK"; // GK card back: Clean Sheets / Saves instead of Goals / Assists
+  const cleanSheets = p.clean_sheets || 0, saves = p.saves || 0;
   const passing = Math.max(0, Math.min(100, p.passing || 0));
   const passion = Math.max(0, Math.min(100, p.passion || 0));
   const hasSocials = !!(p.facebook_url || p.instagram_url);
@@ -30,8 +32,7 @@ export default function PlayerCard({ p }: { p: Player }) {
           <p className="pb-pos">{p.position}</p>
           <div className="pb-stats">
             <div className="pb-stat"><b>{matches}</b><span>Matches</span></div>
-            <div className="pb-stat"><b>{goals}</b><span>Goals</span></div>
-            <div className="pb-stat"><b>{assists}</b><span>Assists</span></div>
+            {isGK ? (<><div className="pb-stat"><b>{cleanSheets}</b><span>Clean Sheets</span></div><div className="pb-stat"><b>{saves}</b><span>Saves</span></div></>) : (<><div className="pb-stat"><b>{goals}</b><span>Goals</span></div><div className="pb-stat"><b>{assists}</b><span>Assists</span></div></>)}
           </div>
           <div className="pb-bars">
             <div className="pb-bar"><span className="pb-bar-label">Passing</span><div className="pb-track"><i style={{ width: `${passing}%` }} /></div><b>{passing}</b></div>
