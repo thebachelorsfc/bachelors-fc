@@ -1,4 +1,7 @@
-export type Player = { id?: string; name: string; jersey_no: number; position: string; position_code: string; photo_url: string | null; joined_year: number; status: "active" | "tba"; };
+export type Player = { id?: string; name: string; jersey_no: number; position: string; position_code: string; photo_url: string | null; joined_year: number; status: "active" | "tba";
+  // Card-back fields (migration 009; owner fills them in Admin → Players)
+  matches_played?: number; goals?: number; assists?: number; passing?: number; passion?: number;
+  facebook_url?: string | null; instagram_url?: string | null; };
 // Seed = ONLY verified real players from the live site. Open shirts are NOT people.
 export const SEED_PLAYERS: Player[] = [
   { name: "Atikur Jr.", jersey_no: 10, position: "Left Wing Forward", position_code: "FWD", photo_url: "/assets/players/atikur.jpg", joined_year: 2026, status: "active" },
