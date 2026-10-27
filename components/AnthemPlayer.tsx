@@ -1,11 +1,14 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Club anthem player (2026-10-27; premium layout pass same day): one tap
 // plays the anthem MP3 (browsers block autoplay with sound, so it is always
-// tap-to-play). Layout: medallion crest + title header row with the animated
-// equalizer, gold seek bar with a knob, and a centred control row —
-// back 10s · play/pause · forward 10s — so no dead space on any screen.
+// tap-to-play). Layout: crest (top-aligned, no ring) + title header row with
+// the animated equalizer, gold seek bar with a knob, and a centred control
+// row — back 10s · play/pause · forward 10s — so no dead space anywhere.
+// Duration is read live from the <audio> element (mount check + native
+// listeners): the React loadedmetadata event alone can be missed when the
+// file is cached, which left the total at 0:00 and dead seek buttons.
 export default function AnthemPlayer({ src }: { src: string }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -13,29 +16,42 @@ export default function AnthemPlayer({ src }: { src: string }) {
   const [dur, setDur] = useState(0);
   const fmt = (t: number) => (!isFinite(t) || t < 0 ? "0:00" : `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`);
 
+  useEffect(() => {
+    const a = audioRef.current; if (!a) return;
+    const sync = () => { if (isFinite(a.duration) && a.duration > 0) setDur(a.duration); };
+    sync();
+    a.addEventListener("loadedmetadata", sync);
+    a.addEventListener("durationchange", sync);
+    return () => { a.removeEventListener("loadedmetadata", sync); a.removeEventListener("durationchange", sync); };
+  }, []);
+
   function toggle() {
     const a = audioRef.current; if (!a) return;
     if (playing) { a.pause(); setPlaying(false); }
     else { a.play().then(() => setPlaying(true)).catch(() => setPlaying(false)); }
   }
   function seek(e: React.MouseEvent<HTMLDivElement>) {
-    const a = audioRef.current; if (!a || !dur) return;
+    const a = audioRef.current; if (!a) return;
+    const d = a.duration; if (!isFinite(d) || d <= 0) return;
     const r = e.currentTarget.getBoundingClientRect();
-    a.currentTime = ((e.clientX - r.left) / r.width) * dur;
+    a.currentTime = ((e.clientX - r.left) / r.width) * d;
   }
   function skip(sec: number) {
-    const a = audioRef.current; if (!a || !dur) return;
-    a.currentTime = Math.min(Math.max(0, a.currentTime + sec), dur);
+    const a = audioRef.current; if (!a) return;
+    const d = a.duration;
+    const t = a.currentTime + sec;
+    a.currentTime = isFinite(d) && d > 0 ? Math.min(Math.max(0, t), d) : Math.max(0, t);
   }
 
   return (
     <div className="card anthem-card">
       <audio ref={audioRef} src={src} preload="metadata"
         onTimeUpdate={(e) => setCur(e.currentTarget.currentTime)}
-        onLoadedMetadata={(e) => setDur(e.currentTarget.duration)}
+        onLoadedMetadata={(e) => { const d = e.currentTarget.duration; if (isFinite(d) && d > 0) setDur(d); }}
+        onDurationChange={(e) => { const d = e.currentTarget.duration; if (isFinite(d) && d > 0) setDur(d); }}
         onEnded={() => { setPlaying(false); setCur(0); }} />
       <div className="anthem-head">
-        <span className="anthem-medal"><img src="/assets/logo-transparent.png" alt="The Bachelors FC crest" /></span>
+        <img className="anthem-crestimg" src="/assets/logo-transparent.png" alt="The Bachelors FC crest" />
         <div className="anthem-headtx">
           <div className="anthem-title">The Bachelors FC — Club Anthem</div>
           <div className="anthem-sub">Forged in Brotherhood, Driven by Purpose</div>
