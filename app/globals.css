@@ -64,8 +64,12 @@ section{padding:70px 0}
 @media(min-width:900px){section{padding:92px 0}}
 section h2{position:relative}
 section h2::after{content:"";display:block;width:54px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--gold),#c9a22708);margin-top:12px}
-h1{font-size:clamp(2.6rem,6.5vw,4.8rem);line-height:.96;text-transform:uppercase;margin:.2em 0}
-h2{font-size:clamp(2rem,4.6vw,3.2rem);line-height:1;text-transform:uppercase;margin:.15em 0 .4em}
+h1{font-size:clamp(2.6rem,6.5vw,4.8rem);line-height:.96;text-transform:uppercase;margin:.2em 0;font-weight:700}
+h2{font-size:clamp(2rem,4.6vw,3.2rem);line-height:1;text-transform:uppercase;margin:.15em 0 .4em;font-weight:600}
+/* Typography polish (2026-10-27): one card-title scale for every h3 site-wide
+   (pillars, tour, squad names, join steps, contact, history, admin) — feature
+   titles keep their own sizes via .person-body h3 / .pb-name / inline styles. */
+h3{font-size:clamp(1.18rem,2.4vw,1.38rem);line-height:1.18;letter-spacing:.02em;font-weight:600}
 
 /* — Hero — */
 .hero{position:relative;overflow:hidden;padding:40px 0 54px;background:

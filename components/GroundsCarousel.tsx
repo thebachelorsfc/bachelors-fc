@@ -33,7 +33,7 @@ export default function GroundsCarousel({ grounds }: { grounds: GroundSlide[] })
           <article className="gcard" key={g.id}>
             {g.photo_url && <div className="gcard-photo"><img src={g.photo_url} alt={g.name} loading={gi === 0 ? "eager" : "lazy"} decoding="async" /></div>}
             <div className="gcard-body">
-              <h2 style={{ margin: "0 0 4px", fontSize: 22 }}>{g.name}</h2>
+              <h3 style={{ margin: "0 0 4px" }}>{g.name}</h3>
               <p style={{ color: "var(--muted)", margin: 0 }}>📍 {g.address}</p>
               <div className="gstats">
                 <div className="gstat"><b>{g.played}</b><span>Matches played</span></div>
