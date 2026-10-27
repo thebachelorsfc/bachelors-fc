@@ -11,7 +11,6 @@ import PlayerCard, { OpenShirt } from "@/components/PlayerCard";
 import Counter from "@/components/Counter";
 import FacebookFeed from "@/components/FacebookFeed";
 import AnthemPlayer from "@/components/AnthemPlayer";
-import { resolveAnthemSrc } from "@/lib/anthem";
 import SquadCarousel from "@/components/SquadCarousel";
 import CardCarousel from "@/components/CardCarousel";
 import PersonCard from "@/components/PersonCard";
@@ -31,7 +30,6 @@ export default async function Home(){
   const sessDt = (x:any) => new Date(`${x.session_date}T${String(x.session_time || "12:00").slice(0,5)}:00`);
   const inWindow = allSessions.filter((x:any)=>x.session_date && sessDt(x).getTime() >= nowDhaka.getTime() - 24*3600*1000)
     .sort((a:any,b:any)=>sessDt(a).getTime() - sessDt(b).getTime());
-  const anthemSrc = await resolveAnthemSrc();
   const nextMatch:any = inWindow.find((x:any)=>sessDt(x).getTime() >= nowDhaka.getTime()) || inWindow[inWindow.length - 1] || null;
   const nmDate = nextMatch ? new Date(nextMatch.session_date + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }) : "";
   const nmTime = nextMatch?.session_time ? (()=>{ const [h,m] = String(nextMatch.session_time).slice(0,5).split(":").map(Number); const ap = h >= 12 ? "PM" : "AM"; const hh = h % 12 === 0 ? 12 : h % 12; return `${hh}:${String(m).padStart(2,"0")} ${ap}`; })() : "";
@@ -71,12 +69,12 @@ export default async function Home(){
       <CardCarousel slide="min(320px,84%)">{PILLARS.map(p=><div className="card" key={p.no}><div className="eyebrow">{p.no} / {p.title}</div><h3>{p.sub}</h3><p style={{color:"var(--muted)"}}>{p.text}</p></div>)}</CardCarousel>
     </section>
 
-    {anthemSrc && (
+    {SITE.anthemSrc && (
       <section className="wrap">
         <p className="eyebrow">Club Anthem</p>
         <h2>Our Anthem</h2>
         <p style={{ color: "var(--muted)", maxWidth: 640 }}>The song of the brotherhood — press play, sing along, and feel what this club stands for.</p>
-        <AnthemPlayer src={anthemSrc} />
+        <AnthemPlayer />
       </section>
     )}
 

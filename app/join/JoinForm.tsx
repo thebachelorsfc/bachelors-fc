@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase/browser";
+import Link from "next/link";
 const input: React.CSSProperties = { width:"100%", padding:"12px 14px", borderRadius:10, border:"1px solid var(--field-br)", background:"var(--field-bg)", color:"var(--field-tx)" };
 const label: React.CSSProperties = { display:"block", fontSize:13, marginBottom:6, color:"var(--label)" };
 export default function JoinForm(){
@@ -20,7 +21,7 @@ export default function JoinForm(){
       if(error){ if(/already|registered/i.test(error.message)) setAcct("exists"); }
       else { if(data.session) await fetch("/api/player/register",{method:"POST",headers:{Authorization:`Bearer ${data.session.access_token}`}}); setAcct("created"); } } } catch { /* account step is best-effort — the application is already saved */ }
     setDone(true); }
-  if(done) return <div className="card" style={{textAlign:"center"}}><h3>You&apos;re in the queue ✓</h3><p style={{color:"var(--muted)"}}>{acct==="exists" ? "Your application is submitted — and you already had a player login with this email, so there is nothing more to fill in. " : acct==="created" ? "Done in one place: your application AND your player account were created together with this form. " : "Your application is submitted. "}Our team reviews every application privately and will reach out on your mobile/WhatsApp to arrange your trial. Once you are approved and added to the squad, log in any time from Player Login with this email and your password to RSVP for sessions.</p><p style={{marginTop:14}}><a className="btn ghost" href="/login">Go to Player Login</a></p></div>;
+  if(done) return <div className="card" style={{textAlign:"center"}}><h3>You&apos;re in the queue ✓</h3><p style={{color:"var(--muted)"}}>{acct==="exists" ? "Your application is submitted — and you already had a player login with this email, so there is nothing more to fill in. " : acct==="created" ? "Done in one place: your application AND your player account were created together with this form. " : "Your application is submitted. "}Our team reviews every application privately and will reach out on your mobile/WhatsApp to arrange your trial. Once you are approved and added to the squad, log in any time from Player Login with this email and your password to RSVP for sessions.</p><p style={{marginTop:14}}><Link className="btn ghost" href="/login">Go to Player Login</Link></p></div>;
   return(<div className="card">
     <div style={{display:"flex",gap:8,marginBottom:18}}>{["About you","Background","Football"].map((t,i)=><span key={t} style={{flex:1,textAlign:"center",padding:"8px 4px",borderRadius:999,background:step===i+1?"var(--gold)":"var(--chip-bg)",color:step===i+1?"#111":"var(--chip-tx)",border:"1px solid "+(step===i+1?"transparent":"var(--chip-br)"),fontWeight:700,fontSize:13}}>{i+1} · {t}</span>)}</div>
     {err && <p style={{color:"var(--bad)"}}>{err}</p>}
