@@ -5,7 +5,7 @@ import { SITE, PAYMENTS } from "@/lib/site";
 import Jersey3D from "@/components/Jersey3D";
 
 export type ProductLike = { id: string; name: string; description?: string | null; photo_url?: string | null; sizes?: string[] | null; price_bdt?: number | null; stock?: number | null; is_available?: boolean };
-const inp: React.CSSProperties = { width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #ffffff2a", background: "#0a1633", color: "#f7f5ef", marginTop: 8 };
+const inp: React.CSSProperties = { width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid var(--field-br)", background: "var(--field-bg)", color: "var(--field-tx)", marginTop: 8 };
 
 export default function ProductCard({ p, featured }: { p: ProductLike; featured?: boolean }) {
   const sizes = p.sizes?.length ? p.sizes : ["S", "M", "L", "XL"];
@@ -32,12 +32,12 @@ export default function ProductCard({ p, featured }: { p: ProductLike; featured?
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: featured ? 14 : 0 }}>
         <h3 style={{ margin: 0, fontSize: featured ? 26 : 20 }}>{p.name}</h3>
         {!priced && <span className="eyebrow" style={{ fontSize: ".62rem" }}>Showcase</span>}
-        {soldOut && <span className="eyebrow" style={{ fontSize: ".62rem", color: "#ff9d9d" }}>Sold out</span>}
+        {soldOut && <span className="eyebrow" style={{ fontSize: ".62rem", color: "var(--bad)" }}>Sold out</span>}
       </div>
       {p.description && <p style={{ color: "var(--muted)", margin: "8px 0 12px" }}>{p.description}</p>}
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
         {sizes.map((s) => (
-          <button key={s} onClick={() => setSize(s)} style={{ padding: "6px 13px", borderRadius: 999, border: "1px solid " + (size === s ? "var(--gold)" : "#ffffff2e"), background: size === s ? "#c9a22722" : "transparent", color: "var(--paper)", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>{s}</button>
+          <button key={s} onClick={() => setSize(s)} style={{ padding: "6px 13px", borderRadius: 999, border: "1px solid " + (size === s ? "var(--gold)" : "var(--chip-br)"), background: size === s ? "#c9a22722" : "transparent", color: "var(--paper)", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>{s}</button>
         ))}
       </div>
       {priced ? (
@@ -62,11 +62,11 @@ export default function ProductCard({ p, featured }: { p: ProductLike; featured?
                   <>
                     <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
                       {methods.map(([k, l]) => (
-                        <button key={k} onClick={() => setF({ ...f, payment_method: k })} style={{ padding: "8px 16px", borderRadius: 999, border: "1px solid " + (f.payment_method === k ? "var(--gold)" : "#ffffff2e"), background: f.payment_method === k ? "#c9a22722" : "transparent", color: "var(--paper)", fontWeight: 700, cursor: "pointer" }}>{l}</button>
+                        <button key={k} onClick={() => setF({ ...f, payment_method: k })} style={{ padding: "8px 16px", borderRadius: 999, border: "1px solid " + (f.payment_method === k ? "var(--gold)" : "var(--chip-br)"), background: f.payment_method === k ? "#c9a22722" : "transparent", color: "var(--paper)", fontWeight: 700, cursor: "pointer" }}>{l}</button>
                       ))}
                     </div>
                     <p style={{ color: "var(--muted)", fontSize: 14, marginTop: 10 }}>
-                      Send <strong style={{ color: "var(--paper)" }}>৳{p.price_bdt}</strong> ({f.payment_method === "bkash" ? "bKash" : "Nagad"} Send Money) to <strong style={{ color: "var(--gold2)", fontSize: 16 }}>{PAYMENTS[f.payment_method as "bkash" | "nagad"]}</strong>, then enter:
+                      Send <strong style={{ color: "var(--paper)" }}>৳{p.price_bdt}</strong> ({f.payment_method === "bkash" ? "bKash" : "Nagad"} Send Money) to <strong style={{ color: "var(--gold-text)", fontSize: 16 }}>{PAYMENTS[f.payment_method as "bkash" | "nagad"]}</strong>, then enter:
                     </p>
                     <input style={inp} placeholder="Number you sent from (01XXXXXXXXX)" value={f.sender_number} onChange={(e) => setF({ ...f, sender_number: e.target.value })} />
                     <input style={inp} placeholder="Transaction ID (TrxID)" value={f.trx_id} onChange={(e) => setF({ ...f, trx_id: e.target.value })} />
@@ -74,7 +74,7 @@ export default function ProductCard({ p, featured }: { p: ProductLike; featured?
                 ) : (
                   <p style={{ color: "var(--muted)", fontSize: 14, marginTop: 10 }}>Place the order now — the club will contact you to arrange bKash/Nagad payment and delivery.</p>
                 )}
-                {err && <p style={{ color: "#ff9d9d", marginTop: 10 }}>{err}</p>}
+                {err && <p style={{ color: "var(--bad)", marginTop: 10 }}>{err}</p>}
                 <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
                   <button className="btn" disabled={busy} onClick={placeOrder}>{busy ? "Placing…" : `Confirm order — ৳${p.price_bdt}`}</button>
                   <button className="btn ghost" onClick={() => setOpenForm(false)}>Cancel</button>

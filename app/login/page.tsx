@@ -45,7 +45,7 @@ export default function LoginPage() {
           </div>
           <input className="login-inp" type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
           <input className="login-inp" type="password" placeholder="Password" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="current-password" />
-          {msg && <p style={{ color: "#ffd97a", fontSize: 14, marginTop: 12 }}>{msg}</p>}
+          {msg && <p style={{ color: "var(--note)", fontSize: 14, marginTop: 12 }}>{msg}</p>}
           <button className="btn login-btn" disabled={busy || !email || pw.length < 6} onClick={submit}>{busy ? "Please wait…" : "Log in"}</button>
           <button className="login-forgot" onClick={forgot} disabled={busy}>Forgot password?</button>
           <div className="login-foot">New to the club? Joining starts on the <Link href="/join">Join page</Link> — one single form creates your application and this account together.</div>

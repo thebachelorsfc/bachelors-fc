@@ -84,7 +84,7 @@ export default function DashboardPage() {
         {account?.status === "approved" && player && (
           <>
             <h2 style={{ marginTop: 30 }}>Upcoming sessions</h2>
-            {msg && <p style={{ color: "#ffd97a" }}>{msg}</p>}
+            {msg && <p style={{ color: "var(--note)" }}>{msg}</p>}
             {sessions.length === 0 && <div className="card"><p style={{ color: "var(--muted)", margin: 0 }}>No upcoming sessions scheduled yet. The next session will appear here as soon as the club sets it.</p></div>}
             <div className="grid">
               {sessions.map((s: Sess) => (
@@ -98,12 +98,12 @@ export default function DashboardPage() {
                   </p>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     {Object.entries(STATUS_BTN).map(([k, label]) => (
-                      <button key={k} onClick={() => rsvp(s.id, k)} className="btn" style={s.my_status === k ? {} : { background: "transparent", color: "#f7f5ef", border: "1px solid #ffffff33" }}>{label}</button>
+                      <button key={k} onClick={() => rsvp(s.id, k)} className="btn" style={s.my_status === k ? {} : { background: "var(--chip-bg)", color: "var(--chip-tx)", border: "1px solid var(--chip-br)" }}>{label}</button>
                     ))}
                   </div>
                   {s.rsvps.filter((r: any) => r.status === "in").length > 0 && (
                     <p style={{ color: "var(--muted)", fontSize: 14, margin: "12px 0 0" }}>
-                      <strong style={{ color: "var(--gold2)" }}>Playing:</strong> {s.rsvps.filter((r: any) => r.status === "in").map((r: any) => r.name).join(", ")}
+                      <strong style={{ color: "var(--gold-text)" }}>Playing:</strong> {s.rsvps.filter((r: any) => r.status === "in").map((r: any) => r.name).join(", ")}
                     </p>
                   )}
                 </div>

@@ -39,7 +39,7 @@ export default function GroundsCarousel({ grounds }: { grounds: GroundSlide[] })
                 <div className="gstat"><b>{g.played}</b><span>Matches played</span></div>
                 <div className="gstat"><b>{g.lastLabel}</b><span>Last played</span></div>
               </div>
-              <div className="gnext">{g.nextLabel ? <>Next here: <strong style={{ color: "var(--gold2)" }}>{g.nextLabel}</strong></> : "No session scheduled here right now."}</div>
+              <div className="gnext">{g.nextLabel ? <>Next here: <strong style={{ color: "var(--gold-text)" }}>{g.nextLabel}</strong></> : "No session scheduled here right now."}</div>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <a className="btn" href={g.directions} target="_blank" rel="noreferrer">Get directions</a>
               </div>

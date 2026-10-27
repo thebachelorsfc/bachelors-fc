@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/browser";
-const inp: React.CSSProperties = { width: "100%", padding: "12px 14px", borderRadius: 10, border: "1px solid #ffffff2a", background: "#0a1633", color: "#f7f5ef", marginTop: 10 };
+const inp: React.CSSProperties = { width: "100%", padding: "12px 14px", borderRadius: 10, border: "1px solid var(--field-br)", background: "var(--field-bg)", color: "var(--field-tx)", marginTop: 10 };
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -52,7 +52,7 @@ export default function ResetPasswordPage() {
             <p style={{ color: "var(--muted)", marginTop: 0 }}>Type a new password for your player account. Use at least 6 characters — and this time, note it down somewhere safe.</p>
             <input style={inp} type="password" placeholder="New password (min. 6 characters)" value={pw1} onChange={(e) => setPw1(e.target.value)} autoComplete="new-password" />
             <input style={inp} type="password" placeholder="Type the new password again" value={pw2} onChange={(e) => setPw2(e.target.value)} autoComplete="new-password" />
-            {msg && <p style={{ color: "#ffd97a", fontSize: 14, marginTop: 12 }}>{msg}</p>}
+            {msg && <p style={{ color: "var(--note)", fontSize: 14, marginTop: 12 }}>{msg}</p>}
             <button className="btn" style={{ width: "100%", marginTop: 14 }} disabled={busy || !pw1 || !pw2} onClick={save}>{busy ? "Please wait…" : "Save new password"}</button>
           </div>
         ) : (
