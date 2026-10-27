@@ -16,7 +16,14 @@ import PersonCard from "@/components/PersonCard";
 
 export default async function Home(){
   const players:any[] = (await getPlayers()) ?? SEED_PLAYERS; const highlights:any[] = await getHighlights(); const people:any[] = await getPeople();
-  const groundSlides = buildGroundSlides(await getGrounds(), await getAllSessions()); const galleryItems:any[] = await getGalleryItems();
+  const allSessions:any[] = await getAllSessions();
+  const groundSlides = buildGroundSlides(await getGrounds(), allSessions); const galleryItems:any[] = await getGalleryItems();
+  // Slim Next Match card (owner re-requested 2026-10-27 after the old Next
+  // Session section was removed): next upcoming session only, hidden if none.
+  const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Dhaka" });
+  const nextMatch:any = allSessions.filter((x:any)=>x.session_date && x.session_date >= todayStr).sort((a:any,b:any)=>String(a.session_date).localeCompare(String(b.session_date)) || String(a.session_time||"").localeCompare(String(b.session_time||"")))[0] || null;
+  const nmDate = nextMatch ? new Date(nextMatch.session_date + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }) : "";
+  const nmTime = nextMatch?.session_time ? (()=>{ const [h,m] = String(nextMatch.session_time).slice(0,5).split(":").map(Number); const ap = h >= 12 ? "PM" : "AM"; const hh = h % 12 === 0 ? 12 : h % 12; return `${hh}:${String(m).padStart(2,"0")} ${ap}`; })() : "";
   const order:Record<string,number>={FWD:0,MID:1,DEF:2,GK:3}; const sortedPlayers=[...players].sort((a:any,b:any)=>((order[a.position_code]??9)-(order[b.position_code]??9))||(a.jersey_no-b.jersey_no));
   return(<main>
     <section className="hero" style={{textAlign:"center"}}>
@@ -27,6 +34,17 @@ export default async function Home(){
         <p className="rise rise-4" style={{display:"flex",gap:12,justifyContent:"center",marginTop:26,flexWrap:"wrap"}}><Link className="btn" href="/join">Join the Squad</Link><Link className="btn ghost" href="/squad">Meet the Squad</Link></p>
       </div>
     </section>
+
+    {nextMatch && (<section className="wrap" style={{ marginTop: 26 }}>
+      <div className="nm-card">
+        <div className="nm-main">
+          <span className="nm-tag">{nextMatch.session_date === todayStr ? "🔴 Match Today" : "Next Match"}</span>
+          <div className="nm-title">{nextMatch.title}{nextMatch.opponent ? ` · vs ${nextMatch.opponent}` : ""}</div>
+          <div className="nm-meta">📅 {nmDate}{nmTime ? ` · 🕒 ${nmTime}` : ""}{nextMatch.ground ? ` · 📍 ${nextMatch.ground}` : ""}</div>
+        </div>
+        <Link className="btn" href="/login">Player Login · RSVP →</Link>
+      </div>
+    </section>)}
 
     <section className="wrap">
       <CardCarousel slide="min(270px,47%)" auto>
