@@ -3,9 +3,10 @@ import Image from "next/image";
 import { useState } from "react";
 import type { Player } from "@/lib/players";
 // Player trading card with a 3D flip (owner's feature, 2026-10-27): tap/click
-// the front to flip to the back — season stats (matches/goals/assists),
-// Passing & Passion rating bars, and the player's social profiles at the
-// bottom. Stats & socials are owner-entered in Admin → Players (SQL 009).
+// the front to flip to the back — season stats (matches/goals/assists; GK:
+// clean sheets/saves), Passing & Passion rating bars, and the club crest.
+// Stats are owner-entered in Admin → Players (SQL 009 + 010).
+// Owner's final call 2026-10-27: NO social-media links on player cards.
 // PRIVACY RULE (owner, 2026-10-27): the card shows ONLY performance stats
 // and PUBLIC social profile links — never personal data (no phone number,
 // age, address, education or anything else from the join application).
@@ -38,14 +39,7 @@ export default function PlayerCard({ p }: { p: Player }) {
             <div className="pb-bar"><span className="pb-bar-label">Passing</span><div className="pb-track"><i style={{ width: `${passing}%` }} /></div><b>{passing}</b></div>
             <div className="pb-bar"><span className="pb-bar-label">Passion</span><div className="pb-track"><i style={{ width: `${passion}%` }} /></div><b>{passion}</b></div>
           </div>
-          <div className="pb-mid">
-            <div className="pb-mid-row">
-              {p.facebook_url ? <a className="person-soc" href={p.facebook_url} target="_blank" rel="noreferrer" title={`${p.name} on Facebook`} aria-label={`${p.name} on Facebook`} onClick={(e) => e.stopPropagation()}>f</a> : <span className="pb-soc-sp" />}
-              <Image src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={72} height={85} style={{ objectFit: "contain", opacity: 0.92 }} />
-              {p.instagram_url ? <a className="person-soc" href={p.instagram_url} target="_blank" rel="noreferrer" title={`${p.name} on Instagram`} aria-label={`${p.name} on Instagram`} onClick={(e) => e.stopPropagation()}><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5" /><circle cx="12" cy="12" r="3.8" /><circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none" /></svg></a> : <span className="pb-soc-sp" />}
-            </div>
-            <span>The Bachelors FC</span>
-          </div>
+          <div className="pb-mid" aria-hidden="true"><Image src="/assets/logo-transparent.png" alt="" width={72} height={85} style={{ objectFit: "contain", opacity: 0.92 }} /><span>The Bachelors FC</span></div>
           <p className="pb-flipback">↩ Tap to flip back</p>
         </article>
       </div>
