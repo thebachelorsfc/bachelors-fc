@@ -15,7 +15,7 @@ export const SITE = {
   // Club anthem (Option A, 2026-10-27): drop the MP3 at public/assets/anthem.mp3
   // and set this to "/assets/anthem.mp3" — the Our Anthem section + player on
   // the homepage render only while this is non-empty.
-  anthemSrc: "",
+  anthemSrc: "/assets/anthem.mp3",
   mottoAlt: "United, Not Alone",
   location: "Khulshi, Chittagong",
   founded: 2026,
