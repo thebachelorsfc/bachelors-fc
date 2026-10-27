@@ -176,12 +176,13 @@ footer a:hover{color:var(--gold-text)}
 ::-webkit-scrollbar-track{background:transparent}
 :root[data-theme="light"] ::-webkit-scrollbar-thumb{background:#c9bfa4}
 
-/* — Premium footer social chips: compact icon circles, one line — */
-.social-row{margin-left:auto;display:flex;gap:10px;flex-wrap:nowrap}
-.social-chip{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;flex:none;border-radius:50%;border:1px solid var(--line);background:#ffffff06;color:var(--gold-text);text-decoration:none;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease}
-.social-chip svg{width:18px;height:18px;stroke:var(--gold-text);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;color:var(--gold-text)}
-.social-chip:hover{border-color:var(--gold);background:#c9a22714;transform:translateY(-2px);box-shadow:0 10px 22px #c9a22726}
-@media (max-width:560px){.social-row{margin-left:0}}
+/* — Footer social strip (2026-10-28, Real Madrid-style): one centred row
+   of large solid glyphs, no circles/chips — the club's four real links — */
+.social-strip{display:flex;justify-content:center;align-items:center;gap:clamp(32px,8vw,58px);margin-top:28px;padding-top:24px;border-top:1px solid var(--line)}
+.social-big{display:inline-flex;color:var(--gold-text);text-decoration:none;opacity:.94;transition:transform .18s ease,opacity .18s ease,filter .18s ease}
+.social-big svg{width:27px;height:27px;display:block;fill:currentColor}
+.social-big:hover{transform:translateY(-3px);opacity:1;filter:drop-shadow(0 8px 14px #c9a22745)}
+.social-big:active{transform:scale(.93)}
 
 /* — Social posts carousel (Brotherhood-style) — */
 .soc-wrap{position:relative}
@@ -302,7 +303,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 ::placeholder{color:var(--muted);opacity:.8}
 ::-webkit-scrollbar{width:10px}
 ::-webkit-scrollbar-thumb{border:2px solid var(--ink);border-radius:99px}
-.social-chip:active{transform:scale(.92)}
+.social-big:active{transform:scale(.92)}
 .soc-arrow:active{transform:scale(.92)}
 .lb-btn:active{transform:scale(.92)}
 .top-btn{position:fixed;right:18px;bottom:22px;z-index:65;width:46px;height:46px;border-radius:50%;border:1px solid var(--line-gold);background:#0a1130e8;backdrop-filter:blur(8px);color:var(--gold-text);font-size:19px;line-height:1;cursor:pointer;box-shadow:0 14px 30px #00000059;display:grid;place-items:center;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .3s ease,transform .3s cubic-bezier(.22,1,.36,1),border-color .2s}
