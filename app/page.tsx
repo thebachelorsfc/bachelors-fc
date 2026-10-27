@@ -21,7 +21,15 @@ export default async function Home(){
   // Slim Next Match card (owner re-requested 2026-10-27 after the old Next
   // Session section was removed): next upcoming session only, hidden if none.
   const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Dhaka" });
-  const nextMatch:any = allSessions.filter((x:any)=>x.session_date && x.session_date >= todayStr).sort((a:any,b:any)=>String(a.session_date).localeCompare(String(b.session_date)) || String(a.session_time||"").localeCompare(String(b.session_time||"")))[0] || null;
+  // Card window (owner, 2026-10-27): a session shows from creation until 24
+  // hours after its start time, then the card vanishes on its own; creating
+  // a new session makes it appear again. Earliest upcoming wins; the 24h
+  // tail only applies when nothing upcoming exists.
+  const nowDhaka = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Dhaka" }));
+  const sessDt = (x:any) => new Date(`${x.session_date}T${String(x.session_time || "12:00").slice(0,5)}:00`);
+  const inWindow = allSessions.filter((x:any)=>x.session_date && sessDt(x).getTime() >= nowDhaka.getTime() - 24*3600*1000)
+    .sort((a:any,b:any)=>sessDt(a).getTime() - sessDt(b).getTime());
+  const nextMatch:any = inWindow.find((x:any)=>sessDt(x).getTime() >= nowDhaka.getTime()) || inWindow[inWindow.length - 1] || null;
   const nmDate = nextMatch ? new Date(nextMatch.session_date + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }) : "";
   const nmTime = nextMatch?.session_time ? (()=>{ const [h,m] = String(nextMatch.session_time).slice(0,5).split(":").map(Number); const ap = h >= 12 ? "PM" : "AM"; const hh = h % 12 === 0 ? 12 : h % 12; return `${hh}:${String(m).padStart(2,"0")} ${ap}`; })() : "";
   const order:Record<string,number>={FWD:0,MID:1,DEF:2,GK:3}; const sortedPlayers=[...players].sort((a:any,b:any)=>((order[a.position_code]??9)-(order[b.position_code]??9))||(a.jersey_no-b.jersey_no));
@@ -35,11 +43,11 @@ export default async function Home(){
       </div>
     </section>
 
-    {nextMatch && (<section className="wrap" style={{ marginTop: 26 }}>
+    {nextMatch && (<section className="wrap nm-section">
       <div className="nm-card">
         <div className="nm-main">
-          <span className="nm-tag">{nextMatch.session_date === todayStr ? "🔴 Match Today" : "Next Match"}</span>
-          <div className="nm-title">{nextMatch.title}{nextMatch.opponent ? ` · vs ${nextMatch.opponent}` : ""}</div>
+          <span className="nm-tag">{nextMatch.session_date === todayStr ? "🔴 Match Today" : nextMatch.session_date < todayStr ? "Latest Match" : "Next Match"}</span>
+          <div className="nm-title">The Bachelors FC{nextMatch.opponent ? ` vs ${nextMatch.opponent}` : ""}</div>
           <div className="nm-meta">📅 {nmDate}{nmTime ? ` · 🕒 ${nmTime}` : ""}{nextMatch.ground ? ` · 📍 ${nextMatch.ground}` : ""}</div>
         </div>
         <Link className="btn" href="/login">Player Login · RSVP →</Link>
