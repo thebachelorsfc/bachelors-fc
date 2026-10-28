@@ -504,3 +504,18 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 .lb-val small{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:3px}
 .lb-val.big{font-size:34px}
 @media (max-width:560px){.lb-podium2{grid-template-columns:1fr}.lb-spot-count{display:none}}
+
+/* Events section (homepage) — captain card stays dark in both themes */
+.ev-cap{display:flex;gap:18px;align-items:center;height:100%;padding:20px;border-radius:18px;color:#f7f5ef;background:linear-gradient(115deg,#141b42,#0a1230 55%,#3a2c07);border:1.5px solid #d4af37}
+.ev-cap-fb{width:118px;height:148px;border-radius:14px;border:2px solid #d4af37;background:#101c48;color:#f0cb6e;display:grid;place-items:center;font-family:Oswald,sans-serif;font-weight:700;font-size:30px;flex:none}
+.ev-cap-kicker{font-family:Oswald,sans-serif;font-size:12px;letter-spacing:.3em;color:#f0cb6e;text-transform:uppercase}
+.ev-cap-stats{display:flex;gap:16px;margin-top:10px}
+.ev-cap-stats div strong{display:block;font-family:Oswald,sans-serif;font-size:20px;color:#f0cb6e;line-height:1.1}
+.ev-cap-stats div small{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#a8afc4}
+.ev-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;min-height:38px}
+.ev-date{display:flex;flex-direction:column}
+.ev-date strong{font-family:Oswald,sans-serif;font-size:26px;line-height:1;color:var(--gold-text)}
+.ev-date small{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.ev-tag{font-family:Oswald,sans-serif;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:.3rem .6rem;border-radius:999px;background:var(--chip-bg);color:var(--gold-text);border:1px solid var(--chip-br)}
+.cap-chip{display:inline-block;font-family:Oswald,sans-serif;font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#0a0a12;background:linear-gradient(90deg,#8f6f14,#f0cb6e,#d4af37);padding:.28rem .6rem;border-radius:999px}
+@media (max-width:480px){.ev-cap{flex-direction:column;text-align:center}.ev-cap-stats{justify-content:center}}

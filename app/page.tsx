@@ -40,6 +40,16 @@ export default async function Home(){
   const nmDirections = nextMatch ? (nmSlide?.directions || (nextMatch.ground ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(nextMatch.ground + ", Chittagong")}` : "")) : "";
   const nmDate = nextMatch ? new Date(nextMatch.session_date + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }) : "";
   const nmTime = nextMatch?.session_time ? (()=>{ const [h,m] = String(nextMatch.session_time).slice(0,5).split(":").map(Number); const ap = h >= 12 ? "PM" : "AM"; const hh = h % 12 === 0 ? 12 : h % 12; return `${hh}:${String(m).padStart(2,"0")} ${ap}`; })() : "";
+  // Events section (owner, 2026-10-29): the captain (Admin → Players "Make ©
+  // Captain", migration 013) headlines it; the events are the real sessions —
+  // upcoming ones first, else the latest played one. Nothing is invented.
+  const captain:any = players.find((p:any)=>p.is_captain) || null;
+  const fmtEvTime = (t:any) => { if (!t) return ""; const [h,m] = String(t).slice(0,5).split(":").map(Number); const ap = h >= 12 ? "PM" : "AM"; const hh = h % 12 === 0 ? 12 : h % 12; return `${hh}:${String(m).padStart(2,"0")} ${ap}`; };
+  const fmtEvFull = (d:any) => new Date(String(d) + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+  const upcomingEvents:any[] = allSessions.filter((x:any)=>x.session_date && sessMs(x) > Date.now()).sort((a:any,b:any)=>sessMs(a)-sessMs(b)).slice(0,4);
+  const pastEvents:any[] = allSessions.filter((x:any)=>x.session_date && sessMs(x) <= Date.now()).sort((a:any,b:any)=>sessMs(b)-sessMs(a));
+  const latestEvent:any = upcomingEvents.length ? null : (pastEvents[0] || null);
+  const evTitle = (s:any) => s.opponent ? `The Bachelors FC vs ${s.opponent}` : (s.title || "Club Session");
   const order:Record<string,number>={FWD:0,MID:1,DEF:2,GK:3}; const sortedPlayers=[...players].sort((a:any,b:any)=>((order[a.position_code]??9)-(order[b.position_code]??9))||(a.jersey_no-b.jersey_no));
   return(<main>
     <section className="hero" style={{textAlign:"center"}}>
@@ -85,6 +95,42 @@ export default async function Home(){
     <section className="wrap" id="tour"><p className="eyebrow">Off the pitch</p><h2>The Bachelors on Tour</h2>
       <CardCarousel slide="min(320px,84%)">{TOUR.map(t=><div className="card" key={t.stop}><div className="eyebrow">Stop {t.stop}</div><h3>{t.name}</h3><p style={{color:"var(--muted)"}}>{t.note}</p></div>)}</CardCarousel>
     </section>
+
+    {(captain || upcomingEvents.length>0 || latestEvent) && (<section className="wrap" id="events"><p className="eyebrow">Mark the date</p><h2>Events</h2>
+      <p style={{color:"var(--muted)",maxWidth:680}}>Matchdays, friendlies and brotherhood days — everything the club lines up, in one place{captain ? ", led on the pitch by our captain" : ""}.</p>
+      <CardCarousel slide="min(340px,88%)">
+        {captain && (<div className="ev-cap">
+          {captain.photo_url ? <Image src={captain.photo_url} alt={captain.name} width={236} height={296} style={{width:118,height:148,objectFit:"cover",objectPosition:"top",borderRadius:14,border:"2px solid #d4af37",flex:"none"}}/> : <span className="ev-cap-fb">#{captain.jersey_no}</span>}
+          <div style={{minWidth:0}}>
+            <span className="ev-cap-kicker">© Club Captain</span>
+            <h3 style={{margin:"4px 0 2px"}}>{captain.name}</h3>
+            <p style={{margin:0,color:"#a8afc4",fontSize:14}}>#{captain.jersey_no} · {captain.position} · Since {captain.joined_year}</p>
+            <div className="ev-cap-stats">
+              <div><strong>{captain.matches_played||0}</strong><small>Matches</small></div>
+              {captain.position_code==="GK" ? (<><div><strong>{captain.clean_sheets||0}</strong><small>Clean sheets</small></div><div><strong>{captain.saves||0}</strong><small>Saves</small></div></>) : (<><div><strong>{captain.goals||0}</strong><small>Goals</small></div><div><strong>{captain.motm||0}</strong><small>MOTM</small></div></>)}
+            </div>
+            <p style={{margin:"10px 0 0",color:"#a8afc4",fontSize:13.5}}>The armband of the brotherhood — first into every battle, last to leave the pitch.</p>
+          </div>
+        </div>)}
+        {upcomingEvents.map((s:any)=>{ const d=new Date(String(s.session_date)+"T00:00:00"); return (<div className="card" key={s.id}>
+          <div className="ev-top"><span className="ev-date"><strong>{d.getDate()}</strong><small>{d.toLocaleDateString("en-GB",{month:"short",year:"numeric"})}</small></span><span className="ev-tag">{s.session_date===todayStr ? "🔴 Match Today" : "Upcoming"}</span></div>
+          <h3>{evTitle(s)}</h3>
+          <p style={{color:"var(--muted)"}}>{fmtEvFull(s.session_date)}{fmtEvTime(s.session_time) ? ` · 🕒 ${fmtEvTime(s.session_time)}` : ""}{s.ground ? ` · 📍 ${s.ground}` : ""}</p>
+          <p style={{marginBottom:0}}><Link className="btn ghost" href="/login">Player Login · RSVP →</Link></p>
+        </div>); })}
+        {latestEvent && (<div className="card">
+          <div className="ev-top"><span className="ev-date"><strong>{new Date(String(latestEvent.session_date)+"T00:00:00").getDate()}</strong><small>{new Date(String(latestEvent.session_date)+"T00:00:00").toLocaleDateString("en-GB",{month:"short",year:"numeric"})}</small></span><span className="ev-tag">Latest event</span></div>
+          <h3>{evTitle(latestEvent)}</h3>
+          <p style={{color:"var(--muted)"}}>{fmtEvFull(latestEvent.session_date)}{fmtEvTime(latestEvent.session_time) ? ` · 🕒 ${fmtEvTime(latestEvent.session_time)}` : ""}{latestEvent.ground ? ` · 📍 ${latestEvent.ground}` : ""} — played, remembered, and written into the club&apos;s story.</p>
+          <p style={{marginBottom:0}}><Link className="btn ghost" href="/history">Club history →</Link></p>
+        </div>)}
+        {!upcomingEvents.length && (<div className="card">
+          <div className="ev-top"><span className="ev-tag">Coming up</span></div>
+          <h3>Next event — to be announced</h3>
+          <p style={{color:"var(--muted)",marginBottom:0}}>The next matchday is being lined up. The date lands here the moment it is set — players hear it first, then the brotherhood gathers.</p>
+        </div>)}
+      </CardCarousel>
+    </section>)}
 
     <section className="wrap"><p className="eyebrow">Join Us</p><h2>How to Join</h2>
       <p style={{color:"var(--muted)",maxWidth:680}}>Three steps between you and the shirt — no trials by fire, no politics. Just football, brotherhood and purpose.</p>

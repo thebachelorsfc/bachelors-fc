@@ -27,6 +27,7 @@ export default function PlayerCard({ p }: { p: Player }) {
           <div className="eyebrow" style={{ marginTop: 12 }}>{p.position_code} · #{p.jersey_no}</div>
           <h3 style={{ margin: "6px 0" }}>{p.name}</h3>
           <p style={{ color: "var(--muted)", margin: 0, fontSize: 14 }}>{p.position} · Joined {p.joined_year} · Active Member</p>
+          {p.is_captain ? <p style={{ margin: "9px 0 0" }}><span className="cap-chip">© Club Captain</span></p> : null}
         </article>
         <article className="card player-card flip-face flip-back" onClick={() => setFlip(false)} role="button" tabIndex={0} aria-label={`Flip ${p.name}'s card back`} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFlip(false); } }}>
           <span className="pb-ghost" aria-hidden="true">#{p.jersey_no}</span>

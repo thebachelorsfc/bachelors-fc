@@ -4,6 +4,7 @@ export type Player = { id?: string; name: string; jersey_no: number; position: s
   clean_sheets?: number; saves?: number; // goalkeeper card-back stats (migration 010)
   motm?: number; yellow_cards?: number; red_cards?: number; penalties_saved?: number; // stat pack (migration 011)
   speed?: number; preferred_foot?: string | null;
+  is_captain?: boolean; // club captain flag (migration 013; set in Admin → Players)
   facebook_url?: string | null; instagram_url?: string | null; };
 // Seed = ONLY verified real players from the live site. Open shirts are NOT people.
 export const SEED_PLAYERS: Player[] = [
