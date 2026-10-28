@@ -499,12 +499,14 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 .lb-ava.big{width:64px;height:64px}
 .lb-ava-fb{display:grid;place-items:center;background:#101c48;color:#f0cb6e;font-family:Oswald,sans-serif;font-weight:700}
 .lb-who{flex:1;min-width:0}
-.lb-who strong{display:block;font-size:16.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-who strong{display:block;font-size:16.5px}
+.lb-who .name-row{flex-wrap:wrap}
 .lb-who em{font-style:normal;color:var(--muted);font-size:12.5px}
 .lb-val{font-family:Oswald,sans-serif;font-weight:700;font-size:22px;color:var(--gold-text);text-align:right;line-height:1}
 .lb-val small{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:3px}
 .lb-val.big{font-size:34px}
-@media (max-width:560px){.lb-podium2{grid-template-columns:1fr}.lb-spot-count{display:none}}
+.lb-first .lb-val{flex:none;max-width:96px}
+@media (max-width:560px){.lb-podium2{grid-template-columns:1fr}.lb-spot-count{display:none}.lb-first{gap:12px;padding:16px}.lb-ava.big{width:56px;height:56px}}
 
 /* Events section (homepage) — captain card stays dark in both themes */
 /* Captain © badge — gold-ringed sign that sits right after the captain's name
