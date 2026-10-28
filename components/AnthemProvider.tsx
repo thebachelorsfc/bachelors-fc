@@ -24,6 +24,46 @@ export default function AnthemProvider({ src, children }: { src: string; childre
   const [cur, setCur] = useState(0);
   const [dur, setDur] = useState(0);
   const pathname = usePathname();
+  // Mini player is draggable (2026-10-28, owner): the visitor can drag it
+  // anywhere on screen; the spot is remembered on this device.
+  const miniRef = useRef<HTMLDivElement | null>(null);
+  const dragRef = useRef<{ sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
+  const suppressRef = useRef(false);
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const [dragging, setDragging] = useState(false);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("bfc-mini-pos");
+      if (raw) { const p = JSON.parse(raw); if (typeof p?.x === "number" && typeof p?.y === "number") setPos({ x: Math.max(4, Math.min(p.x, window.innerWidth - 80)), y: Math.max(4, Math.min(p.y, window.innerHeight - 60)) }); }
+    } catch {}
+  }, []);
+  const clampPos = (x: number, y: number) => {
+    const el = miniRef.current; const w = el?.offsetWidth ?? 240; const h = el?.offsetHeight ?? 54;
+    return { x: Math.min(Math.max(6, x), Math.max(6, window.innerWidth - w - 6)), y: Math.min(Math.max(6, y), Math.max(6, window.innerHeight - h - 6)) };
+  };
+  function onMiniDown(e: React.PointerEvent<HTMLDivElement>) {
+    if (e.button !== undefined && e.button !== 0) return;
+    const el = miniRef.current; if (!el) return;
+    const r = el.getBoundingClientRect();
+    dragRef.current = { sx: e.clientX, sy: e.clientY, ox: r.left, oy: r.top, moved: false };
+    try { el.setPointerCapture(e.pointerId); } catch {}
+  }
+  function onMiniMove(e: React.PointerEvent<HTMLDivElement>) {
+    const d = dragRef.current; if (!d) return;
+    const dx = e.clientX - d.sx, dy = e.clientY - d.sy;
+    if (!d.moved && Math.abs(dx) + Math.abs(dy) < 7) return;
+    d.moved = true; setDragging(true);
+    setPos(clampPos(d.ox + dx, d.oy + dy));
+  }
+  function onMiniUp() {
+    const d = dragRef.current; dragRef.current = null; setDragging(false);
+    if (d?.moved) {
+      suppressRef.current = true;
+      setTimeout(() => { suppressRef.current = false; }, 300);
+      setPos((p) => { if (p) { try { localStorage.setItem("bfc-mini-pos", JSON.stringify(p)); } catch {} } return p; });
+    }
+  }
+  function guard(fn: () => void) { if (suppressRef.current) { suppressRef.current = false; return; } fn(); }
   const fmt = (t: number) => (!isFinite(t) || t < 0 ? "0:00" : `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`);
 
   useEffect(() => {
@@ -67,8 +107,8 @@ export default function AnthemProvider({ src, children }: { src: string; childre
         onEnded={() => { setPlaying(false); setCur(0); }} />}
       {children}
       {showMini && (
-        <div className="anthem-mini" role="region" aria-label="Club anthem player">
-          <button className="anthem-mini-play" onClick={toggle} aria-label={playing ? "Pause the club anthem" : "Play the club anthem"}>
+        <div ref={miniRef} className={`anthem-mini${dragging ? " dragging" : ""}`} role="region" aria-label="Club anthem player — drag to move" title="Drag to move" style={pos ? { left: pos.x, top: pos.y, bottom: "auto" } : undefined} onPointerDown={onMiniDown} onPointerMove={onMiniMove} onPointerUp={onMiniUp} onPointerCancel={onMiniUp}>
+          <button className="anthem-mini-play" onClick={() => guard(toggle)} aria-label={playing ? "Pause the club anthem" : "Play the club anthem"}>
             {playing
               ? <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4.2" height="14" rx="1.4" /><rect x="13.8" y="5" width="4.2" height="14" rx="1.4" /></svg>
               : <svg viewBox="0 0 24 24" aria-hidden="true" style={{ marginLeft: 2 }}><path d="M8 5.4v13.2c0 .9 1 1.5 1.8 1L20 13a1.2 1.2 0 0 0 0-2L9.8 4.4C9 3.9 8 4.5 8 5.4z" /></svg>}
@@ -78,7 +118,7 @@ export default function AnthemProvider({ src, children }: { src: string; childre
             <span className="anthem-mini-time">{fmt(cur)} / {fmt(dur)}</span>
           </div>
           <div className={`anthem-eq anthem-mini-eq${playing ? " on" : ""}`} aria-hidden="true"><span /><span /><span /><span /><span /></div>
-          <button className="anthem-mini-x" onClick={stop} aria-label="Stop the club anthem">✕</button>
+          <button className="anthem-mini-x" onClick={() => guard(stop)} aria-label="Stop the club anthem">✕</button>
         </div>
       )}
     </Ctx.Provider>

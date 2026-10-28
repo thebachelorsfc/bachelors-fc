@@ -21,6 +21,7 @@ export const SITE = {
   founded: 2026,
   founder: "Mostafa",
   contacts: {
+    email: "thebachelorsfc@gmail.com",
     facebook: "https://www.facebook.com/share/1BpXvUbupE/",
     messenger: "https://m.me/TheBachelorsFC",
     whatsappGroup: "https://chat.whatsapp.com/HtVCs6GprUc1RSeuJH7xSI",
