@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import NextImage from "next/image"; // aliased: this file also uses the global Image() constructor for the PNG download canvas
 import QRCode from "qrcode";
+import CapBadge from "@/components/CapBadge";
 
 /* Digital Membership Card — shown on the player dashboard (approved + linked players only).
    Stays dark in both themes (like the stat cards). Download renders the same card to a
@@ -128,6 +129,21 @@ export default function MemberCard({ player }: { player: any }) {
       while (ctx.measureText(player.name.toUpperCase()).width > 740 && size > 40) { size -= 6; ctx.font = `700 ${size}px Oswald`; }
       ctx.fillStyle = PAPER;
       ctx.fillText(player.name.toUpperCase(), 452, 268);
+      // Captain sign: gold-ringed © right after the name at cap height — only
+      // for the player flagged is_captain, so it follows the armband on its own.
+      if ((player as any).is_captain) {
+        const nw = ctx.measureText(player.name.toUpperCase()).width;
+        const br = Math.round(size * 0.34);
+        const bcx = 452 + nw + br + 16, bcy = 268 - Math.round(size * 0.35);
+        if (bcx + br < 1056) {
+          ctx.beginPath(); ctx.arc(bcx, bcy, br, 0, Math.PI * 2);
+          ctx.fillStyle = "#0a1230"; ctx.fill();
+          ctx.lineWidth = 5; ctx.strokeStyle = GOLD; ctx.stroke();
+          ctx.fillStyle = GOLD2; ctx.font = `700 ${Math.round(br * 1.12)}px Oswald`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.fillText("©", bcx, bcy + 2);
+          ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+        }
+      }
       ctx.fillStyle = GOLD; ctx.fillRect(452, 292, 120, 5);
 
       // EMV-style gold chip, right side
@@ -197,7 +213,7 @@ export default function MemberCard({ player }: { player: any }) {
               <span>OFFICIAL MEMBER CARD</span>
             </div>
           </div>
-          <h3 className="mcard-name">{player.name}</h3>
+          <h3 className="mcard-name">{player.name}{player.is_captain ? <CapBadge /> : null}</h3>
           <div className="mcard-rows">
             <p><span>Position</span><strong>{player.position} ({player.position_code})</strong></p>
             <p><span>Member since</span><strong>{player.joined_year ?? 2026}</strong></p>

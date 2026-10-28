@@ -16,6 +16,7 @@ import SquadCarousel from "@/components/SquadCarousel";
 import CardCarousel from "@/components/CardCarousel";
 import PersonCard from "@/components/PersonCard";
 import Leaderboard from "@/components/Leaderboard";
+import CapBadge from "@/components/CapBadge";
 
 export default async function Home(){
   // All six reads run in PARALLEL (perf fix 2026-10-29: sequential awaits made
@@ -102,16 +103,21 @@ export default async function Home(){
       <p style={{color:"var(--muted)",maxWidth:680}}>Matchdays, friendlies and brotherhood days — everything the club lines up, in one place{captain ? ", led on the pitch by our captain" : ""}.</p>
       <CardCarousel slide="min(340px,88%)">
         {captain && (<div className="ev-cap">
-          {captain.photo_url ? <Image src={captain.photo_url} alt={captain.name} width={236} height={296} style={{width:118,height:148,objectFit:"cover",objectPosition:"top",borderRadius:14,border:"2px solid #d4af37",flex:"none"}}/> : <span className="ev-cap-fb">#{captain.jersey_no}</span>}
-          <div style={{minWidth:0}}>
-            <span className="ev-cap-kicker">© Club Captain</span>
-            <h3 style={{margin:"4px 0 2px"}}>{captain.name}</h3>
-            <p style={{margin:0,color:"#a8afc4",fontSize:14}}>#{captain.jersey_no} · {captain.position} · Since {captain.joined_year}</p>
+          <div className="ev-cap-photo">
+            {captain.photo_url ? <Image src={captain.photo_url} alt={captain.name} fill sizes="(max-width:560px) 88vw, 340px" style={{objectFit:"cover",objectPosition:"top"}}/> : <span className="ev-cap-fb">#{captain.jersey_no}</span>}
+            <Image className="ev-cap-crest" src="/assets/logo-transparent.png" alt="" width={88} height={104}/>
+            <span className="ev-cap-num">#{captain.jersey_no}</span>
+          </div>
+          <div className="ev-cap-body">
+            <span className="ev-cap-kicker">Club Captain</span>
+            <h3 className="ev-cap-name"><span className="nm">{captain.name}</span><CapBadge/></h3>
+            <p className="ev-cap-meta">#{captain.jersey_no} · {captain.position} · Since {captain.joined_year}</p>
             <div className="ev-cap-stats">
               <div><strong>{captain.matches_played||0}</strong><small>Matches</small></div>
               {captain.position_code==="GK" ? (<><div><strong>{captain.clean_sheets||0}</strong><small>Clean sheets</small></div><div><strong>{captain.saves||0}</strong><small>Saves</small></div></>) : (<><div><strong>{captain.goals||0}</strong><small>Goals</small></div><div><strong>{captain.motm||0}</strong><small>MOTM</small></div></>)}
             </div>
-            <p style={{margin:"10px 0 0",color:"#a8afc4",fontSize:13.5}}>The armband of the brotherhood — first into every battle, last to leave the pitch.</p>
+            <p className="ev-cap-quote">The armband of the brotherhood — first into every battle, last to leave the pitch.</p>
+            <div className="ev-cap-band">Forged in Brotherhood</div>
           </div>
         </div>)}
         {upcomingEvents.map((s:any)=>{ const d=new Date(String(s.session_date)+"T00:00:00"); return (<div className="card" key={s.id}>

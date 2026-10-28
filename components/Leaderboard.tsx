@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import CapBadge from "@/components/CapBadge";
 
 /* Public Leaderboard — live from the players' real stats (same numbers as the
    card backs). Podium for the top 3 + ranked rows. Plus the latest awarded
@@ -49,7 +50,7 @@ export default function Leaderboard() {
       {p.photo_url
         ? <Image className={big ? "lb-ava big" : "lb-ava"} src={p.photo_url} alt={p.name} width={128} height={128} loading="lazy" />
         : <span className={big ? "lb-ava big lb-ava-fb" : "lb-ava lb-ava-fb"}>{String(p.name).split(/\s+/).map((w: string) => w[0]).slice(0, 2).join("")}</span>}
-      <span className="lb-who"><strong>{p.name}</strong><em>#{p.jersey_no} · {cat.sub(p)}</em></span>
+      <span className="lb-who"><strong>{p.name}{p.is_captain ? <CapBadge /> : null}</strong><em>#{p.jersey_no} · {cat.sub(p)}</em></span>
       <span className={big ? "lb-val big" : "lb-val"}>{cat.value(p)}<small>{cat.unit}</small></span>
     </>
   );
@@ -61,7 +62,7 @@ export default function Leaderboard() {
           {latest.player.photo_url && <Image src={latest.player.photo_url} alt={latest.player.name} width={152} height={152} loading="lazy" />}
           <div className="lb-spot-body">
             <span className="lb-spot-kicker">🏆 Man of the Match</span>
-            <strong>{latest.player.name}</strong>
+            <strong>{latest.player.name}{latest.player.is_captain ? <CapBadge /> : null}</strong>
             <em>{[latest.session.opponent ? `vs ${latest.session.opponent}` : latest.session.title, fmtDay(latest.session.session_date), latest.session.ground].filter(Boolean).join(" · ")}</em>
           </div>
           <span className="lb-spot-count">MOTM ×{latest.player.motm ?? 1}</span>

@@ -12,7 +12,7 @@ export async function GET() {
     .order("session_date", { ascending: false }).limit(1);
   if (error || !sessions?.length) return NextResponse.json({ latest: null });
   const s: any = sessions[0];
-  const { data: pl } = await w.from("players").select("id,name,jersey_no,position,position_code,photo_url,motm").eq("id", s.motm_player_id).limit(1);
+  const { data: pl } = await w.from("players").select("id,name,jersey_no,position,position_code,photo_url,motm,is_captain").eq("id", s.motm_player_id).limit(1);
   if (!pl?.length) return NextResponse.json({ latest: null });
   return NextResponse.json({ latest: { player: pl[0], session: { title: s.title, session_date: s.session_date, opponent: s.opponent, ground: s.ground } } });
 }
