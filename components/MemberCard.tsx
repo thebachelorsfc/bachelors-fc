@@ -56,36 +56,63 @@ export default function MemberCard({ player }: { player: any }) {
       const g = ctx.createLinearGradient(0, 0, W, H);
       g.addColorStop(0, "#0d173f"); g.addColorStop(0.55, NAVY); g.addColorStop(1, "#05060a");
       ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-      // gold frame
+      // home-kit pinstripe texture on the navy area
+      ctx.strokeStyle = "rgba(255,255,255,0.030)"; ctx.lineWidth = 5;
+      for (let x = 470; x < W - 24; x += 26) { ctx.beginPath(); ctx.moveTo(x, 26); ctx.lineTo(x, H - 26); ctx.stroke(); }
+      // static sheen band (premium foil feel)
+      ctx.save(); ctx.beginPath(); (ctx as any).roundRect(0, 0, W, H, 40); ctx.clip();
+      const sh = ctx.createLinearGradient(180, 0, 1080, 0);
+      sh.addColorStop(0, "rgba(255,255,255,0)"); sh.addColorStop(0.5, "rgba(255,246,200,0.055)"); sh.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = sh; ctx.fillRect(0, 0, W, H); ctx.restore();
+      // gold frame + corner diamonds
       ctx.strokeStyle = GOLD; ctx.globalAlpha = 0.85; ctx.lineWidth = 3;
       ctx.beginPath(); (ctx as any).roundRect(7, 7, W - 14, H - 14, 36); ctx.stroke();
       ctx.globalAlpha = 0.22; ctx.lineWidth = 1;
       ctx.beginPath(); (ctx as any).roundRect(20, 20, W - 40, H - 40, 28); ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = GOLD;
+      [[34, 34], [W - 34, 34], [34, H - 34], [W - 34, H - 34]].forEach(([cx, cy]) => {
+        ctx.save(); ctx.translate(cx, cy); ctx.rotate(Math.PI / 4); ctx.globalAlpha = 0.55; ctx.fillRect(-7, -7, 14, 14); ctx.restore();
+      });
       ctx.globalAlpha = 1;
 
       const crest = await loadImg("/assets/logo-transparent.png");
       // faint watermark crest, right-centre
       if (crest) { ctx.globalAlpha = 0.07; ctx.drawImage(crest, 620, 130, 560, 560); ctx.globalAlpha = 1; }
 
-      // photo panel (left, full height, cover-cropped), clipped to card radius
-      ctx.save();
-      ctx.beginPath(); (ctx as any).roundRect(0, 0, 416, H, [40, 0, 0, 40]); ctx.clip();
+      // foil gradient helper (member ID, shirt number)
+      const foil = (x0: number, x1: number) => {
+        const fg = ctx.createLinearGradient(x0, 0, x1, 0);
+        fg.addColorStop(0, "#8f6f14"); fg.addColorStop(0.35, GOLD2); fg.addColorStop(0.55, "#fff2b0"); fg.addColorStop(0.8, GOLD); fg.addColorStop(1, "#8f6f14");
+        return fg;
+      };
+
+      // photo panel (left, full height, cover-cropped) with a FEATHERED right edge
       const photo = player.photo_url ? await loadImg(player.photo_url) : null;
-      if (photo) {
-        const s = Math.max(416 / photo.width, H / photo.height);
-        const w = photo.width * s, h = photo.height * s;
-        ctx.drawImage(photo, (416 - w) / 2, (H - h) / 2, w, h);
-      } else {
-        ctx.fillStyle = "#101c48"; ctx.fillRect(0, 0, 416, H);
-        ctx.fillStyle = GOLD2; ctx.font = "700 150px Oswald"; ctx.textAlign = "center";
-        ctx.fillText(initials(player.name), 208, H / 2 + 40); ctx.textAlign = "left";
+      const pc = document.createElement("canvas"); pc.width = 416; pc.height = H;
+      const pctx = pc.getContext("2d");
+      if (pctx) {
+        if (photo) {
+          const s = Math.max(416 / photo.width, H / photo.height);
+          const w = photo.width * s, h = photo.height * s;
+          pctx.drawImage(photo, (416 - w) / 2, (H - h) / 2, w, h);
+        } else {
+          pctx.fillStyle = "#101c48"; pctx.fillRect(0, 0, 416, H);
+          pctx.fillStyle = GOLD2; pctx.font = "700 150px Oswald"; pctx.textAlign = "center";
+          pctx.fillText(initials(player.name), 208, H / 2 + 40); pctx.textAlign = "left";
+        }
+        const sg2 = pctx.createLinearGradient(0, H - 300, 0, H);
+        sg2.addColorStop(0, "rgba(4,5,10,0)"); sg2.addColorStop(1, "rgba(4,5,10,0.88)");
+        pctx.fillStyle = sg2; pctx.fillRect(0, 0, 416, H);
+        pctx.globalCompositeOperation = "destination-in";
+        const fm = pctx.createLinearGradient(0, 0, 416, 0);
+        fm.addColorStop(0, "#000"); fm.addColorStop(0.8, "#000"); fm.addColorStop(1, "rgba(0,0,0,0)");
+        pctx.fillStyle = fm; pctx.fillRect(0, 0, 416, H);
+        pctx.globalCompositeOperation = "source-over";
+        ctx.drawImage(pc, 0, 0);
       }
-      const sg = ctx.createLinearGradient(0, H - 300, 0, H);
-      sg.addColorStop(0, "rgba(4,5,10,0)"); sg.addColorStop(1, "rgba(4,5,10,0.88)");
-      ctx.fillStyle = sg; ctx.fillRect(0, 0, 416, H);
-      ctx.fillStyle = GOLD2; ctx.font = "700 96px Oswald";
+      ctx.fillStyle = foil(36, 260); ctx.font = "700 96px Oswald";
       ctx.fillText(`#${player.jersey_no}`, 36, H - 44);
-      ctx.restore();
 
       // header: crest + club name
       if (crest) ctx.drawImage(crest, 452, 46, 92, 92);
@@ -102,6 +129,18 @@ export default function MemberCard({ player }: { player: any }) {
       ctx.fillText(player.name.toUpperCase(), 452, 268);
       ctx.fillStyle = GOLD; ctx.fillRect(452, 292, 120, 5);
 
+      // EMV-style gold chip, right side
+      {
+        const cx = 1078, cy = 296, cw = 132, ch = 96;
+        const cg = ctx.createLinearGradient(cx, cy, cx + cw, cy + ch);
+        cg.addColorStop(0, "#8f6f14"); cg.addColorStop(0.4, GOLD2); cg.addColorStop(0.6, "#fff2b0"); cg.addColorStop(1, GOLD);
+        ctx.fillStyle = cg; ctx.beginPath(); (ctx as any).roundRect(cx, cy, cw, ch, 14); ctx.fill();
+        ctx.strokeStyle = "rgba(90,66,8,0.65)"; ctx.lineWidth = 2.5;
+        ctx.beginPath(); (ctx as any).roundRect(cx + 10, cy + 10, cw - 20, ch - 20, 9); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx, cy + ch / 2); ctx.lineTo(cx + 34, cy + ch / 2); ctx.moveTo(cx + cw - 34, cy + ch / 2); ctx.lineTo(cx + cw, cy + ch / 2);
+        ctx.moveTo(cx + cw / 2, cy); ctx.lineTo(cx + cw / 2, cy + 26); ctx.moveTo(cx + cw / 2, cy + ch - 26); ctx.lineTo(cx + cw / 2, cy + ch); ctx.stroke();
+      }
+
       // detail rows
       const rows: [string, string][] = [
         ["POSITION", `${player.position} (${player.position_code})`],
@@ -112,12 +151,14 @@ export default function MemberCard({ player }: { player: any }) {
         const y = 372 + i * 78;
         ctx.fillStyle = GOLD2; ctx.font = "600 24px Oswald"; ctx.fillText(k, 452, y);
         ctx.fillStyle = PAPER; ctx.font = "600 37px Oswald"; ctx.fillText(v, 452, y + 40);
+        ctx.strokeStyle = "rgba(212,175,55,0.16)"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(452, y + 58); ctx.lineTo(1006, y + 58); ctx.stroke();
       });
 
-      // motto + member id
+      // motto + member id (gold foil)
       ctx.fillStyle = MUTE; ctx.font = "italic 400 27px Inter";
       ctx.fillText("Forged in Brotherhood, Driven by Purpose", 452, 668);
-      ctx.fillStyle = GOLD2; ctx.font = "600 33px monospace";
+      ctx.fillStyle = foil(452, 452 + ctx.measureText(id).width + 190); ctx.font = "600 33px monospace";
       ctx.fillText(id, 452, 716);
 
       // QR bottom-right
@@ -140,6 +181,7 @@ export default function MemberCard({ player }: { player: any }) {
   return (
     <div>
       <div className="mcard">
+        <div className="mcard-chip" aria-hidden="true" />
         <div className="mcard-photo">
           {player.photo_url
             ? <img src={player.photo_url} alt={player.name} />
