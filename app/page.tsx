@@ -1,7 +1,7 @@
 import Link from "next/link"; import Image from "next/image";
 import { SITE, PILLARS, TOUR, KIT } from "@/lib/site";
 import { SEED_PLAYERS, openNumbers } from "@/lib/players";
-import { getPlayers, getHighlights, getPeople, getGrounds, getAllSessions, getGalleryItems } from "@/lib/data";
+import { getPlayers, getHighlights, getPeople, getGrounds, getAllSessions, getGalleryItems, getSocialPosts } from "@/lib/data";
 import { buildGroundSlides } from "@/lib/groundSlides";
 import GroundsCarousel from "@/components/GroundsCarousel";
 import GalleryPreview from "@/components/GalleryPreview";
@@ -20,7 +20,7 @@ import Leaderboard from "@/components/Leaderboard";
 export default async function Home(){
   // All six reads run in PARALLEL (perf fix 2026-10-29: sequential awaits made
   // the homepage take ~5.7s server-side; one round of parallel queries ≈ 1s).
-  const [playersRaw, highlights, people, allSessions, groundsRaw, galleryItems]: any[] = await Promise.all([getPlayers(), getHighlights(), getPeople(), getAllSessions(), getGrounds(), getGalleryItems()]);
+  const [playersRaw, highlights, people, allSessions, groundsRaw, galleryItems, socialPosts]: any[] = await Promise.all([getPlayers(), getHighlights(), getPeople(), getAllSessions(), getGrounds(), getGalleryItems(), getSocialPosts()]);
   const players:any[] = playersRaw ?? SEED_PLAYERS;
   const groundSlides = buildGroundSlides(groundsRaw, allSessions);
   // Slim Next Match card (owner re-requested 2026-10-27 after the old Next
@@ -173,6 +173,6 @@ export default async function Home(){
       <p style={{marginTop:16}}><Link className="btn ghost" href="/gallery">Gallery & all highlights →</Link></p>
     </section>)}
 
-    <FacebookFeed/>
+    <FacebookFeed posts={socialPosts}/>
   </main>);
 }

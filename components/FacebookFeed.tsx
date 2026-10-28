@@ -1,4 +1,4 @@
-import { SITE } from "@/lib/site"; import { getSocialPosts } from "@/lib/data"; import SocialCarousel from "@/components/SocialCarousel";
+import { SITE } from "@/lib/site"; import SocialCarousel from "@/components/SocialCarousel";
 
 // Club's public page URL — username matches the m.me/TheBachelorsFC link on the original site.
 const PAGE_URL = "https://www.facebook.com/TheBachelorsFC";
@@ -7,8 +7,10 @@ const PLUGIN_SRC =
   encodeURIComponent(PAGE_URL) +
   "&tabs=timeline&width=500&height=560&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=false";
 
-export default async function FacebookFeed() {
-  const posts = await getSocialPosts();
+// Posts arrive as a prop from the homepage's parallel data batch (perf fix
+// 2026-10-29: this component used to run its OWN sequential server query,
+// adding a full round trip after all the others had finished).
+export default function FacebookFeed({ posts = [] }: { posts?: any[] }) {
   return (
     <section className="wrap" id="facebook">
       <p className="eyebrow">On Social</p>
