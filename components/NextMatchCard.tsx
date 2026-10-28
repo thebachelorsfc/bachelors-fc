@@ -9,7 +9,7 @@ import Link from "next/link";
 // earliest upcoming session only). startsAt is an absolute instant — the
 // session's Dhaka wall time converted to UTC — so the countdown is right
 // in any visitor's timezone.
-export default function NextMatchCard({ tag, opponent, meta, startsAt }: { tag: string; opponent: string; meta: string; startsAt: string }) {
+export default function NextMatchCard({ tag, opponent, meta, startsAt, directions }: { tag: string; opponent: string; meta: string; startsAt: string; directions?: string }) {
   const start = new Date(startsAt).getTime();
   const [left, setLeft] = useState<number>(() => start - Date.now());
   useEffect(() => {
@@ -33,7 +33,10 @@ export default function NextMatchCard({ tag, opponent, meta, startsAt }: { tag: 
           <div className="nm-title">The Bachelors FC{opponent ? ` vs ${opponent}` : ""}</div>
           <div className="nm-meta">{meta}</div>
         </div>
-        <Link className="btn" href="/login">Player Login · RSVP →</Link>
+        <div className="nm-actions">
+          <Link className="btn nm-rsvp" href="/login">Player Login · RSVP →</Link>
+          {directions ? <a className="btn ghost nm-dir" href={directions} target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>Get Directions</a> : null}
+        </div>
       </div>
     </div>
   );
