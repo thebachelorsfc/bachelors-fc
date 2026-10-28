@@ -373,9 +373,14 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 .pb-bars{margin-top:13px;gap:9px}
 
 /* — Slim Next Match card on the homepage (2026-10-27) — */
-.nm-card{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;border:1px solid var(--line-gold);border-radius:18px;padding:16px 20px;background:radial-gradient(420px 160px at 12% 0%,#c9a22714,transparent 70%),var(--card)}
+.nm-card{display:flex;flex-direction:column;gap:12px;border:1px solid var(--line-gold);border-radius:18px;padding:16px 20px;background:radial-gradient(420px 160px at 12% 0%,#c9a22714,transparent 70%),var(--card)}
 .nm-tag{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#06060a;background:linear-gradient(120deg,var(--gold),var(--gold2));border-radius:99px;padding:4px 11px}
-.nm-title{font-family:var(--font-display);font-size:1.35rem;letter-spacing:.02em;margin-top:9px;color:var(--paper)}
+.nm-title{font-family:var(--font-display);font-size:1.35rem;letter-spacing:.02em;margin-top:0;color:var(--paper)}
+.nm-toprow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.nm-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.nm-count{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:99px;border:1px solid var(--line-gold);background:#c9a2270d;flex:none}
+.nm-count-label{font-size:9.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.nm-count-val{font-family:var(--font-display);font-size:15px;font-weight:600;letter-spacing:.06em;color:var(--gold-text);font-variant-numeric:tabular-nums}
 .nm-meta{color:var(--muted);font-size:14px;margin-top:3px}
 .nm-section{padding-top:0;padding-bottom:0;margin-top:32px;margin-bottom:30px}
 .nm-card{box-shadow:0 18px 44px -18px #00000090}

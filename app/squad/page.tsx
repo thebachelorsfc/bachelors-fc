@@ -1,4 +1,4 @@
-import type { Metadata } from "next"; import { SEED_PLAYERS, OPEN_NUMBERS } from "@/lib/players"; import { getPlayers } from "@/lib/data"; import PlayerCard, { OpenShirt } from "@/components/PlayerCard"; import SquadCarousel from "@/components/SquadCarousel";
+import type { Metadata } from "next"; import { SEED_PLAYERS, openNumbers } from "@/lib/players"; import { getPlayers } from "@/lib/data"; import PlayerCard, { OpenShirt } from "@/components/PlayerCard"; import SquadCarousel from "@/components/SquadCarousel";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Squad | The Bachelors FC", alternates: { canonical: "/squad" } };
 export default async function Squad() {
@@ -8,7 +8,7 @@ export default async function Squad() {
   return (<main className="wrap"><section><p className="eyebrow">The Lineup</p><h1>Meet the Squad</h1>
     <p style={{ color: "var(--muted)" }}>The faces of The Bachelors FC — {players.length} players and counting.</p>
     <SquadCarousel>{sorted.map((p: any) => <PlayerCard key={p.jersey_no} p={p} />)}</SquadCarousel>
-    <h2 style={{ fontSize: 22, marginTop: 28 }}>Open shirts</h2>
-    <SquadCarousel auto={false}>{OPEN_NUMBERS.map(n => <OpenShirt key={n} n={n} />)}</SquadCarousel>
+    {openNumbers(players).length > 0 && (<><h2 style={{ fontSize: 22, marginTop: 28 }}>Open shirts</h2>
+    <SquadCarousel auto={false}>{openNumbers(players).map(n => <OpenShirt key={n} n={n} />)}</SquadCarousel></>)}
   </section></main>);
 }

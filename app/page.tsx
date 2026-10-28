@@ -1,6 +1,6 @@
 import Link from "next/link"; import Image from "next/image";
 import { SITE, PILLARS, TOUR, KIT } from "@/lib/site";
-import { SEED_PLAYERS, OPEN_NUMBERS } from "@/lib/players";
+import { SEED_PLAYERS, openNumbers } from "@/lib/players";
 import { getPlayers, getHighlights, getPeople, getGrounds, getAllSessions, getGalleryItems } from "@/lib/data";
 import { buildGroundSlides } from "@/lib/groundSlides";
 import GroundsCarousel from "@/components/GroundsCarousel";
@@ -11,6 +11,7 @@ import PlayerCard, { OpenShirt } from "@/components/PlayerCard";
 import Counter from "@/components/Counter";
 import FacebookFeed from "@/components/FacebookFeed";
 import AnthemPlayer from "@/components/AnthemPlayer";
+import NextMatchCard from "@/components/NextMatchCard";
 import SquadCarousel from "@/components/SquadCarousel";
 import CardCarousel from "@/components/CardCarousel";
 import PersonCard from "@/components/PersonCard";
@@ -22,15 +23,15 @@ export default async function Home(){
   // Slim Next Match card (owner re-requested 2026-10-27 after the old Next
   // Session section was removed): next upcoming session only, hidden if none.
   const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Dhaka" });
-  // Card window (owner, 2026-10-27): a session shows from creation until 24
-  // hours after its start time, then the card vanishes on its own; creating
-  // a new session makes it appear again. Earliest upcoming wins; the 24h
-  // tail only applies when nothing upcoming exists.
-  const nowDhaka = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Dhaka" }));
-  const sessDt = (x:any) => new Date(`${x.session_date}T${String(x.session_time || "12:00").slice(0,5)}:00`);
-  const inWindow = allSessions.filter((x:any)=>x.session_date && sessDt(x).getTime() >= nowDhaka.getTime() - 24*3600*1000)
-    .sort((a:any,b:any)=>sessDt(a).getTime() - sessDt(b).getTime());
-  const nextMatch:any = inWindow.find((x:any)=>sessDt(x).getTime() >= nowDhaka.getTime()) || inWindow[inWindow.length - 1] || null;
+  // Card rule (owner, 2026-10-28 — supersedes the 24h-tail rule): the card
+  // shows the earliest UPCOMING session with a live kick-off countdown;
+  // when the countdown reaches zero the card vanishes; a newly created
+  // session makes it reappear. Session times are Dhaka wall time (UTC+6,
+  // no DST) — convert to an absolute instant so the countdown is right in
+  // any visitor's timezone.
+  const sessMs = (x:any) => { const [Y,M,D] = String(x.session_date).split("-").map(Number); const [h,mi] = String(x.session_time || "12:00").slice(0,5).split(":").map(Number); return Date.UTC(Y, (M||1)-1, D||1, (h||0)-6, mi||0); };
+  const nextMatch:any = allSessions.filter((x:any)=>x.session_date && sessMs(x) > Date.now()).sort((a:any,b:any)=>sessMs(a)-sessMs(b))[0] || null;
+  const nmStartISO = nextMatch ? new Date(sessMs(nextMatch)).toISOString() : "";
   const nmDate = nextMatch ? new Date(nextMatch.session_date + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }) : "";
   const nmTime = nextMatch?.session_time ? (()=>{ const [h,m] = String(nextMatch.session_time).slice(0,5).split(":").map(Number); const ap = h >= 12 ? "PM" : "AM"; const hh = h % 12 === 0 ? 12 : h % 12; return `${hh}:${String(m).padStart(2,"0")} ${ap}`; })() : "";
   const order:Record<string,number>={FWD:0,MID:1,DEF:2,GK:3}; const sortedPlayers=[...players].sort((a:any,b:any)=>((order[a.position_code]??9)-(order[b.position_code]??9))||(a.jersey_no-b.jersey_no));
@@ -45,14 +46,7 @@ export default async function Home(){
     </section>
 
     {nextMatch && (<section className="wrap nm-section">
-      <div className="nm-card">
-        <div className="nm-main">
-          <span className="nm-tag">{nextMatch.session_date === todayStr ? "🔴 Match Today" : nextMatch.session_date < todayStr ? "Latest Match" : "Next Match"}</span>
-          <div className="nm-title">The Bachelors FC{nextMatch.opponent ? ` vs ${nextMatch.opponent}` : ""}</div>
-          <div className="nm-meta">📅 {nmDate}{nmTime ? ` · 🕒 ${nmTime}` : ""}{nextMatch.ground ? ` · 📍 ${nextMatch.ground}` : ""}</div>
-        </div>
-        <Link className="btn" href="/login">Player Login · RSVP →</Link>
-      </div>
+      <NextMatchCard tag={nextMatch.session_date === todayStr ? "🔴 Match Today" : "Next Match"} opponent={nextMatch.opponent || ""} meta={`📅 ${nmDate}${nmTime ? ` · 🕒 ${nmTime}` : ""}${nextMatch.ground ? ` · 📍 ${nextMatch.ground}` : ""}`} startsAt={nmStartISO} />
     </section>)}
 
     <section className="wrap">
@@ -97,7 +91,7 @@ export default async function Home(){
     </section>
 
     <section className="wrap"><p className="eyebrow">The Lineup</p><h2>Meet the Squad</h2>
-      <SquadCarousel>{sortedPlayers.map((p:any)=><PlayerCard key={p.jersey_no} p={p}/>)}{OPEN_NUMBERS.slice(0,3).map(n=><OpenShirt key={n} n={n}/>)}</SquadCarousel>
+      <SquadCarousel>{sortedPlayers.map((p:any)=><PlayerCard key={p.jersey_no} p={p}/>)}{openNumbers(sortedPlayers).slice(0,3).map(n=><OpenShirt key={n} n={n}/>)}</SquadCarousel>
       <p style={{marginTop:16}}><Link className="btn ghost" href="/squad">Full squad →</Link></p>
     </section>
 

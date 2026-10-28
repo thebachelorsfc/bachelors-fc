@@ -12,3 +12,9 @@ export const SEED_PLAYERS: Player[] = [
   { name: "Chowdhury", jersey_no: 99, position: "Goalkeeper", position_code: "GK", photo_url: "/assets/players/mostafa.png", joined_year: 2026, status: "active" },
 ];
 export const OPEN_NUMBERS = [5, 7, 9, 11, 19, 26, 28];
+// Truly-open shirts = the candidate pool minus numbers the live squad already wears.
+// Always render through this helper so a taken shirt can never be advertised as open
+// (the unfiltered list went stale as players joined — fixed 2026-10-28).
+export function openNumbers(players: { jersey_no: number }[]): number[] {
+  return OPEN_NUMBERS.filter(n => !players.some(p => p.jersey_no === n));
+}
