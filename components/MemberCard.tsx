@@ -133,16 +133,16 @@ export default function MemberCard({ player }: { player: any }) {
       // for the player flagged is_captain, so it follows the armband on its own.
       if ((player as any).is_captain) {
         const nw = ctx.measureText(player.name.toUpperCase()).width;
-        const br = Math.round(size * 0.34);
+        // Radius auto-fits the space left of the card edge, so the badge ALWAYS
+        // draws (an earlier fixed fit-guard silently skipped it on long names).
+        const br = Math.max(13, Math.min(Math.round(size * 0.34), Math.floor((1236 - 468 - nw) / 2)));
         const bcx = 452 + nw + br + 16, bcy = 268 - Math.round(size * 0.35);
-        if (bcx + br < 1056) {
-          ctx.beginPath(); ctx.arc(bcx, bcy, br, 0, Math.PI * 2);
-          ctx.fillStyle = "#0a1230"; ctx.fill();
-          ctx.lineWidth = 5; ctx.strokeStyle = GOLD; ctx.stroke();
-          ctx.fillStyle = GOLD2; ctx.font = `700 ${Math.round(br * 1.12)}px Oswald`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-          ctx.fillText("©", bcx, bcy + 2);
-          ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
-        }
+        ctx.beginPath(); ctx.arc(bcx, bcy, br, 0, Math.PI * 2);
+        ctx.fillStyle = "#0a1230"; ctx.fill();
+        ctx.lineWidth = 5; ctx.strokeStyle = GOLD; ctx.stroke();
+        ctx.fillStyle = GOLD2; ctx.font = `700 ${Math.round(br * 1.12)}px Oswald`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText("©", bcx, bcy + 2);
+        ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
       }
       ctx.fillStyle = GOLD; ctx.fillRect(452, 292, 120, 5);
 

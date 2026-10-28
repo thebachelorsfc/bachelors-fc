@@ -464,7 +464,8 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 .mcard-head img{width:44px;height:44px;object-fit:contain}
 .mcard-head strong{display:block;font-family:Oswald,sans-serif;font-size:16px;letter-spacing:.06em}
 .mcard-head span{display:block;font-size:10px;letter-spacing:.34em;color:#f0cb6e;font-weight:600;margin-top:2px}
-.mcard-name{font-family:Oswald,sans-serif;font-size:clamp(24px,5.4vw,36px);font-weight:700;text-transform:uppercase;margin:2px 0 0;padding-bottom:8px;border-bottom:2px solid #d4af37;line-height:1.05}
+.mcard-name{font-family:Oswald,sans-serif;font-size:clamp(24px,5.4vw,36px);font-weight:700;text-transform:uppercase;margin:2px 0 0;padding-bottom:8px;border-bottom:2px solid #d4af37;line-height:1.05;display:flex;align-items:center;white-space:nowrap}
+.mcard-name .cap-badge{font-size:12px;margin-left:9px}
 .mcard-rows{display:grid;gap:6px}
 .mcard-rows p{margin:0;display:flex;justify-content:space-between;gap:12px;font-size:13.5px}
 .mcard-rows span{color:#f0cb6e;font-family:Oswald,sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;padding-top:2px}
