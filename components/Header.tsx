@@ -21,10 +21,11 @@ const I = {
   mail: <svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4.5 7.5 12 13l7.5-5.5"/></svg>,
   user: <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.4 3.6-5 7-5s6.2 1.6 7 5"/></svg>,
   award: <svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M8.9 13.4 7.2 21l4.8-2.5L16.8 21l-1.7-7.6"/></svg>,
+  trophy: <svg viewBox="0 0 24 24"><path d="M7.5 3.5h9V9a4.5 4.5 0 0 1-9 0V3.5Z"/><path d="M7.5 5H4.8a2.8 2.8 0 0 0 2.9 4.4M16.5 5h2.7a2.8 2.8 0 0 1-2.9 4.4"/><path d="M12 13.5V17M9 20.5h6M10.2 20.5 11.2 17h1.6l1 3.5"/></svg>,
 };
 const NAV: [string, string, keyof typeof I][] = [
   ["Home","/","home"],["Mission","/about","target"],["Kit","/#kit","shirt"],["Tour","/#tour","pin"],
-  ["Gallery","/gallery","image"],["Squad","/squad","users"],["People","/people","award"],["Store","/store","bag"],["History","/history","clock"],
+  ["Gallery","/gallery","image"],["Squad","/squad","users"],["Leaderboard","/#leaderboard","trophy"],["People","/people","award"],["Store","/store","bag"],["History","/history","clock"],
   ["Grounds","/grounds","flag"],["Rules","/rules","list"],["Contact","/contact","mail"],["Login","/login","user"],
 ];
 

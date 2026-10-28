@@ -101,7 +101,7 @@ export default async function Home(){
       <p style={{marginTop:16}}><Link className="btn ghost" href="/squad">Full squad →</Link></p>
     </section>
 
-    <section className="wrap"><p className="eyebrow">Top Performers</p><h2>Leaderboard</h2>
+    <section className="wrap" id="leaderboard"><p className="eyebrow">Top Performers</p><h2>Leaderboard</h2>
       <Leaderboard/>
     </section>
 
