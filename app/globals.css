@@ -511,6 +511,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
    (Events card, dashboard, leaderboard, membership card). Driven entirely by
    players.is_captain, so it moves to the new captain automatically. */
 .cap-badge{display:inline-flex;align-items:center;justify-content:center;width:1.5em;height:1.5em;margin-left:.32em;border-radius:50%;border:2px solid #d4af37;background:radial-gradient(circle at 35% 30%,#25336e,#0a1230 72%);color:#f0cb6e;font-family:Oswald,sans-serif;font-weight:700;font-size:.6em;line-height:1;vertical-align:-.06em;box-shadow:0 0 0 3px rgba(212,175,55,.16),0 2px 8px rgba(0,0,0,.4);flex:none}
+/* Name + captain badge wrapper: flex centring keeps the badge exactly
+   parallel with the name (same line, same height) in every context. */
+.name-row{display:inline-flex;align-items:center}
 
 /* Premium captain card (Events section) — portrait, stays dark in both themes */
 .ev-cap{position:relative;display:flex;flex-direction:column;height:100%;border-radius:20px;overflow:hidden;color:#f7f5ef;background:linear-gradient(165deg,#131c46,#0a1230 55%,#191104);border:1.5px solid #d4af37;box-shadow:0 18px 40px rgba(0,0,0,.38)}

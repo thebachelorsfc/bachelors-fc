@@ -59,7 +59,7 @@ export default function DashboardPage() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
           <div>
             <p className="eyebrow">Player Dashboard</p>
-            <h1 style={{ marginBottom: 4 }}>{player ? <>{player.name}{player.is_captain ? <CapBadge /> : null}</> : "Welcome, Bachelor"}</h1>
+            <h1 style={{ marginBottom: 4 }}>{player ? <span className="name-row">{player.name}{player.is_captain ? <CapBadge /> : null}</span> : "Welcome, Bachelor"}</h1>
             <p style={{ color: "var(--muted)", margin: 0 }}>{me?.email}{player ? ` · #${player.jersey_no} · ${player.position}` : ""}</p>
           </div>
           <button className="btn ghost" onClick={logout}>Log out</button>

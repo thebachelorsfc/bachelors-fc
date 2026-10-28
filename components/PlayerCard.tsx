@@ -26,14 +26,14 @@ export default function PlayerCard({ p }: { p: Player }) {
         <article className="card player-card flip-face flip-front" onClick={() => setFlip(true)} role="button" tabIndex={0} aria-label={`Flip ${p.name}'s card to see stats`} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFlip(true); } }}>
           {p.photo_url ? (<div className="photo"><Image src={p.photo_url} alt={p.name} fill sizes="(max-width:560px) 45vw, 255px" /><span className="num">#{p.jersey_no}</span><span className="flip-hint">↻ Stats</span></div>) : (<div className="photo" style={{ display: "grid", placeItems: "center" }}><span style={{ fontSize: 64, fontWeight: 800, color: "var(--gold)" }}>#{p.jersey_no}</span><span className="flip-hint">↻ Stats</span></div>)}
           <div className="eyebrow" style={{ marginTop: 12 }}>{p.position_code} · #{p.jersey_no}</div>
-          <h3 style={{ margin: "6px 0" }}>{p.name}{p.is_captain ? <CapBadge /> : null}</h3>
+          <h3 style={{ margin: "6px 0" }}><span className="name-row">{p.name}{p.is_captain ? <CapBadge /> : null}</span></h3>
           <p style={{ color: "var(--muted)", margin: 0, fontSize: 14 }}>{p.position} · Joined {p.joined_year} · Active Member</p>
         </article>
         <article className="card player-card flip-face flip-back" onClick={() => setFlip(false)} role="button" tabIndex={0} aria-label={`Flip ${p.name}'s card back`} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFlip(false); } }}>
           <span className="pb-ghost" aria-hidden="true">#{p.jersey_no}</span>
           <Image className="pb-wm" src="/assets/logo-transparent.png" alt="" width={240} height={284} style={{ objectFit: "contain" }} aria-hidden="true" />
           <div className="pb-top"><span className="pb-chip">{p.position_code} · #{p.jersey_no}</span><span className="pb-season">Season 2026</span></div>
-          <h3 className="pb-name">{p.name}{p.is_captain ? <CapBadge /> : null}</h3>
+          <h3 className="pb-name"><span className="name-row">{p.name}{p.is_captain ? <CapBadge /> : null}</span></h3>
           <p className="pb-pos">{p.position}{p.preferred_foot ? ` · ${p.preferred_foot} foot` : ""}</p>
           <div className="pb-stats">
             <div className="pb-stat"><b>{matches}</b><span>Matches</span></div>
