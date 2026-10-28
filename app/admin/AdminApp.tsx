@@ -34,6 +34,7 @@ export default function AdminApp(){
   async function addPlayer(){ const r=await fetch("/api/players",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...np,jersey_no:Number(np.jersey_no),joined_year:Number(np.joined_year)})}); const j=await r.json(); setMsg(r.ok?`Player added: ${j.name} #${j.jersey_no}${j.photo_url?" — photo auto-set from application 📷":""}`:(j.error||"Failed")); if(r.ok){ setNp({name:"",jersey_no:"",position:"",position_code:"FWD",joined_year:"2026"}); load(); } }
   async function delPlayer(id:string){ if(!confirm("Delete this player?")) return; await fetch(`/api/players/${id}`,{method:"DELETE"}); load(); }
   async function addSession(){ const r=await fetch("/api/sessions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(ns)}); setMsg(r.ok?"Session saved — it now shows as Next Session on the homepage.":"Failed to save session"); if(r.ok) setNs({title:"",session_date:"",session_time:"",ground:"",opponent:""}); }
+  async function motmAct(s:any,action:string){ const body:any={session_id:s.id,action}; if(action==="award"){ const sel=(document.getElementById(`motm-sel-${s.id}`) as HTMLSelectElement|null)?.value; if(!sel){ setMsg("Pick the winning player first"); return; } body.player_id=sel; } const r=await fetch("/api/admin/motm",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); const j=await r.json().catch(()=>({})); setMsg(r.ok?(action==="open"?`MOTM vote opened for ${s.title} — players can vote from their dashboards 🗳`:action==="close"?`MOTM vote closed for ${s.title}`:`🏆 MOTM awarded for ${s.title}!`):(j.error||"MOTM action failed")); if(r.ok) load(); }
   async function uploadPhoto(){ if(!gf.file){ setMsg("Choose a photo first"); return; } const fd=new FormData(); fd.set("photo",gf.file); fd.set("caption",gf.caption); fd.set("category",gf.category); fd.set("taken_on",gf.taken_on); const r=await fetch("/api/gallery",{method:"POST",body:fd}); const j=await r.json().catch(()=>({})); setMsg(r.ok?"Photo added to the gallery":(j.error||"Upload failed")); if(r.ok){ setGf({caption:"",category:"team",taken_on:"",file:null}); load(); } }
   async function delPhoto(id:string){ if(!confirm("Delete this photo?")) return; await fetch(`/api/gallery/${id}`,{method:"DELETE"}); load(); }
   async function addHighlight(){ const r=await fetch("/api/highlights",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(hf)}); const j=await r.json().catch(()=>({})); setMsg(r.ok?"Highlight added":(j.error||"Failed")); if(r.ok){ setHf({title:"",video_url:"",played_on:""}); load(); } }
@@ -133,6 +134,25 @@ export default function AdminApp(){
         <p style={{margin:"0 0 6px",fontSize:12.5,color:"var(--muted)"}}>👑 Admin set — tap to mark any player for this session (works even if he has no account yet; the player can change it later from his dashboard):</p>
         <div style={{display:"flex",flexDirection:"column",gap:6}}>{(s.players||[]).map((pl:any)=><div key={pl.id} style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}><span style={{flex:"1 1 110px",fontSize:13.5}}>#{pl.jersey_no} {pl.name}</span>{["in","maybe","out"].map((st:string)=><button key={st} className="btn ghost" style={{padding:".28rem .6rem",fontSize:12,...(pl.status===st?{background:st==="in"?"#7be3a0":st==="out"?"#ff9d9d":"var(--gold)",color:"#06060a",borderColor:"transparent",fontWeight:800}:{})}} onClick={async()=>{ const r=await fetch("/api/admin/rsvps",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({session_id:s.id,player_id:pl.id,status:st})}); setMsg(r.ok?`${pl.name} marked ${st.toUpperCase()} for ${s.title} ✓`:"RSVP save failed"); if(r.ok) load(); }}>{st.toUpperCase()}</button>)}</div>)}</div>
       </div></div>)}</div>}</div>}
+    {tab==="sessions" && rsvpList.length>0 && <div className="card" style={{marginTop:14}}><h3>🏆 Man of the Match</h3>
+      <p style={{color:"var(--muted)",fontSize:13.5,margin:"0 0 10px"}}>Open a vote after a session — players pick the MOTM from their dashboards (only those who played can be voted for). Awarding adds +1 to the winner&apos;s MOTM stat and puts him in the homepage spotlight. Needs migration 012.</p>
+      {rsvpList.map((s:any)=>{ const counts=s.motm_counts||{}; const top=Object.entries(counts).sort((a:any,b:any)=>b[1]-a[1]); const nameOf=(id:string)=>players.find((p:any)=>p.id===id)?.name||"Player"; return <div key={s.id} style={{borderTop:"1px solid var(--line)",padding:"10px 0"}}>
+        <strong>{s.title}</strong> <span style={{color:"var(--muted)",fontSize:13}}>{s.session_date||""}</span>
+        {s.motm_player_id ? <p style={{margin:"6px 0 0",fontSize:14}}>🏆 <strong style={{color:"var(--gold-text)"}}>MOTM: {nameOf(s.motm_player_id)}</strong></p>
+        : s.motm_open ? <div style={{marginTop:8}}>
+            {top.length===0 ? <p style={{color:"var(--muted)",fontSize:14,margin:"0 0 8px"}}>Vote is open — no votes yet.</p> : <p style={{fontSize:14,margin:"0 0 8px",lineHeight:1.7}}>{top.slice(0,5).map(([id,n]:any)=><span key={id} style={{display:"block"}}>{nameOf(id)} — <strong>{n}</strong> {n===1?"vote":"votes"}</span>)}</p>}
+            <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+              <select id={`motm-sel-${s.id}`} style={{...input,width:"auto",maxWidth:230}} defaultValue={top.length?top[0][0]:""}>
+                <option value="" disabled>Pick the winner…</option>
+                {(s.players||[]).map((pl:any)=><option key={pl.id} value={pl.id}>#{pl.jersey_no} {pl.name}{counts[pl.id]?` (${counts[pl.id]})`:""}</option>)}
+              </select>
+              <button className="btn" onClick={()=>motmAct(s,"award")}>🏆 Award MOTM</button>
+              <button className="btn ghost" onClick={()=>motmAct(s,"close")}>Close vote</button>
+            </div>
+          </div>
+        : <div style={{marginTop:8}}><button className="btn ghost" onClick={()=>motmAct(s,"open")}>🗳 Open MOTM vote</button></div>}
+      </div>;})}
+    </div>}
     {posterFor && <PosterGenerator session={posterFor} grounds={grs} inCount={(posterFor.list||[]).filter((r:any)=>r.status==="in").length} onClose={()=>setPosterFor(null)} />}
     {tab==="people" && <div>
       <div className="card" style={{marginBottom:14}}><strong>👥 People — Founders &amp; Leadership.</strong> <span style={{color:"var(--muted)"}}>These profiles appear on the People page as sliding cards: photo, role, quote, their own message, and social links so visitors can reach them directly. Sort order 0 shows first. If saving fails with a database error, the People SQL (migration 008) has not been run in Supabase yet.</span></div>

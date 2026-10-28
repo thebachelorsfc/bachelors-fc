@@ -8,8 +8,11 @@ export async function GET() { if (!isAdmin()) return NextResponse.json({ error: 
   const ids = sessions.map((s: any) => s.id);
   const { data: rsvps } = await w.from("session_rsvps").select("*").in("session_id", ids);
   const { data: players } = await w.from("players").select("id,name,jersey_no").order("jersey_no");
+  const { data: votes } = await w.from("motm_votes").select("session_id,candidate_player_id").in("session_id", ids);
   const nameOf = new Map((players ?? []).map((p: any) => [p.id, p.name]));
   return NextResponse.json(sessions.map((s: any) => ({ id: s.id, title: s.title, session_date: s.session_date, session_time: s.session_time, ground: s.ground ?? null, opponent: s.opponent ?? null,
+    motm_open: !!s.motm_open, motm_player_id: s.motm_player_id ?? null,
+    motm_counts: (votes ?? []).filter((v: any) => v.session_id === s.id).reduce((acc: any, v: any) => { acc[v.candidate_player_id] = (acc[v.candidate_player_id] || 0) + 1; return acc; }, {} as Record<string, number>),
     list: (rsvps ?? []).filter((r: any) => r.session_id === s.id).map((r: any) => ({ name: nameOf.get(r.player_id) || "Player", status: r.status })),
     players: (players ?? []).map((p: any) => ({ id: p.id, name: p.name, jersey_no: p.jersey_no, status: (rsvps ?? []).find((r: any) => r.session_id === s.id && r.player_id === p.id)?.status || null })) }))); }
 // Admin override (2026-10-27): the admin can mark any squad player IN/OUT/MAYBE

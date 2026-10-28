@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import MemberCard from "@/components/MemberCard";
+import MotmVote from "@/components/MotmVote";
 
 type Sess = any;
 const STATUS_BTN: Record<string, string> = { in: "✅ IN", out: "❌ OUT", maybe: "🤔 MAYBE" };
@@ -86,6 +87,7 @@ export default function DashboardPage() {
           <>
             <h2 style={{ marginTop: 30 }}>Your membership card</h2>
             <MemberCard player={player} />
+            <MotmVote token={token} />
             <h2 style={{ marginTop: 34 }}>Upcoming sessions</h2>
             {msg && <p style={{ color: "var(--note)" }}>{msg}</p>}
             {sessions.length === 0 && <div className="card"><p style={{ color: "var(--muted)", margin: 0 }}>No upcoming sessions scheduled yet. The next session will appear here as soon as the club sets it.</p></div>}

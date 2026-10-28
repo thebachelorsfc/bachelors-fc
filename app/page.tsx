@@ -15,6 +15,7 @@ import NextMatchCard from "@/components/NextMatchCard";
 import SquadCarousel from "@/components/SquadCarousel";
 import CardCarousel from "@/components/CardCarousel";
 import PersonCard from "@/components/PersonCard";
+import Leaderboard from "@/components/Leaderboard";
 
 export default async function Home(){
   const players:any[] = (await getPlayers()) ?? SEED_PLAYERS; const highlights:any[] = await getHighlights(); const people:any[] = await getPeople();
@@ -98,6 +99,10 @@ export default async function Home(){
     <section className="wrap"><p className="eyebrow">The Lineup</p><h2>Meet the Squad</h2>
       <SquadCarousel>{sortedPlayers.map((p:any)=><PlayerCard key={p.jersey_no} p={p}/>)}{openNumbers(sortedPlayers).slice(0,3).map(n=><OpenShirt key={n} n={n}/>)}</SquadCarousel>
       <p style={{marginTop:16}}><Link className="btn ghost" href="/squad">Full squad →</Link></p>
+    </section>
+
+    <section className="wrap"><p className="eyebrow">Top Performers</p><h2>Leaderboard</h2>
+      <Leaderboard/>
     </section>
 
     {groundSlides.length>0 && (<section className="wrap"><p className="eyebrow">Our Grounds</p><h2>Where we play</h2>
