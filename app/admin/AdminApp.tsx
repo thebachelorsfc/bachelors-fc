@@ -1,12 +1,14 @@
 "use client";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { useCallback, useEffect, useState } from "react";
+import PosterGenerator from "@/components/PosterGenerator";
 const input: React.CSSProperties = { width:"100%", padding:"10px 12px", borderRadius:10, border:"1px solid var(--field-br)", background:"var(--field-bg)", color:"var(--field-tx)" };
 export default function AdminApp(){
   const [authed,setAuthed]=useState<boolean|null>(null); const [pw,setPw]=useState(""); const [tab,setTab]=useState("applications");
   const [apps,setApps]=useState<any[]>([]); const [players,setPlayers]=useState<any[]>([]); const [msg,setMsg]=useState(""); const [grs,setGrs]=useState<any[]>([]); const [ppl,setPpl]=useState<any[]>([]);
   const [np,setNp]=useState({name:"",jersey_no:"",position:"",position_code:"FWD",joined_year:"2026"});
   const [ns,setNs]=useState({title:"",session_date:"",session_time:"",ground:"",opponent:""});
+  const [posterFor,setPosterFor]=useState<any>(null);
   const [gal,setGal]=useState<any[]>([]); const [hls,setHls]=useState<any[]>([]);
   const [gf,setGf]=useState<{caption:string;category:string;taken_on:string;file:File|null}>({caption:"",category:"team",taken_on:"",file:null});
   const [hf,setHf]=useState({title:"",video_url:"",played_on:""});
@@ -126,11 +128,12 @@ export default function AdminApp(){
       <input style={input} placeholder="Ground / turf" value={ns.ground} onChange={e=>setNs({...ns,ground:e.target.value})}/>
       <input style={input} placeholder="Opponent (optional)" value={ns.opponent} onChange={e=>setNs({...ns,opponent:e.target.value})}/></div>
       <button className="btn" style={{marginTop:12}} onClick={addSession}>Save session</button>
-      {rsvpList.length>0 && <div style={{marginTop:18}}><h3>Who&apos;s playing — RSVPs</h3>{rsvpList.map((s:any)=><div key={s.id} style={{borderTop:"1px solid var(--line)",padding:"10px 0"}}><strong>{s.title}</strong> <span style={{color:"var(--muted)",fontSize:13}}>{s.session_date||""}</span>
+      {rsvpList.length>0 && <div style={{marginTop:18}}><h3>Who&apos;s playing — RSVPs</h3>{rsvpList.map((s:any)=><div key={s.id} style={{borderTop:"1px solid var(--line)",padding:"10px 0"}}><strong>{s.title}</strong> <span style={{color:"var(--muted)",fontSize:13}}>{s.session_date||""}</span> <button className="btn" style={{marginLeft:8,padding:".3rem .7rem",fontSize:12.5}} onClick={()=>setPosterFor(s)}>🖼 Poster</button>
       {s.list.length===0 ? <p style={{color:"var(--muted)",fontSize:14,margin:"4px 0"}}>No RSVPs yet.</p> : <p style={{fontSize:14,margin:"4px 0",lineHeight:1.7}}>{["in","maybe","out"].map(st=>(<span key={st} style={{display:"block"}}><strong style={{color:st==="in"?"var(--ok)":st==="out"?"var(--bad)":"var(--gold-text)"}}>{st.toUpperCase()}:</strong> <span style={{color:"var(--muted)"}}>{s.list.filter((r:any)=>r.status===st).map((r:any)=>r.name).join(", ")||"—"}</span></span>))}</p>}<div style={{marginTop:10}}>
         <p style={{margin:"0 0 6px",fontSize:12.5,color:"var(--muted)"}}>👑 Admin set — tap to mark any player for this session (works even if he has no account yet; the player can change it later from his dashboard):</p>
         <div style={{display:"flex",flexDirection:"column",gap:6}}>{(s.players||[]).map((pl:any)=><div key={pl.id} style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}><span style={{flex:"1 1 110px",fontSize:13.5}}>#{pl.jersey_no} {pl.name}</span>{["in","maybe","out"].map((st:string)=><button key={st} className="btn ghost" style={{padding:".28rem .6rem",fontSize:12,...(pl.status===st?{background:st==="in"?"#7be3a0":st==="out"?"#ff9d9d":"var(--gold)",color:"#06060a",borderColor:"transparent",fontWeight:800}:{})}} onClick={async()=>{ const r=await fetch("/api/admin/rsvps",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({session_id:s.id,player_id:pl.id,status:st})}); setMsg(r.ok?`${pl.name} marked ${st.toUpperCase()} for ${s.title} ✓`:"RSVP save failed"); if(r.ok) load(); }}>{st.toUpperCase()}</button>)}</div>)}</div>
       </div></div>)}</div>}</div>}
+    {posterFor && <PosterGenerator session={posterFor} grounds={grs} inCount={(posterFor.list||[]).filter((r:any)=>r.status==="in").length} onClose={()=>setPosterFor(null)} />}
     {tab==="people" && <div>
       <div className="card" style={{marginBottom:14}}><strong>👥 People — Founders &amp; Leadership.</strong> <span style={{color:"var(--muted)"}}>These profiles appear on the People page as sliding cards: photo, role, quote, their own message, and social links so visitors can reach them directly. Sort order 0 shows first. If saving fails with a database error, the People SQL (migration 008) has not been run in Supabase yet.</span></div>
       <div className="card"><h3>👤 Add a person</h3>
