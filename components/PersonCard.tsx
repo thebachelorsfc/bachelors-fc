@@ -3,7 +3,7 @@ const waLink = (n?: string | null) => { if (!n) return null; let d = String(n).r
 export default function PersonCard({ p }: { p: any }) {
   const wa = waLink(p.whatsapp);
   return (<article className="card person-card">
-    {p.photo_url ? (<div className="person-photo"><img className="person-img" src={p.photo_url} alt={p.name} loading="lazy" decoding="async" /></div>) : (<div className="person-photo person-noimg"><Image src="/assets/logo-transparent.png" alt="" width={84} height={99} style={{ objectFit: "contain", opacity: 0.9 }} /></div>)}
+    {p.photo_url ? (<div className="person-photo"><Image className="person-img" src={p.photo_url} alt={p.name} width={800} height={600} sizes="(max-width:560px) 94vw, 560px" loading="lazy" /></div>) : (<div className="person-photo person-noimg"><Image src="/assets/logo-transparent.png" alt="" width={84} height={99} style={{ objectFit: "contain", opacity: 0.9 }} /></div>)}
     <div className="person-body">
       {p.role && <div className="eyebrow">{p.role}</div>}
       <h3>{p.name}</h3>

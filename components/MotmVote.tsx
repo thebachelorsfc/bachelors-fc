@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 
 /* Dashboard MOTM voting card — appears only while the admin has a vote open.
    One vote per player, changeable while open. Counts appear after you've voted. */
@@ -45,7 +46,7 @@ export default function MotmVote({ token }: { token: string }) {
                     style={{ position: "relative", overflow: "hidden", display: "flex", alignItems: "center", gap: 10, justifyContent: "flex-start", textAlign: "left", padding: ".55rem .8rem", ...(mine ? {} : { background: "var(--chip-bg)", color: "var(--chip-tx)", border: "1px solid var(--chip-br)" }) }}>
                     {votes !== null && <span style={{ position: "absolute", inset: 0, width: `${(votes / max) * 100}%`, background: mine ? "rgba(6,6,10,0.18)" : "rgba(212,175,55,0.16)" }} />}
                     {c.photo_url
-                      ? <img src={c.photo_url} alt="" style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover", objectPosition: "top", position: "relative" }} />
+                      ? <Image src={c.photo_url} alt="" width={76} height={76} style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover", objectPosition: "top", position: "relative" }} />
                       : <span style={{ width: 38, height: 38, borderRadius: "50%", background: "#101c48", color: "#f0cb6e", display: "grid", placeItems: "center", fontFamily: "Oswald", position: "relative" }}>#{c.jersey_no}</span>}
                     <span style={{ position: "relative", flex: 1 }}>{c.name} <span style={{ opacity: 0.75 }}>· #{c.jersey_no}</span></span>
                     {votes !== null && <strong style={{ position: "relative" }}>{votes} {votes === 1 ? "vote" : "votes"}</strong>}

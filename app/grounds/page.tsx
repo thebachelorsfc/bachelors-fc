@@ -3,8 +3,7 @@ export const metadata: Metadata = { title: "Grounds | The Bachelors FC", alterna
 export const dynamic = "force-dynamic";
 
 export default async function Grounds() {
-  const grounds: any[] = await getGrounds();
-  const sessions: any[] = await getAllSessions();
+  const [grounds, sessions]: any[] = await Promise.all([getGrounds(), getAllSessions()]);
   const slides = buildGroundSlides(grounds, sessions);
   return (<main className="wrap"><section><p className="eyebrow">Our Grounds</p><h1>Where we play</h1>
     <p style={{ color: "var(--muted)", maxWidth: 720 }}>The Bachelors FC has no stadium of its own — these are the turfs and fields around Chittagong where the brotherhood shows up, session after session.</p>

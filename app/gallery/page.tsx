@@ -3,8 +3,7 @@ import GalleryClient from "./GalleryClient";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Gallery & Highlights | The Bachelors FC" };
 export default async function GalleryPage() {
-  const items: any[] = await getGalleryItems();
-  const highlights: any[] = await getHighlights();
+  const [items, highlights]: any[] = await Promise.all([getGalleryItems(), getHighlights()]);
   return (
     <main className="wrap">
       <section style={{ paddingBottom: 24 }}>

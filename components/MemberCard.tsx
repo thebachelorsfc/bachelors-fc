@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import NextImage from "next/image"; // aliased: this file also uses the global Image() constructor for the PNG download canvas
 import QRCode from "qrcode";
 
 /* Digital Membership Card — shown on the player dashboard (approved + linked players only).
@@ -184,7 +185,7 @@ export default function MemberCard({ player }: { player: any }) {
         <div className="mcard-chip" aria-hidden="true" />
         <div className="mcard-photo">
           {player.photo_url
-            ? <img src={player.photo_url} alt={player.name} />
+            ? <NextImage src={player.photo_url} alt={player.name} fill sizes="(max-width:560px) 40vw, 240px" />
             : <span className="mcard-initials">{initials(player.name)}</span>}
           <span className="mcard-no">#{player.jersey_no}</span>
         </div>

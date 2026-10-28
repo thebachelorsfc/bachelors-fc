@@ -18,9 +18,11 @@ import PersonCard from "@/components/PersonCard";
 import Leaderboard from "@/components/Leaderboard";
 
 export default async function Home(){
-  const players:any[] = (await getPlayers()) ?? SEED_PLAYERS; const highlights:any[] = await getHighlights(); const people:any[] = await getPeople();
-  const allSessions:any[] = await getAllSessions();
-  const groundSlides = buildGroundSlides(await getGrounds(), allSessions); const galleryItems:any[] = await getGalleryItems();
+  // All six reads run in PARALLEL (perf fix 2026-10-29: sequential awaits made
+  // the homepage take ~5.7s server-side; one round of parallel queries ≈ 1s).
+  const [playersRaw, highlights, people, allSessions, groundsRaw, galleryItems]: any[] = await Promise.all([getPlayers(), getHighlights(), getPeople(), getAllSessions(), getGrounds(), getGalleryItems()]);
+  const players:any[] = playersRaw ?? SEED_PLAYERS;
+  const groundSlides = buildGroundSlides(groundsRaw, allSessions);
   // Slim Next Match card (owner re-requested 2026-10-27 after the old Next
   // Session section was removed): next upcoming session only, hidden if none.
   const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Dhaka" });

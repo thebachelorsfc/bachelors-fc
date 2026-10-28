@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 
 /* Public Leaderboard — live from the players' real stats (same numbers as the
    card backs). Podium for the top 3 + ranked rows. Plus the latest awarded
@@ -46,7 +47,7 @@ export default function Leaderboard() {
   const Person = ({ p, big }: { p: any; big?: boolean }) => (
     <>
       {p.photo_url
-        ? <img className={big ? "lb-ava big" : "lb-ava"} src={p.photo_url} alt={p.name} loading="lazy" />
+        ? <Image className={big ? "lb-ava big" : "lb-ava"} src={p.photo_url} alt={p.name} width={128} height={128} loading="lazy" />
         : <span className={big ? "lb-ava big lb-ava-fb" : "lb-ava lb-ava-fb"}>{String(p.name).split(/\s+/).map((w: string) => w[0]).slice(0, 2).join("")}</span>}
       <span className="lb-who"><strong>{p.name}</strong><em>#{p.jersey_no} · {cat.sub(p)}</em></span>
       <span className={big ? "lb-val big" : "lb-val"}>{cat.value(p)}<small>{cat.unit}</small></span>
@@ -57,7 +58,7 @@ export default function Leaderboard() {
     <div>
       {latest && (
         <div className="lb-spot">
-          {latest.player.photo_url && <img src={latest.player.photo_url} alt={latest.player.name} loading="lazy" />}
+          {latest.player.photo_url && <Image src={latest.player.photo_url} alt={latest.player.name} width={152} height={152} loading="lazy" />}
           <div className="lb-spot-body">
             <span className="lb-spot-kicker">🏆 Man of the Match</span>
             <strong>{latest.player.name}</strong>

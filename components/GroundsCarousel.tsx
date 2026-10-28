@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useDragScroll } from "@/components/useDragScroll";
 export type GroundSlide = { id: string; name: string; address: string; photo_url?: string | null; played: number; lastLabel: string; nextLabel?: string | null; directions: string };
 export default function GroundsCarousel({ grounds }: { grounds: GroundSlide[] }) {
@@ -31,7 +32,7 @@ export default function GroundsCarousel({ grounds }: { grounds: GroundSlide[] })
       <div className="grd-track" ref={trackRef} onScroll={onScroll} {...drag}>
         {grounds.map((g, gi) => (
           <article className="gcard" key={g.id}>
-            {g.photo_url && <div className="gcard-photo"><img src={g.photo_url} alt={g.name} loading={gi === 0 ? "eager" : "lazy"} decoding="async" /></div>}
+            {g.photo_url && <div className="gcard-photo"><Image src={g.photo_url} alt={g.name} width={680} height={336} sizes="(max-width:560px) 86vw, 340px" loading={gi === 0 ? "eager" : "lazy"} /></div>}
             <div className="gcard-body">
               <h3 style={{ margin: "0 0 4px" }}>{g.name}</h3>
               <p style={{ color: "var(--muted)", margin: 0 }}>📍 {g.address}</p>
