@@ -9,7 +9,7 @@ import Link from "next/link";
 // earliest upcoming session only). startsAt is an absolute instant — the
 // session's Dhaka wall time converted to UTC — so the countdown is right
 // in any visitor's timezone.
-export default function NextMatchCard({ tag, opponent, meta, startsAt, directions }: { tag: string; opponent: string; meta: string; startsAt: string; directions?: string }) {
+export default function NextMatchCard({ tag, opponent, meta, startsAt, directions, matchday }: { tag: string; opponent: string; meta: string; startsAt: string; directions?: string; matchday?: boolean }) {
   const start = new Date(startsAt).getTime();
   const [left, setLeft] = useState<number>(() => start - Date.now());
   useEffect(() => {
@@ -23,7 +23,7 @@ export default function NextMatchCard({ tag, opponent, meta, startsAt, direction
   const pad = (n: number) => String(n).padStart(2, "0");
   const val = d > 0 ? `${d}d ${pad(h)}:${pad(m)}:${pad(sec)}` : `${pad(h)}:${pad(m)}:${pad(sec)}`;
   return (
-    <div className="nm-card">
+    <div className={matchday ? "nm-card matchday" : "nm-card"}>
       <div className="nm-toprow">
         <span className="nm-tag">{tag}</span>
         <span className="nm-count"><span className="nm-count-label">Kick-off in</span><span className="nm-count-val" suppressHydrationWarning>{val}</span></span>

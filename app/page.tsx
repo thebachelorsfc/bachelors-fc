@@ -57,17 +57,18 @@ export default async function Home(){
   const bandItem:any = galleryItems.find((g:any)=>/brotherhood lives on/i.test(g.caption||"")) || galleryItems.find((g:any)=>/forged in brotherhood/i.test(g.caption||"")) || galleryItems[0] || null;
   const order:Record<string,number>={FWD:0,MID:1,DEF:2,GK:3}; const sortedPlayers=[...players].sort((a:any,b:any)=>((order[a.position_code]??9)-(order[b.position_code]??9))||(a.jersey_no-b.jersey_no));
   return(<main>
-    <section className="hero" style={{textAlign:"center"}}>
+    <section className={nextMatch?.session_date === todayStr ? "hero hero-matchday" : "hero"} style={{textAlign:"center"}}>
       <div className="wrap" style={{position:"relative",zIndex:1}}>
         <div className="rise rise-1"><Image className="hero-crest" src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={168} height={198} style={{objectFit:"contain"}} priority/></div>
         <h1 className="hero-title rise rise-2">Forged in<br/><span className="gold-text">Brotherhood</span></h1>
         <p className="rise rise-3" style={{maxWidth:640,margin:"16px auto 0",color:"var(--muted)"}}>An apolitical, non-profit football club in Khulshi, Chittagong — built for bachelor youth who chose purpose over loneliness.</p>
+        {nextMatch?.session_date === todayStr && (<p className="md-ribbon rise rise-4"><span className="md-dot" aria-hidden="true"/>Match Today{nextMatch.opponent ? ` — vs ${nextMatch.opponent}` : ""}{nmTime ? ` · 🕒 ${nmTime}` : ""}{nextMatch.ground ? ` · 📍 ${nextMatch.ground}` : ""}</p>)}
         <p className="rise rise-4" style={{display:"flex",gap:12,justifyContent:"center",marginTop:26,flexWrap:"wrap"}}><Link className="btn" href="/join">Join the Squad</Link><Link className="btn ghost" href="/squad">Meet the Squad</Link></p>
       </div>
     </section>
 
     {nextMatch && (<section className="wrap nm-section">
-      <NextMatchCard tag={nextMatch.session_date === todayStr ? "🔴 Match Today" : "Next Match"} opponent={nextMatch.opponent || ""} meta={`📅 ${nmDate}${nmTime ? ` · 🕒 ${nmTime}` : ""}${nextMatch.ground ? ` · 📍 ${nextMatch.ground}` : ""}`} startsAt={nmStartISO} directions={nmDirections} />
+      <NextMatchCard tag={nextMatch.session_date === todayStr ? "🔴 Match Today" : "Next Match"} opponent={nextMatch.opponent || ""} meta={`📅 ${nmDate}${nmTime ? ` · 🕒 ${nmTime}` : ""}${nextMatch.ground ? ` · 📍 ${nextMatch.ground}` : ""}`} startsAt={nmStartISO} directions={nmDirections} matchday={nextMatch.session_date === todayStr} />
     </section>)}
 
     <section className="wrap">

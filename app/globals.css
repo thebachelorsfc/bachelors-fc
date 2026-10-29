@@ -555,5 +555,36 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 .photo-band-in{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px}
 .photo-band-kick{margin:0;color:var(--gold2);font-family:var(--font-display);font-size:12px;letter-spacing:.42em;text-transform:uppercase;text-shadow:0 2px 14px rgba(0,0,0,.6)}
 .photo-band-motto{margin:12px 0 0;color:#f7f5ef;font-family:var(--font-display);font-size:clamp(30px,6.2vw,56px);line-height:1.1;text-transform:uppercase;text-shadow:0 4px 30px rgba(0,0,0,.6)}
+/* Matchday Mode — active only when the next session is TODAY (Dhaka):
+   hero scorebug ribbon + a red-hot Next Match card. */
+.md-ribbon{display:inline-flex;align-items:center;gap:9px;margin:20px auto 0;padding:8px 16px;border-radius:999px;background:#20060a;border:1px solid rgba(229,72,77,.45);color:#ffb3b8;font-family:var(--font-display);letter-spacing:.14em;font-size:12.5px;text-transform:uppercase}
+.md-dot{width:8px;height:8px;border-radius:50%;background:#ff4747;animation:mdPulse 1.2s ease-in-out infinite}
+@keyframes mdPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.72)}}
+.hero-matchday{box-shadow:inset 0 -140px 140px -70px rgba(229,72,77,.16),inset 0 90px 120px -60px rgba(201,162,39,.14)}
+.nm-card.matchday{border-color:rgba(229,72,77,.55);background:radial-gradient(420px 160px at 12% 0%,rgba(229,72,77,.13),transparent 70%),var(--card)}
+.nm-card.matchday .nm-title{font-size:1.6rem}
+.nm-card.matchday .nm-tag{background:linear-gradient(120deg,#e5484d,#ff7a72);color:#fff}
+/* Formation pitch (/squad "Our Shape") */
+.pitch{position:relative;aspect-ratio:3/3.6;max-width:520px;margin:16px auto 8px;border-radius:18px;border:2px solid rgba(255,255,255,.5);overflow:hidden;background:repeating-linear-gradient(0deg,rgba(255,255,255,.045) 0 38px,rgba(0,0,0,.05) 38px 76px),linear-gradient(180deg,#20653c,#17492b)}
+.pitch-line{position:absolute;background:rgba(255,255,255,.5)}
+.pitch-half{left:0;right:0;top:50%;height:2px;transform:translateY(-1px)}
+.pitch-circle{position:absolute;left:50%;top:50%;width:110px;height:110px;border:2px solid rgba(255,255,255,.5);border-radius:50%;transform:translate(-50%,-50%)}
+.pitch-box{position:absolute;left:50%;transform:translateX(-50%);width:46%;height:11%;border:2px solid rgba(255,255,255,.5)}
+.pitch-box-t{top:0;border-top:none}
+.pitch-box-b{bottom:0;border-bottom:none}
+.pitch-p{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;width:78px;text-align:center;z-index:2}
+.pitch-p img{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid var(--gold2);background:#0a1230}
+.pitch-fb{display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;border:2px solid var(--gold2);background:#0a1230;color:var(--gold2);font-family:var(--font-display);font-size:14px}
+.pitch-name{display:inline-flex;align-items:center;gap:3px;background:rgba(4,10,6,.72);color:#f7f5ef;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:2.5px 8px;border-radius:99px;white-space:nowrap}
+.pitch-name b{color:var(--gold2)}
+/* Golden Boot Race strip (Leaderboard) */
+.race{margin:0 0 18px;padding:14px 16px;border:1px solid var(--line-gold);border-radius:14px;background:var(--card)}
+.race-title{margin:0 0 10px;font-family:var(--font-display);letter-spacing:.14em;text-transform:uppercase;font-size:13px;color:var(--gold-text)}
+.race-row{display:flex;align-items:center;gap:10px;padding:5px 0}
+.race-medal{width:22px;text-align:center}
+.race-name{flex:0 1 150px;font-weight:700;font-size:14px;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.race-bar{flex:1;height:9px;border-radius:99px;background:var(--chip-bg);overflow:hidden}
+.race-bar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.race-goals{font-family:var(--font-display);color:var(--gold-text);font-size:14px;min-width:38px;text-align:right}
 /* (captain card is portrait by design at every width — no small-screen override needed) */
 

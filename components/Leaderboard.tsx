@@ -69,6 +69,19 @@ export default function Leaderboard() {
         </div>
       )}
 
+      {(() => { const scorers = (players ?? []).filter((p: any) => (p.goals ?? 0) > 0).sort((a: any, b: any) => (b.goals - a.goals) || String(a.name).localeCompare(String(b.name))).slice(0, 3); if (scorers.length < 2) return null; const top = scorers[0].goals; return (
+        <div className="race">
+          <p className="race-title">🥇 Golden Boot Race</p>
+          {scorers.map((p: any, i: number) => (
+            <div className="race-row" key={p.id || p.jersey_no}>
+              <span className="race-medal">{["🥇", "🥈", "🥉"][i]}</span>
+              <span className="race-name"><span className="name-row">{p.name}{p.is_captain ? <CapBadge /> : null}</span></span>
+              <span className="race-bar"><span style={{ width: `${Math.max(8, Math.round((p.goals / top) * 100))}%` }} /></span>
+              <span className="race-goals">{p.goals} ⚽</span>
+            </div>
+          ))}
+        </div> ); })()}
+
       <div className="lb-tabs" role="tablist">
         {available.map(c => (
           <button key={c.key} role="tab" aria-selected={c.key === cat.key} className="btn"
