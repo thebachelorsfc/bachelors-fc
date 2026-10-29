@@ -29,7 +29,7 @@ const I = {
 const NAV: [string, string, keyof typeof I][] = [
   ["Home","/","home"],["Mission","/about","target"],["Kit","/#kit","shirt"],["Tour","/#tour","pin"],
   ["Gallery","/gallery","image"],["Squad","/squad","users"],["Leaderboard","/#leaderboard","trophy"],["Events","/#events","calendar"],["People","/people","award"],["Store","/store","bag"],["History","/history","clock"],
-  ["Grounds","/grounds","flag"],["Rules","/rules","list"],["Contact","/contact","mail"],["Login","/login","user"],
+  ["Grounds","/grounds","flag"],["Rules","/rules","list"],["Login","/login","user"],
 ];
 
 export default function Header() {
