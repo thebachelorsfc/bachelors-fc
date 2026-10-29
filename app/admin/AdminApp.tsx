@@ -6,7 +6,7 @@ import PosterGenerator from "@/components/PosterGenerator";
 import MatchStatsPanel from "@/components/MatchStatsPanel";
 const input: React.CSSProperties = { width:"100%", padding:"10px 12px", borderRadius:10, border:"1px solid var(--field-br)", background:"var(--field-bg)", color:"var(--field-tx)" };
 export default function AdminApp(){
-  const [authed,setAuthed]=useState<boolean|null>(null); const [pw,setPw]=useState(""); const [tab,setTab]=useState("applications");
+  const [authed,setAuthed]=useState<boolean|null>(null); const [pw,setPw]=useState(""); const [tab,setTab]=useState("home");
   const [apps,setApps]=useState<any[]>([]); const [players,setPlayers]=useState<any[]>([]); const [msg,setMsg]=useState(""); const [grs,setGrs]=useState<any[]>([]); const [ppl,setPpl]=useState<any[]>([]);
   const [np,setNp]=useState({name:"",jersey_no:"",position:"",position_code:"FWD",joined_year:"2026"});
   const [ns,setNs]=useState({title:"",session_date:"",session_time:"",ground:"",opponent:""});
@@ -53,9 +53,31 @@ export default function AdminApp(){
   if(authed===null) return <p style={{color:"var(--muted)"}}>Loading…</p>;
   if(!authed) return <div className="card" style={{maxWidth:420}}><h3>Admin Login</h3>{msg&&<p style={{color:"var(--bad)"}}>{msg}</p>}<input style={input} type="password" placeholder="Admin password" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&login()}/><button className="btn" style={{marginTop:12}} onClick={login}>Log in</button></div>;
   return(<div>
-    <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>{["applications","players","sessions","grounds","people","accounts","gallery","highlights","social","anthem","store","orders"].map(t=><button key={t} className="btn" style={tab===t?{}:{background:"var(--chip-bg)",color:"var(--chip-tx)",border:"1px solid var(--chip-br)"}} onClick={()=>setTab(t)}>{t[0].toUpperCase()+t.slice(1)} {t==="applications"&&apps.length?`(${apps.length})`:""}</button>)}
-    <button className="btn ghost" style={{marginLeft:"auto"}} onClick={async()=>{await fetch("/api/admin/login",{method:"DELETE"}); setAuthed(false);}}>Log out</button></div>
+    {(()=>{ const GROUPS:{id:string;label:string;tabs:[string,string][]}[]=[
+      {id:"matchday",label:"⚽ Matchday",tabs:[["sessions","Sessions"]]},
+      {id:"people",label:"👥 People",tabs:[["applications","Applications"],["players","Players"],["accounts","Accounts"],["people","People"]]},
+      {id:"content",label:"🖼 Content",tabs:[["gallery","Gallery"],["highlights","Highlights"],["social","Social"],["anthem","Anthem"]]},
+      {id:"club",label:"🏪 Club",tabs:[["grounds","Grounds"],["store","Store"],["orders","Orders"]]},
+    ]; const active=GROUPS.find(g=>g.tabs.some(([id])=>id===tab)); const pendOrds=ords.filter((o:any)=>o.status==="pending").length; const chip=(on:boolean):React.CSSProperties=>on?{}:{background:"var(--chip-bg)",color:"var(--chip-tx)",border:"1px solid var(--chip-br)"};
+    return (<>
+    <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap",alignItems:"center"}}>
+      <button className="btn" style={chip(tab==="home")} onClick={()=>setTab("home")}>🏠 Home</button>
+      {GROUPS.map(g=><button key={g.id} className="btn" style={chip(active?.id===g.id)} onClick={()=>setTab(g.tabs[0][0])}>{g.label}</button>)}
+      <button className="btn ghost" style={{marginLeft:"auto"}} onClick={async()=>{await fetch("/api/admin/login",{method:"DELETE"}); setAuthed(false);}}>Log out</button>
+    </div>
+    {active && active.tabs.length>1 && <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>{active.tabs.map(([id,label])=><button key={id} className="btn" style={{padding:".45rem .9rem",fontSize:14,...chip(tab===id)}} onClick={()=>setTab(id)}>{label}{id==="applications"&&apps.length?` (${apps.length})`:""}{id==="orders"&&pendOrds?` (${pendOrds})`:""}</button>)}</div>}
+    </>); })()}
     {msg&&<p style={{color:"var(--gold-text)"}}>{msg}</p>}
+    {tab==="home" && (()=>{ const pendApps=apps.filter((a:any)=>a.status==="pending").length; const pendAccs=accs.filter((a:any)=>a.status==="pending").length; const pendOrds=ords.filter((o:any)=>o.status==="pending").length; const today=new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Dhaka"}); const nextSess=[...rsvpList].filter((s:any)=>s.session_date&&s.session_date>=today).sort((a:any,b:any)=>String(a.session_date).localeCompare(String(b.session_date)))[0]; const cardS:React.CSSProperties={textAlign:"left",cursor:"pointer",width:"100%",font:"inherit",color:"inherit"}; return <div>
+      <h3 style={{margin:"4px 0 12px"}}>Admin Home</h3>
+      <div className="grid">
+        <button className="card" style={cardS} onClick={()=>setTab("applications")}><strong style={{fontSize:17}}>📋 Applications</strong><p style={{color:"var(--muted)",margin:"6px 0 0",fontSize:14}}>{pendApps>0?`${pendApps} pending — review them now`:"No pending applications"}{apps.length?` · ${apps.length} total`:""}</p></button>
+        <button className="card" style={cardS} onClick={()=>setTab("accounts")}><strong style={{fontSize:17}}>🔑 Player Accounts</strong><p style={{color:"var(--muted)",margin:"6px 0 0",fontSize:14}}>{pendAccs>0?`${pendAccs} waiting for approval`:"No accounts waiting"}</p></button>
+        <button className="card" style={cardS} onClick={()=>setTab("sessions")}><strong style={{fontSize:17}}>📅 Next Session</strong><p style={{color:"var(--muted)",margin:"6px 0 0",fontSize:14}}>{nextSess?`${nextSess.title} · ${nextSess.session_date}${nextSess.session_time?` · ${nextSess.session_time}`:""}`:"No upcoming session — tap to create one"}</p></button>
+        <button className="card" style={cardS} onClick={()=>setTab("orders")}><strong style={{fontSize:17}}>🛍 Orders</strong><p style={{color:"var(--muted)",margin:"6px 0 0",fontSize:14}}>{pendOrds>0?`${pendOrds} new order${pendOrds>1?"s":""} to confirm`:"No new orders"}{ords.length?` · ${ords.length} total`:""}</p></button>
+      </div>
+      <div className="card" style={{marginTop:14}}><strong>Quick numbers</strong><p style={{color:"var(--muted)",margin:"6px 0 0",fontSize:14}}>👥 Squad: {players.length} players · 📸 Gallery: {gal.length} photos · 🏟 Grounds: {grs.length} · 🎬 Highlights: {hls.length}</p></div>
+    </div>; })()}
     {tab==="applications" && (apps.length===0 ? <div className="card">No applications yet. New applications from the Join form will appear here as Pending.</div> :
       <div className="grid">{apps.map(a=><div className="card" key={a.id}><div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>{a.photo_url && <Image src={a.photo_url} alt={a.full_name} width={92} height={92} style={{width:46,height:46,borderRadius:12,objectFit:"cover",border:"1px solid var(--line-gold)"}}/>}<strong>{a.full_name}</strong><span className="eyebrow">{a.status}</span>{(()=>{ const ac=accs.find((x:any)=>x.email&&a.email&&x.email.toLowerCase()===String(a.email).toLowerCase()); return ac ? <span style={{fontSize:12,padding:"3px 9px",borderRadius:99,border:"1px solid var(--line-gold)",color:"var(--gold-text)"}}>Login account ✓ {ac.status}</span> : <span style={{fontSize:12,color:"var(--muted)"}}>No login account yet</span>; })()}<span style={{color:"var(--muted)",fontSize:13}}>{new Date(a.created_at).toLocaleString()}</span></div>
       <p style={{color:"var(--muted)",fontSize:14}}>{a.mobile}{a.whatsapp?` · WhatsApp ${a.whatsapp}`:""} · {a.email} · Age {a.age} · {a.location}<br/>{a.educational_background}{a.occupation?` · ${a.occupation}`:""}{a.marital_status?` · ${a.marital_status}`:""}{a.blood_group?` · Blood ${a.blood_group}`:""}{a.preferred_position?` · Wants: ${a.preferred_position}`:""}{a.why_join && <span style={{display:"block",marginTop:4}}>“{a.why_join}”</span>}</p>
