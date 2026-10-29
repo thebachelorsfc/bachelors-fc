@@ -13,6 +13,7 @@ const CATS: Cat[] = [
   { key: "assists", label: "Playmakers", icon: "🎯", unit: "assists", value: p => Number(p.assists ?? 0), sub: p => `${p.matches_played ?? 0} matches` },
   { key: "motm", label: "Most MOTM", icon: "🏆", unit: "MOTM awards", value: p => Number(p.motm ?? 0), sub: p => `${p.matches_played ?? 0} matches` },
   { key: "saves", label: "The Wall", icon: "🧤", unit: "saves", value: p => Number(p.saves ?? 0), sub: p => `${p.matches_played ?? 0} matches · ${p.clean_sheets ?? 0} clean sheets` },
+  { key: "streak", label: "Iron Man", icon: "🔥", unit: "IN streak", value: p => Number(p.streak ?? 0), sub: p => `${p.totalIn ?? 0} sessions IN in total` },
 ];
 
 function fmtDay(d?: string | null): string {
@@ -28,7 +29,10 @@ export default function Leaderboard() {
   const [catKey, setCatKey] = useState("goals");
 
   useEffect(() => {
-    fetch("/api/players").then(r => r.ok ? r.json() : []).then(j => setPlayers(Array.isArray(j) ? j : [])).catch(() => setPlayers([]));
+    Promise.all([
+      fetch("/api/players").then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch("/api/streaks").then(r => r.ok ? r.json() : {}).catch(() => ({})),
+    ]).then(([pl, st]) => { const arr = Array.isArray(pl) ? pl : []; setPlayers(arr.map((p: any) => ({ ...p, streak: (st as any)?.[p.id]?.streak ?? 0, totalIn: (st as any)?.[p.id]?.totalIn ?? 0 }))); }).catch(() => setPlayers([]));
     fetch("/api/motm").then(r => r.ok ? r.json() : { latest: null }).then(j => setLatest(j.latest)).catch(() => setLatest(null));
   }, []);
 

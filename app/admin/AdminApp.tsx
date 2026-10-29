@@ -3,6 +3,7 @@ import { supabaseBrowser } from "@/lib/supabase/browser";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import PosterGenerator from "@/components/PosterGenerator";
+import TeamSheetGenerator from "@/components/TeamSheetGenerator";
 import MatchStatsPanel from "@/components/MatchStatsPanel";
 const input: React.CSSProperties = { width:"100%", padding:"10px 12px", borderRadius:10, border:"1px solid var(--field-br)", background:"var(--field-bg)", color:"var(--field-tx)" };
 export default function AdminApp(){
@@ -10,7 +11,7 @@ export default function AdminApp(){
   const [apps,setApps]=useState<any[]>([]); const [players,setPlayers]=useState<any[]>([]); const [msg,setMsg]=useState(""); const [grs,setGrs]=useState<any[]>([]); const [ppl,setPpl]=useState<any[]>([]);
   const [np,setNp]=useState({name:"",jersey_no:"",position:"",position_code:"FWD",joined_year:"2026"});
   const [ns,setNs]=useState({title:"",session_date:"",session_time:"",ground:"",opponent:""});
-  const [posterFor,setPosterFor]=useState<any>(null);
+  const [posterFor,setPosterFor]=useState<any>(null); const [sheetFor,setSheetFor]=useState<any>(null);
   const [gal,setGal]=useState<any[]>([]); const [hls,setHls]=useState<any[]>([]);
   const [gf,setGf]=useState<{caption:string;category:string;taken_on:string;file:File|null}>({caption:"",category:"team",taken_on:"",file:null});
   const [hf,setHf]=useState({title:"",video_url:"",played_on:""});
@@ -157,6 +158,7 @@ export default function AdminApp(){
       <button className="btn" style={{marginTop:12}} onClick={addSession}>Save session</button>
       {rsvpList.length>0 && <div style={{marginTop:18}}><h3>Who&apos;s playing — RSVPs</h3>{rsvpList.map((s:any)=><div key={s.id} style={{borderTop:"1px solid var(--line)",padding:"10px 0"}}><strong>{s.title}</strong> <span style={{color:"var(--muted)",fontSize:13}}>{s.session_date||""}</span> <button className="btn" style={{marginLeft:8,padding:".3rem .7rem",fontSize:12.5}} onClick={()=>setPosterFor(s)}>🖼 Poster</button>
       <button className="btn ghost" style={{marginLeft:6,padding:".3rem .7rem",fontSize:12.5}} onClick={()=>{ const parts=[`⚽ *The Bachelors FC — ${s.title}*`,s.session_date?`📅 ${s.session_date}${s.session_time?` · ${s.session_time}`:""}`:"",s.ground?`📍 ${s.ground}`:"",s.opponent?`🆚 vs ${s.opponent}`:"","RSVP kore dao 👉 https://bachelors-fc.vercel.app/login"]; window.open(`https://wa.me/?text=${encodeURIComponent(parts.filter(Boolean).join("\n"))}`,"_blank"); }}>💬 WhatsApp</button>
+      <button className="btn ghost" style={{marginLeft:6,padding:".3rem .7rem",fontSize:12.5}} onClick={()=>setSheetFor(s)}>📋 Team Sheet</button>
       <button className="btn ghost" style={{marginLeft:6,padding:".3rem .7rem",fontSize:12.5,color:"var(--bad)"}} onClick={async()=>{ if(!confirm(`Delete session "${s.title}"? Its RSVPs will be removed too.`)) return; const r=await fetch(`/api/sessions/${s.id}`,{method:"DELETE"}); if(r.ok){ setMsg("Session deleted"); load(); } else setMsg("Delete failed — if your admin session expired, log out and log in again"); }}>🗑 Delete</button>
       {s.list.length===0 ? <p style={{color:"var(--muted)",fontSize:14,margin:"4px 0"}}>No RSVPs yet.</p> : <p style={{fontSize:14,margin:"4px 0",lineHeight:1.7}}>{["in","maybe","out"].map(st=>(<span key={st} style={{display:"block"}}><strong style={{color:st==="in"?"var(--ok)":st==="out"?"var(--bad)":"var(--gold-text)"}}>{st.toUpperCase()}:</strong> <span style={{color:"var(--muted)"}}>{s.list.filter((r:any)=>r.status===st).map((r:any)=>r.name).join(", ")||"—"}</span></span>))}</p>}<div style={{marginTop:10}}>
         <p style={{margin:"0 0 6px",fontSize:12.5,color:"var(--muted)"}}>👑 Admin set — tap to mark any player for this session (works even if he has no account yet; the player can change it later from his dashboard):</p>
@@ -186,6 +188,7 @@ export default function AdminApp(){
       {rsvpList.map((s:any)=><MatchStatsPanel key={s.id} session={s} notify={setMsg} onSaved={()=>load()} />)}
     </div>}
     {posterFor && <PosterGenerator session={posterFor} grounds={grs} inCount={(posterFor.list||[]).filter((r:any)=>r.status==="in").length} onClose={()=>setPosterFor(null)} />}
+    {sheetFor && <TeamSheetGenerator session={sheetFor} players={players} onClose={()=>setSheetFor(null)} />}
     {tab==="people" && <div>
       <div className="card" style={{marginBottom:14}}><strong>👥 People — Founders &amp; Leadership.</strong> <span style={{color:"var(--muted)"}}>These profiles appear on the People page as sliding cards: photo, role, quote, their own message, and social links so visitors can reach them directly. Sort order 0 shows first. If saving fails with a database error, the People SQL (migration 008) has not been run in Supabase yet.</span></div>
       <div className="card"><h3>👤 Add a person</h3>
