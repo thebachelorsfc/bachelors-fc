@@ -47,7 +47,10 @@ export async function POST(req: Request) {
   for (const r of b.entries) { if (r && r.player_id) { const e = clean(r); newMap.set(e.player_id, e); } }
 
   // Apply per-player deltas to the season totals.
-  const ids = new Set<string>([...oldMap.keys(), ...newMap.keys()]);
+  const idSet: Record<string, true> = {};
+  oldMap.forEach((_v, k) => { idSet[k] = true; });
+  newMap.forEach((_v, k) => { idSet[k] = true; });
+  const ids = Object.keys(idSet);
   for (const pid of ids) {
     const o = oldMap.get(pid) ?? blank(pid);
     const n = newMap.get(pid) ?? blank(pid);
@@ -61,7 +64,7 @@ export async function POST(req: Request) {
       penalties_saved: n.penalties_saved - o.penalties_saved,
       clean_sheets: (n.clean_sheet ? 1 : 0) - (o.clean_sheet ? 1 : 0),
     };
-    if (Object.values(d).every(v => v === 0)) continue;
+    if (Object.keys(d).every(k => (d as Record<string, number>)[k] === 0)) continue;
     const { data: pl, error: ple } = await w.from("players").select("matches_played,goals,assists,yellow_cards,red_cards,saves,penalties_saved,clean_sheets").eq("id", pid).limit(1);
     if (ple || !pl?.[0]) continue;
     const cur: any = pl[0];
@@ -74,7 +77,7 @@ export async function POST(req: Request) {
   // Persist this session's entries (only rows that carry data).
   const { error: de } = await w.from("match_stats").delete().eq("session_id", b.session_id);
   if (de) return NextResponse.json({ error: missing(de) ? HINT : "Could not save match stats", detail: de.message }, { status: 500 });
-  const rows = [...newMap.values()].filter(hasData).map(e => ({ session_id: b.session_id, player_id: e.player_id, played: e.played, goals: e.goals, assists: e.assists, yellow_cards: e.yellow_cards, red_cards: e.red_cards, saves: e.saves, penalties_saved: e.penalties_saved, clean_sheet: e.clean_sheet }));
+  const rows = Array.from(newMap.values()).filter(hasData).map(e => ({ session_id: b.session_id, player_id: e.player_id, played: e.played, goals: e.goals, assists: e.assists, yellow_cards: e.yellow_cards, red_cards: e.red_cards, saves: e.saves, penalties_saved: e.penalties_saved, clean_sheet: e.clean_sheet }));
   if (rows.length) {
     const { error: ie } = await w.from("match_stats").insert(rows);
     if (ie) return NextResponse.json({ error: missing(ie) ? HINT : "Could not save match stats", detail: ie.message }, { status: 500 });
