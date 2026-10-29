@@ -31,7 +31,7 @@ export async function PATCH(req: Request, { params }: { params:{ id:string } }) 
   const sb = supabaseWrite();
   if (sb) {
     // One armband only: crowning a new captain clears the flag from everyone else.
-    if (raw.is_captain === true) { const { error: ce } = await sb.from("players").update({ is_captain:false }).neq("id", params.id); if (ce) return NextResponse.json({ error:"Update failed — has migration 013 been run in Supabase?" }, { status:500 }); }
-    const { error } = await sb.from("players").update(patch).eq("id", params.id); if (error) return NextResponse.json({ error:"Update failed" }, { status:500 }); return NextResponse.json({ ok:true }); }
+    if (raw.is_captain === true) { const { error: ce } = await sb.from("players").update({ is_captain:false }).neq("id", params.id); if (ce) return NextResponse.json({ error:"Update failed", detail:ce.message }, { status:500 }); }
+    const { error } = await sb.from("players").update(patch).eq("id", params.id); if (error) return NextResponse.json({ error:"Update failed", detail:error.message }, { status:500 }); return NextResponse.json({ ok:true }); }
   if (raw.is_captain === true) { const all = await store.players(); for (const pl of all) if (pl.id !== params.id && (pl as any).is_captain) await store.updatePlayer(pl.id, { is_captain:false } as any); }
   const p = await store.updatePlayer(params.id, patch); return p ? NextResponse.json(p) : NextResponse.json({ error:"Not found" }, { status:404 }); }
