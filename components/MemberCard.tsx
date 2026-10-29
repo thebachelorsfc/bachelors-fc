@@ -5,8 +5,9 @@ import QRCode from "qrcode";
 import CapBadge from "@/components/CapBadge";
 
 /* Digital Membership Card — shown on the player dashboard (approved + linked players only).
-   Stays dark in both themes (like the stat cards). Download renders the same card to a
-   1260×795 PNG on a canvas: photo is fetched as a blob so the canvas never taints. */
+   Stays dark in both themes (like the stat cards). Download renders the same card on a
+   canvas at 2x (2520×1590 PNG) so it stays crystal clear: drawn in a 1260×795 logical
+   space with the context scaled. Photo is fetched as a blob so the canvas never taints. */
 
 const SITE = "https://bachelors-fc.vercel.app";
 const GOLD = "#d4af37";
@@ -30,7 +31,7 @@ export default function MemberCard({ player }: { player: any }) {
   const id = memberId(player);
 
   useEffect(() => {
-    QRCode.toDataURL(`${SITE}/squad`, { width: 260, margin: 1, color: { dark: "#0a0a12", light: "#ffffff" } })
+    QRCode.toDataURL(`${SITE}/squad`, { width: 512, margin: 1, color: { dark: "#0a0a12", light: "#ffffff" } })
       .then(setQr).catch(() => setQr(""));
   }, []);
 
@@ -49,10 +50,11 @@ export default function MemberCard({ player }: { player: any }) {
   async function download() {
     setBusy(true); setNote("");
     try {
-      const W = 1260, H = 795;
-      const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+      const W = 1260, H = 795, S = 2; // logical 1260×795, rendered at 2x → 2520×1590 PNG
+      const cv = document.createElement("canvas"); cv.width = W * S; cv.height = H * S;
       const ctx = cv.getContext("2d"); if (!ctx) throw new Error("canvas");
-      try { await (document as any).fonts.load('700 92px Oswald'); await (document as any).fonts.load('600 40px Oswald'); await (document as any).fonts.load('400 32px Inter'); } catch {}
+      ctx.scale(S, S);
+      try { await (document as any).fonts.load('700 92px Oswald'); await (document as any).fonts.load('600 40px Oswald'); await (document as any).fonts.load('600 26px Oswald'); await (document as any).fonts.load('400 32px Inter'); } catch {}
 
       // background
       const g = ctx.createLinearGradient(0, 0, W, H);
@@ -91,9 +93,10 @@ export default function MemberCard({ player }: { player: any }) {
 
       // photo panel (left, full height, cover-cropped) with a FEATHERED right edge
       const photo = player.photo_url ? await loadImg(player.photo_url) : null;
-      const pc = document.createElement("canvas"); pc.width = 416; pc.height = H;
+      const pc = document.createElement("canvas"); pc.width = 416 * S; pc.height = H * S;
       const pctx = pc.getContext("2d");
       if (pctx) {
+        pctx.scale(S, S);
         if (photo) {
           const s = Math.max(416 / photo.width, H / photo.height);
           const w = photo.width * s, h = photo.height * s;
@@ -111,17 +114,25 @@ export default function MemberCard({ player }: { player: any }) {
         fm.addColorStop(0, "#000"); fm.addColorStop(0.8, "#000"); fm.addColorStop(1, "rgba(0,0,0,0)");
         pctx.fillStyle = fm; pctx.fillRect(0, 0, 416, H);
         pctx.globalCompositeOperation = "source-over";
-        ctx.drawImage(pc, 0, 0);
+        ctx.drawImage(pc, 0, 0, 416, H);
       }
       ctx.fillStyle = foil(36, 260); ctx.font = "700 96px Oswald";
       ctx.fillText(`#${player.jersey_no}`, 36, H - 44);
 
-      // header: crest + club name
-      if (crest) ctx.drawImage(crest, 452, 46, 92, 92);
+      // header: crest + club name, with a soft gold glow behind
+      const hg = ctx.createRadialGradient(600, 92, 10, 600, 92, 340);
+      hg.addColorStop(0, "rgba(212,175,55,0.13)"); hg.addColorStop(1, "rgba(212,175,55,0)");
+      ctx.fillStyle = hg; ctx.fillRect(430, 0, W - 430, 240);
+      if (crest) ctx.drawImage(crest, 452, 42, 96, 96);
       ctx.fillStyle = PAPER; ctx.font = "700 43px Oswald";
-      ctx.fillText("THE BACHELORS FC", 562, 88);
-      ctx.fillStyle = GOLD2; ctx.font = "600 25px Oswald";
-      ctx.fillText("O F F I C I A L   M E M B E R   C A R D", 562, 124);
+      ctx.fillText("THE BACHELORS FC", 566, 86);
+      // kicker: gold diamond + "Membership Card" (roomier block — the old
+      // spaced-out line sat cramped against the title and looked clipped)
+      ctx.save(); ctx.translate(572, 114); ctx.rotate(Math.PI / 4); ctx.fillStyle = GOLD; ctx.fillRect(-5, -5, 10, 10); ctx.restore();
+      ctx.fillStyle = GOLD2; ctx.font = "600 26px Oswald";
+      (ctx as any).letterSpacing = "5px";
+      ctx.fillText("Membership Card", 590, 124);
+      (ctx as any).letterSpacing = "0px";
 
       // name (shrink to fit)
       let size = 88;
@@ -168,7 +179,7 @@ export default function MemberCard({ player }: { player: any }) {
         const y = 372 + i * 78;
         ctx.fillStyle = GOLD2; ctx.font = "600 24px Oswald"; ctx.fillText(k, 452, y);
         ctx.fillStyle = PAPER; ctx.font = "600 37px Oswald"; ctx.fillText(v, 452, y + 40);
-        ctx.strokeStyle = "rgba(212,175,55,0.16)"; ctx.lineWidth = 1;
+        ctx.strokeStyle = "rgba(212,175,55,0.22)"; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(452, y + 58); ctx.lineTo(1006, y + 58); ctx.stroke();
       });
 
@@ -210,7 +221,7 @@ export default function MemberCard({ player }: { player: any }) {
             <img src="/assets/logo-transparent.png" alt="BFC crest" />
             <div>
               <strong>THE BACHELORS FC</strong>
-              <span>OFFICIAL MEMBER CARD</span>
+              <span>Membership Card</span>
             </div>
           </div>
           <h3 className="mcard-name">{player.name}{player.is_captain ? <CapBadge /> : null}</h3>
