@@ -1,10 +1,12 @@
-/* The Bachelors FC — service worker (PWA installability + offline fallback
-   + Web Push session notifications).
-   Deliberately conservative: pages are NETWORK-FIRST (never stale content),
-   /api and cross-origin requests are never touched, only immutable static
-   assets are cached. Bump the version to retire old caches. */
-const CACHE = "bfc-pwa-v2";
+/* The Bachelors FC — service worker (PWA installability + offline browsing
+   of already-visited pages + Web Push session notifications).
+   Pages are NETWORK-FIRST: online you always get fresh content, and every
+   public page you open is remembered — with no connection, the last-seen
+   copy opens instead of the offline screen. Auth/personal pages (admin,
+   dashboard, login) are never cached. /api is never touched. */
+const CACHE = "bfc-pwa-v3";
 const OFFLINE_URL = "/offline.html";
+const NEVER_CACHE = ["/admin", "/dashboard", "/login", "/reset-password"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -30,11 +32,23 @@ self.addEventListener("fetch", (event) => {
   if (url.pathname.startsWith("/api/")) return;
 
   if (req.mode === "navigate") {
-    event.respondWith(fetch(req).catch(() => caches.match(OFFLINE_URL)));
+    if (NEVER_CACHE.some((p) => url.pathname === p || url.pathname.startsWith(p + "/"))) {
+      event.respondWith(fetch(req).catch(() => caches.match(OFFLINE_URL)));
+      return;
+    }
+    event.respondWith(
+      fetch(req).then((res) => {
+        if (res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then((cache) => cache.put(req, copy));
+        }
+        return res;
+      }).catch(async () => (await caches.match(req)) || caches.match(OFFLINE_URL))
+    );
     return;
   }
 
-  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/assets/") || url.pathname.startsWith("/icons/")) {
+  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/_next/image") || url.pathname.startsWith("/assets/") || url.pathname.startsWith("/icons/")) {
     event.respondWith(
       caches.match(req).then((hit) => hit || fetch(req).then((res) => {
         const copy = res.clone();
