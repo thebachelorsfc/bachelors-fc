@@ -10,7 +10,6 @@ export const dynamic = "force-dynamic";
 import PlayerCard, { OpenShirt } from "@/components/PlayerCard";
 import Counter from "@/components/Counter";
 import FacebookFeed from "@/components/FacebookFeed";
-import InstallAppCard from "@/components/InstallAppCard";
 import AnthemPlayer from "@/components/AnthemPlayer";
 import NextMatchCard from "@/components/NextMatchCard";
 import SquadCarousel from "@/components/SquadCarousel";
@@ -181,6 +180,5 @@ export default async function Home(){
     </section>)}
 
     <FacebookFeed posts={socialPosts}/>
-    <InstallAppCard/>
   </main>);
 }
