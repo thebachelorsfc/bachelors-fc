@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link"; import Image from "next/image";
 import { useEffect, useState } from "react";
+import { isStandalone, promptInstall } from "@/lib/install";
 
 const Moon = () => (<svg viewBox="0 0 24 24"><path d="M20 13.6A8.6 8.6 0 1 1 10.4 4 7 7 0 0 0 20 13.6Z"/></svg>);
 const Sun = () => (<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg>);
@@ -23,6 +24,7 @@ const I = {
   award: <svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M8.9 13.4 7.2 21l4.8-2.5L16.8 21l-1.7-7.6"/></svg>,
   trophy: <svg viewBox="0 0 24 24"><path d="M7.5 3.5h9V9a4.5 4.5 0 0 1-9 0V3.5Z"/><path d="M7.5 5H4.8a2.8 2.8 0 0 0 2.9 4.4M16.5 5h2.7a2.8 2.8 0 0 1-2.9 4.4"/><path d="M12 13.5V17M9 20.5h6M10.2 20.5 11.2 17h1.6l1 3.5"/></svg>,
   calendar: <svg viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="15" rx="2"/><path d="M4 10.2h16M8 3.5v4M16 3.5v4"/></svg>,
+  phone: <svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.4"/><path d="M10.8 18.6h2.4"/></svg>,
 };
 const NAV: [string, string, keyof typeof I][] = [
   ["Home","/","home"],["Mission","/about","target"],["Kit","/#kit","shirt"],["Tour","/#tour","pin"],
@@ -33,7 +35,8 @@ const NAV: [string, string, keyof typeof I][] = [
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [light, setLight] = useState(false);
-  useEffect(() => { setLight(document.documentElement.dataset.theme === "light"); }, []);
+  const [installed, setInstalled] = useState(false);
+  useEffect(() => { setLight(document.documentElement.dataset.theme === "light"); setInstalled(isStandalone()); }, []);
   useEffect(() => { document.body.style.overflow = open ? "hidden" : ""; return () => { document.body.style.overflow = ""; }; }, [open ]);
   useEffect(() => { const fn = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); }; window.addEventListener("keydown", fn); return () => window.removeEventListener("keydown", fn); }, []);
   const toggleTheme = () => {
@@ -59,6 +62,7 @@ export default function Header() {
       </div>
       <nav className="dcard" style={{marginTop:14,overflowY:"auto",padding:"6px 8px"}}>
         {NAV.map(([l,h,ic]) => <Link key={h+l} className="drow" href={h} onClick={() => setOpen(false)}><span className="dico">{I[ic]}</span>{l}<span className="dchev">›</span></Link>)}
+        {!installed && <button type="button" className="drow" style={{width:"100%",background:"none",border:0,cursor:"pointer",font:"inherit",textAlign:"left"}} onClick={async () => { setOpen(false); const ok = await promptInstall(); if (!ok) { if (location.pathname !== "/") location.href = "/#app"; else document.getElementById("app")?.scrollIntoView({ behavior: "smooth" }); } }}><span className="dico">{I.phone}</span>Install App<span className="dchev">›</span></button>}
       </nav>
       <div style={{marginTop:14}}>
         <Link href="/join" className="btn" style={{display:"block",textAlign:"center"}} onClick={() => setOpen(false)}>Join the Squad</Link>

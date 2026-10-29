@@ -547,3 +547,12 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 .ev-date small{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:2px}
 .ev-tag{font-family:Oswald,sans-serif;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:.3rem .6rem;border-radius:999px;background:var(--chip-bg);color:var(--gold-text);border:1px solid var(--chip-br)}
 /* (captain card is portrait by design at every width — no small-screen override needed) */
+
+/* PWA install card (stays dark in both themes, like .soc-card) */
+.app-card{display:flex;gap:20px;align-items:center;background:linear-gradient(135deg,#0b0f1e,#06060a);border:1px solid #c9a22755;border-radius:20px;padding:26px;color:#f7f5ef}
+.app-ic{border-radius:18px;flex:0 0 auto}
+.app-tx h3{margin:6px 0 8px;color:#f7f5ef}
+.app-sub{color:#c6ccd8;margin:0 0 16px;line-height:1.55;max-width:560px}
+.app-steps{color:#c6ccd8;margin:0;line-height:1.6}
+.app-steps strong{color:#f7f5ef}
+@media(max-width:560px){.app-card{flex-direction:column;text-align:center;padding:24px 18px}.app-tx{display:flex;flex-direction:column;align-items:center}}
