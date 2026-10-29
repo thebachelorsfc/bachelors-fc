@@ -549,10 +549,18 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 /* (captain card is portrait by design at every width — no small-screen override needed) */
 
 /* PWA install card (stays dark in both themes, like .soc-card) */
-.app-card{display:flex;gap:20px;align-items:center;background:linear-gradient(135deg,#0b0f1e,#06060a);border:1px solid #c9a22755;border-radius:20px;padding:26px;color:#f7f5ef}
-.app-ic{border-radius:18px;flex:0 0 auto}
-.app-tx h3{margin:6px 0 8px;color:#f7f5ef}
-.app-sub{color:#c6ccd8;margin:0 0 16px;line-height:1.55;max-width:560px}
+.app-sec{margin:30px auto 74px}
+.app-card{position:relative;overflow:hidden;display:flex;gap:22px;align-items:center;background:linear-gradient(135deg,#0d1226,#06060a 60%);border:1px solid #c9a22766;border-radius:22px;padding:30px 28px;color:#f7f5ef;box-shadow:0 24px 60px -18px #c9a22733,0 18px 44px -22px #000}
+.app-card::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,#ffffff08 0 1px,transparent 1px 9px);pointer-events:none}
+.app-card::after{content:"";position:absolute;top:-30%;bottom:-30%;width:34%;left:-45%;background:linear-gradient(100deg,transparent,#ffffff14,transparent);transform:skewX(-14deg);animation:appSheen 5.5s ease-in-out infinite;pointer-events:none}
+@keyframes appSheen{0%,55%{left:-45%}85%,100%{left:115%}}
+.app-ic{border-radius:20px;flex:0 0 auto;position:relative;z-index:1;box-shadow:0 0 0 2px #c9a22788,0 12px 34px -6px #c9a22755}
+.app-tx{position:relative;z-index:1}
+.app-tx h3{margin:6px 0 8px;background:linear-gradient(100deg,#f3d27a,#c9a227 48%,#f7e08b 72%,#a37f16);-webkit-background-clip:text;background-clip:text;color:transparent}
+.app-sub{color:#c6ccd8;margin:0 0 14px;line-height:1.55;max-width:560px}
+.app-chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+.app-chips span{border:1px solid #c9a22766;background:#c9a22714;color:#f3d27a;border-radius:999px;padding:5px 12px;font-size:12.5px}
+.app-card .btn{box-shadow:0 10px 26px -8px #c9a22788}
 .app-steps{color:#c6ccd8;margin:0;line-height:1.6}
 .app-steps strong{color:#f7f5ef}
-@media(max-width:560px){.app-card{flex-direction:column;text-align:center;padding:24px 18px}.app-tx{display:flex;flex-direction:column;align-items:center}}
+@media(max-width:560px){.app-card{flex-direction:column;text-align:center;padding:28px 18px}.app-tx{display:flex;flex-direction:column;align-items:center}.app-chips{justify-content:center}}

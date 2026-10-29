@@ -27,13 +27,14 @@ export default function InstallAppCard() {
   };
 
   return (
-    <section className="wrap" id="app">
+    <section className="wrap app-sec" id="app">
       <div className="app-card">
-        <Image src="/icons/icon-192.png" alt="The Bachelors FC app icon" width={76} height={76} className="app-ic" />
+        <Image src="/icons/icon-192.png" alt="The Bachelors FC app icon" width={84} height={84} className="app-ic" />
         <div className="app-tx">
           <p className="eyebrow">BFC App</p>
           <h3>Get the Bachelors FC app</h3>
-          <p className="app-sub">One tap from your home screen — sessions, RSVP, the anthem and the store. Free, tiny, and always up to date. No Play Store needed.</p>
+          <p className="app-sub">One tap from your home screen — sessions, RSVP, the anthem and the store. No Play Store needed.</p>
+          <div className="app-chips"><span>⚡ Lightning fast</span><span>🔄 Auto-updated</span><span>🆓 100% Free</span></div>
           {ios ? (
             <p className="app-steps">On iPhone: tap <strong>Share</strong> in Safari, then <strong>Add to Home Screen</strong>.</p>
           ) : showSteps ? (
