@@ -3,6 +3,7 @@ import { supabaseBrowser } from "@/lib/supabase/browser";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import PosterGenerator from "@/components/PosterGenerator";
+import MatchStatsPanel from "@/components/MatchStatsPanel";
 const input: React.CSSProperties = { width:"100%", padding:"10px 12px", borderRadius:10, border:"1px solid var(--field-br)", background:"var(--field-bg)", color:"var(--field-tx)" };
 export default function AdminApp(){
   const [authed,setAuthed]=useState<boolean|null>(null); const [pw,setPw]=useState(""); const [tab,setTab]=useState("applications");
@@ -155,6 +156,10 @@ export default function AdminApp(){
           </div>
         : <div style={{marginTop:8}}><button className="btn ghost" onClick={()=>motmAct(s,"open")}>🗳 Open MOTM vote</button></div>}
       </div>;})}
+    </div>}
+    {tab==="sessions" && rsvpList.length>0 && <div className="card" style={{marginTop:14}}><h3>📊 Match Stats Tracker</h3>
+      <p style={{color:"var(--muted)",fontSize:13.5,margin:"0 0 6px"}}>After a match, open the session and enter who played plus their goals, assists and cards (GKs get saves too) — the season totals on the player cards and the leaderboard then update by themselves. Editing the same session later corrects the totals automatically, and totals you entered by hand before are never wiped. Needs migration 014.</p>
+      {rsvpList.map((s:any)=><MatchStatsPanel key={s.id} session={s} notify={setMsg} onSaved={()=>load()} />)}
     </div>}
     {posterFor && <PosterGenerator session={posterFor} grounds={grs} inCount={(posterFor.list||[]).filter((r:any)=>r.status==="in").length} onClose={()=>setPosterFor(null)} />}
     {tab==="people" && <div>
