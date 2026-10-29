@@ -1,8 +1,9 @@
-/* The Bachelors FC — service worker (PWA installability + offline fallback).
+/* The Bachelors FC — service worker (PWA installability + offline fallback
+   + Web Push session notifications).
    Deliberately conservative: pages are NETWORK-FIRST (never stale content),
    /api and cross-origin requests are never touched, only immutable static
    assets are cached. Bump the version to retire old caches. */
-const CACHE = "bfc-pwa-v1";
+const CACHE = "bfc-pwa-v2";
 const OFFLINE_URL = "/offline.html";
 
 self.addEventListener("install", (event) => {
@@ -42,4 +43,30 @@ self.addEventListener("fetch", (event) => {
       }))
     );
   }
+});
+
+/* Web Push — session notifications */
+self.addEventListener("push", (event) => {
+  let d = {};
+  try { d = event.data ? event.data.json() : {}; } catch (e) { /* keep defaults */ }
+  const title = d.title || "The Bachelors FC";
+  event.waitUntil(self.registration.showNotification(title, {
+    body: d.body || "",
+    icon: "/icons/icon-192.png",
+    badge: "/icons/icon-192.png",
+    data: { url: d.url || "/dashboard" },
+  }));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || "/dashboard";
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+      for (const c of list) {
+        if ("focus" in c) { if ("navigate" in c) c.navigate(target); return c.focus(); }
+      }
+      return clients.openWindow(target);
+    })
+  );
 });
