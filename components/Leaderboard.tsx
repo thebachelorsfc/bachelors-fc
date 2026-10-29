@@ -12,7 +12,7 @@ const CATS: Cat[] = [
   { key: "goals", label: "Top Scorers", icon: "⚽", unit: "goals", value: p => Number(p.goals ?? 0), sub: p => `${p.matches_played ?? 0} matches` },
   { key: "assists", label: "Playmakers", icon: "🎯", unit: "assists", value: p => Number(p.assists ?? 0), sub: p => `${p.matches_played ?? 0} matches` },
   { key: "motm", label: "Most MOTM", icon: "🏆", unit: "MOTM awards", value: p => Number(p.motm ?? 0), sub: p => `${p.matches_played ?? 0} matches` },
-  { key: "saves", label: "The Wall", icon: "🧤", unit: "saves", value: p => Number(p.saves ?? 0), sub: p => `${p.clean_sheets ?? 0} clean sheets` },
+  { key: "saves", label: "The Wall", icon: "🧤", unit: "saves", value: p => Number(p.saves ?? 0), sub: p => `${p.matches_played ?? 0} matches · ${p.clean_sheets ?? 0} clean sheets` },
 ];
 
 function fmtDay(d?: string | null): string {
