@@ -53,6 +53,8 @@ export default async function Home(){
   const pastEvents:any[] = allSessions.filter((x:any)=>x.session_date && sessMs(x) <= Date.now()).sort((a:any,b:any)=>sessMs(b)-sessMs(a));
   const latestEvent:any = upcomingEvents.length ? null : (pastEvents[0] || null);
   const evTitle = (s:any) => s.opponent ? `The Bachelors FC vs ${s.opponent}` : (s.title || "Club Session");
+  // Photo band (Phase-2 polish): a real club photo, full-bleed, before the Squad.
+  const bandItem:any = galleryItems.find((g:any)=>/brotherhood lives on/i.test(g.caption||"")) || galleryItems.find((g:any)=>/forged in brotherhood/i.test(g.caption||"")) || galleryItems[0] || null;
   const order:Record<string,number>={FWD:0,MID:1,DEF:2,GK:3}; const sortedPlayers=[...players].sort((a:any,b:any)=>((order[a.position_code]??9)-(order[b.position_code]??9))||(a.jersey_no-b.jersey_no));
   return(<main>
     <section className="hero" style={{textAlign:"center"}}>
@@ -149,6 +151,11 @@ export default async function Home(){
       </CardCarousel>
       <p style={{marginTop:16}}><Link className="btn" href="/join">Start your application →</Link></p>
     </section>
+
+    {bandItem && (<section className="photo-band" aria-label="The brotherhood">
+      <Image src={bandItem.photo_url} alt={bandItem.caption || "The Bachelors FC"} fill sizes="100vw" style={{objectFit:"cover",objectPosition:"center 40%"}}/>
+      <div className="photo-band-in"><p className="photo-band-kick">◆ The Brotherhood ◆</p><p className="photo-band-motto">Forged in Brotherhood,<br/>Driven by Purpose</p></div>
+    </section>)}
 
     <section className="wrap"><p className="eyebrow">The Lineup</p><h2>Meet the Squad</h2>
       <SquadCarousel>{sortedPlayers.map((p:any)=><PlayerCard key={p.jersey_no} p={p}/>)}{openNumbers(sortedPlayers).slice(0,3).map(n=><OpenShirt key={n} n={n}/>)}</SquadCarousel>
