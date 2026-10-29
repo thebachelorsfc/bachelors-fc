@@ -1,13 +1,12 @@
 import { supabaseWrite } from "./supabase/admin";
 import { VAPID_PUBLIC_KEY, VAPID_SUBJECT } from "./pushConfig";
 
-// Session notifications — 100% free channels only:
-//  • Web Push to subscribed devices (needs VAPID_PRIVATE_KEY env)
-//  • Email via the club's own Gmail (needs GMAIL_USER + GMAIL_APP_PASSWORD env)
-// Both silently no-op until their env vars exist, and neither may ever break
-// session creation — callers wrap this in try/catch and we settle all promises.
-
-const SITE = "https://bachelors-fc.vercel.app";
+// Session notifications — Web Push only (100% free, no middleman):
+// a phone notification lands on every subscribed device the moment the club
+// sets a new session. Needs the VAPID_PRIVATE_KEY env var; silently no-ops
+// until it exists, and never breaks session creation (callers try/catch).
+// (An email channel via the club Gmail was built the same day and removed
+// again at the owner's request — push only, by his choice.)
 
 function fmtDate(d?: string): string {
   if (!d) return "";
@@ -22,10 +21,6 @@ function lines(s: any): string[] {
 }
 
 export async function notifyNewSession(s: any) {
-  await Promise.allSettled([sendPush(s), sendEmail(s)]);
-}
-
-async function sendPush(s: any) {
   const priv = process.env.VAPID_PRIVATE_KEY;
   if (!priv) return;
   const sb = supabaseWrite(); if (!sb) return;
@@ -47,32 +42,4 @@ async function sendPush(s: any) {
       }
     }
   }));
-}
-
-async function sendEmail(s: any) {
-  const user = process.env.GMAIL_USER, pass = process.env.GMAIL_APP_PASSWORD;
-  if (!user || !pass) return;
-  const sb = supabaseWrite(); if (!sb) return;
-  const { data: accs } = await sb.from("player_accounts").select("email").eq("status", "approved").not("player_id", "is", null);
-  const emails = Array.from(new Set((accs ?? []).map((a: any) => a.email).filter(Boolean)));
-  if (emails.length === 0) return;
-  const nodemailer = (await import("nodemailer")).default;
-  const t = nodemailer.createTransport({ service: "gmail", auth: { user, pass } });
-  const detail = lines(s).map(l => `<p style="margin:4px 0;font-size:16px">${l}</p>`).join("");
-  const html = `<div style="background:#06060a;padding:28px 16px;font-family:Arial,sans-serif">
-    <div style="max-width:520px;margin:0 auto;background:#0a1230;border:1px solid #d4af37;border-radius:16px;padding:28px;color:#f7f5ef">
-      <p style="margin:0 0 6px;color:#f0cb6e;font-size:12px;letter-spacing:3px">THE BACHELORS FC</p>
-      <h1 style="margin:0 0 14px;font-size:24px">⚽ New session: ${s.title}</h1>
-      ${detail}
-      <p style="margin:18px 0"><a href="${SITE}/dashboard" style="background:#d4af37;color:#06060a;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:bold">RSVP now →</a></p>
-      <p style="margin:0;color:#a8afc4;font-size:13px">Forged in Brotherhood, Driven by Purpose · Khulshi, Chittagong</p>
-    </div></div>`;
-  const text = `The Bachelors FC — New session: ${s.title}\n${lines(s).join("\n")}\nRSVP: ${SITE}/dashboard`;
-  await t.sendMail({
-    from: `"The Bachelors FC" <${user}>`,
-    bcc: emails,
-    subject: `⚽ New session: ${s.title}${s.session_date ? ` — ${fmtDate(s.session_date)}` : ""}`,
-    html,
-    text,
-  });
 }
