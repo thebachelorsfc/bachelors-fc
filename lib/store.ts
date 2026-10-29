@@ -36,6 +36,7 @@ export const store = {
   async setApplicationStatus(id:string, status: Application["status"]) { const s=await read(); const a=s.applications.find(x=>x.id===id); if(!a) return null; a.status=status; await write(s); return a; },
   async sessions() { return (await read()).sessions; },
   async addSession(x: Session) { const s=await read(); s.sessions.unshift(x); await write(s); return x; },
+  async removeSession(id: string) { const s=await read(); s.sessions = s.sessions.filter(x=>x.id!==id); await write(s); },
   async grounds() { return (await read()).grounds; },
   async gallery() { return (await read()).gallery; },
   async addGalleryItem(g: GalleryItem) { const s=await read(); s.gallery.unshift(g); await write(s); return g; },
