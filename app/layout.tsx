@@ -10,6 +10,7 @@ import RecoveryRedirect from "@/components/RecoveryRedirect";
 import AnthemProvider from "@/components/AnthemProvider";
 import { resolveAnthemSrc } from "@/lib/anthem";
 import TopButton from "@/components/TopButton";
+import { Analytics } from "@vercel/analytics/next";
 
 // === PRESERVED METADATA (verified from live site 2026-10-24) — do not alter values ===
 export const metadata: Metadata = {
@@ -32,7 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('bfc-theme');if(t==='light')document.documentElement.dataset.theme='light'}catch(e){}" }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
         <div className="ticker" aria-hidden="true"><div className="ticker-track">{[0,1].map(k=><span key={k}>Forged in Brotherhood ✦ Driven by Purpose ✦ United, Not Alone ✦ Khulshi · Chittagong ✦ Est. 2026 ✦ No Sponsors · No Stadium · Just Us ✦ Forged in Brotherhood ✦ Driven by Purpose ✦ United, Not Alone ✦ Khulshi · Chittagong ✦ Est. 2026 ✦ </span>)}</div></div>
-        <AnthemProvider src={anthemSrc}><Header />{children}<Footer /><TopButton /></AnthemProvider><RecoveryRedirect />
+        <AnthemProvider src={anthemSrc}><Header />{children}<Footer /><TopButton /></AnthemProvider><RecoveryRedirect /><Analytics />
       </body>
     </html>
   );
