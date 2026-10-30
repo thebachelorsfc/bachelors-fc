@@ -548,13 +548,13 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 .ev-tag{font-family:Oswald,sans-serif;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:.3rem .6rem;border-radius:999px;background:var(--chip-bg);color:var(--gold-text);border:1px solid var(--chip-br)}
 /* Photo band — full-bleed real club photo + motto, before Meet the Squad.
    Stays dark in both themes (photo surface), like the hero. */
-.photo-band{position:relative;margin:78px 0 4px;height:clamp(300px,54vw,470px);overflow:hidden;background:#06060a;border-top:1px solid rgba(201,162,39,.45);border-bottom:1px solid rgba(201,162,39,.45)}
+.photo-band{position:relative;margin:78px 0 4px;height:clamp(320px,54vw,560px);overflow:hidden;background:#06060a;border-top:1px solid rgba(201,162,39,.45);border-bottom:1px solid rgba(201,162,39,.45)}
 .photo-band img{animation:bandZoom 26s ease-in-out infinite alternate}
 @keyframes bandZoom{from{transform:scale(1)}to{transform:scale(1.07)}}
-.photo-band::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,6,10,.52),rgba(6,6,10,.18) 42%,rgba(6,6,10,.8));pointer-events:none}
-.photo-band-in{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px}
-.photo-band-kick{margin:0;color:var(--gold2);font-family:var(--font-display);font-size:12px;letter-spacing:.42em;text-transform:uppercase;text-shadow:0 2px 14px rgba(0,0,0,.6)}
-.photo-band-motto{margin:12px 0 0;color:#f7f5ef;font-family:var(--font-display);font-size:clamp(30px,6.2vw,56px);line-height:1.1;text-transform:uppercase;text-shadow:0 4px 30px rgba(0,0,0,.6)}
+.photo-band::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,6,10,.34),rgba(6,6,10,.06) 34%,rgba(6,6,10,.48) 66%,rgba(6,6,10,.9));pointer-events:none}
+.photo-band-in{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;padding:22px 22px 26px}
+.photo-band-kick{margin:0;color:var(--gold2);font-family:var(--font-display);font-size:12px;letter-spacing:.42em;text-transform:uppercase;text-shadow:0 2px 14px rgba(0,0,0,.75)}
+.photo-band-motto{margin:12px 0 0;color:#f7f5ef;font-family:var(--font-display);font-size:clamp(28px,5vw,48px);line-height:1.1;text-transform:uppercase;text-shadow:0 4px 30px rgba(0,0,0,.8),0 1px 3px rgba(0,0,0,.9)}
 /* Matchday Mode — active only when the next session is TODAY (Dhaka):
    hero scorebug ribbon + a red-hot Next Match card. */
 .md-ribbon{display:inline-flex;align-items:center;gap:9px;margin:20px auto 0;padding:8px 16px;border-radius:999px;background:#20060a;border:1px solid rgba(229,72,77,.45);color:#ffb3b8;font-family:var(--font-display);letter-spacing:.14em;font-size:12.5px;text-transform:uppercase}
