@@ -10,7 +10,6 @@ export const dynamic = "force-dynamic";
 import PlayerCard, { OpenShirt } from "@/components/PlayerCard";
 import Counter from "@/components/Counter";
 import FacebookFeed from "@/components/FacebookFeed";
-import RealBall from "@/components/RealBall";
 import AnthemPlayer from "@/components/AnthemPlayer";
 import NextMatchCard from "@/components/NextMatchCard";
 import SquadCarousel from "@/components/SquadCarousel";
@@ -64,7 +63,6 @@ export default async function Home(){
         <p className="rise rise-3" style={{maxWidth:640,margin:"16px auto 0",color:"var(--muted)"}}>An apolitical, non-profit football club in Khulshi, Chittagong — built for bachelor youth who chose purpose over loneliness.</p>
         {nextMatch?.session_date === todayStr && (<p className="md-ribbon rise rise-4"><span className="md-dot" aria-hidden="true"/>Match Today{nextMatch.opponent ? ` — vs ${nextMatch.opponent}` : ""}{nmTime ? ` · 🕒 ${nmTime}` : ""}{nextMatch.ground ? ` · 📍 ${nextMatch.ground}` : ""}</p>)}
         <p className="rise rise-4" style={{display:"flex",gap:12,justifyContent:"center",marginTop:26,flexWrap:"wrap"}}><Link className="btn" href="/join">Join the Squad</Link><Link className="btn ghost" href="/squad">Meet the Squad</Link></p>
-        <RealBall/>
       </div>
     </section>
 
