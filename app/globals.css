@@ -617,3 +617,14 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 .dboard{margin-top:13px;border:1px solid rgba(201,162,39,.55);border-radius:12px;padding:10px 12px 11px;text-align:center;background:linear-gradient(180deg,#101d42,#0a1128);box-shadow:inset 0 0 0 3px #06060a,inset 0 0 0 4px rgba(201,162,39,.35)}
 .dboard-top{display:block;font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:#9aa3b2}
 .dboard-motto{display:block;font-family:var(--font-display);font-weight:600;font-size:13.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold2);margin-top:4px}
+
+/* ── Record book + Who's In stack ── */
+.rec-val{font-family:var(--font-anton);font-weight:400;font-size:2.7rem;line-height:1.05;color:var(--gold-text);margin:6px 0 8px}
+.rec-unit{font-family:var(--font-body);font-size:.95rem;margin-left:9px;color:var(--muted);letter-spacing:.04em}
+.nm-who{display:flex;align-items:center;gap:11px;border-top:1px dashed var(--line-gold);padding-top:11px}
+.nm-who-stack{display:inline-flex;align-items:center}
+.nm-who-stack img,.nm-who-fallback{width:30px;height:30px;border-radius:50%;border:2px solid var(--card);object-fit:cover;margin-left:-9px;background:#16213f}
+.nm-who-stack>*:first-child{margin-left:0}
+.nm-who-fallback{color:#e8c766;font-size:12px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-display)}
+.nm-who-text{font-size:13px;color:var(--muted)}
+.nm-who-text strong{color:var(--gold-text)}

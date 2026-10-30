@@ -17,6 +17,7 @@ import CardCarousel from "@/components/CardCarousel";
 import PersonCard from "@/components/PersonCard";
 import Leaderboard from "@/components/Leaderboard";
 import CapBadge from "@/components/CapBadge";
+import { getInPlayers } from "@/lib/rsvps";
 
 export default async function Home(){
   // All six reads run in PARALLEL (perf fix 2026-10-29: sequential awaits made
@@ -42,6 +43,7 @@ export default async function Home(){
   const nmSlide:any = nextMatch ? groundSlides.find((g:any)=>{ if (nextMatch.ground_id && g.id === nextMatch.ground_id) return true; const sg = String(nextMatch.ground || "").trim().toLowerCase(); const gn = String(g.name || "").trim().toLowerCase(); return !!sg && !!gn && (sg.includes(gn) || gn.includes(sg)); }) : null;
   const nmDirections = nextMatch ? (nmSlide?.directions || (nextMatch.ground ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(nextMatch.ground + ", Chittagong")}` : "")) : "";
   const nmDate = nextMatch ? new Date(nextMatch.session_date + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }) : "";
+  const nmIn = nextMatch ? ((await getInPlayers([nextMatch.id]))[nextMatch.id] || []) : [];
   const nmTime = nextMatch?.session_time ? (()=>{ const [h,m] = String(nextMatch.session_time).slice(0,5).split(":").map(Number); const ap = h >= 12 ? "PM" : "AM"; const hh = h % 12 === 0 ? 12 : h % 12; return `${hh}:${String(m).padStart(2,"0")} ${ap}`; })() : "";
   // Events section (owner, 2026-10-29): the captain (Admin → Players "Make ©
   // Captain", migration 013) headlines it; the events are the real sessions —
@@ -67,7 +69,7 @@ export default async function Home(){
     </section>
 
     {nextMatch && (<section className="wrap nm-section">
-      <NextMatchCard tag={nextMatch.session_date === todayStr ? "🔴 Match Today" : "Next Match"} opponent={nextMatch.opponent || ""} meta={`📅 ${nmDate}${nmTime ? ` · 🕒 ${nmTime}` : ""}${nextMatch.ground ? ` · 📍 ${nextMatch.ground}` : ""}`} startsAt={nmStartISO} directions={nmDirections} matchday={nextMatch.session_date === todayStr} />
+      <NextMatchCard tag={nextMatch.session_date === todayStr ? "🔴 Match Today" : "Next Match"} opponent={nextMatch.opponent || ""} meta={`📅 ${nmDate}${nmTime ? ` · 🕒 ${nmTime}` : ""}${nextMatch.ground ? ` · 📍 ${nextMatch.ground}` : ""}`} startsAt={nmStartISO} directions={nmDirections} matchday={nextMatch.session_date === todayStr} ground={nextMatch.ground || ""} inPlayers={nmIn} />
     </section>)}
 
     <section className="wrap">
