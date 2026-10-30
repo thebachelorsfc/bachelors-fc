@@ -12,11 +12,23 @@
   p{opacity:.75;line-height:1.55;margin:0 0 22px}
   button{background:#c9a227;color:#06060a;border:0;border-radius:999px;padding:12px 26px;font-size:15px;font-weight:700;cursor:pointer}
   .motto{margin-top:26px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#c9a227}
+  .dl{fill:none;stroke:#e8c766;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+  .dl2{stroke-width:2.2}
+  .draw{stroke-dasharray:1;stroke-dashoffset:1;animation:dr .9s ease forwards}
+  .e2{animation-delay:.45s}.e3{animation-delay:.9s}
+  @keyframes dr{to{stroke-dashoffset:0}}
 </style>
 </head>
 <body>
   <div class="box">
     <img src="/icons/icon-192.png" alt="The Bachelors FC crest" />
+    <svg viewBox="0 0 300 150" width="240" height="120" style="display:block;margin:16px auto 0" aria-hidden="true">
+      <path class="dl dl2 draw" pathLength="1" d="M12 128 C 90 122, 210 132, 288 126" opacity=".5"/>
+      <path class="dl draw e2" pathLength="1" d="M60 98 C 130 58, 208 42, 260 49 C 277 51, 289 59, 295 73"/>
+      <circle class="dl draw" pathLength="1" cx="44" cy="104" r="12"/>
+      <path class="dl draw e3" pathLength="1" d="M216 20 V118 M216 20 H282 M282 20 V118"/>
+      <path class="dl dl2 draw e3" pathLength="1" d="M216 44 C 234 40, 264 48, 282 43" opacity=".65"/>
+    </svg>
     <h1>No connection</h1>
     <p>The brotherhood is still here — your internet is not. Check your connection and try again.</p>
     <button onclick="location.reload()">Try again</button>
