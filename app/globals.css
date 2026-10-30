@@ -78,7 +78,7 @@ h3{font-size:clamp(1.18rem,2.4vw,1.38rem);line-height:1.18;letter-spacing:.02em;
   radial-gradient(560px 300px at 8% 20%,#c9a2270d,transparent 60%),
   linear-gradient(180deg,#0a1226,var(--ink) 88%)}
 .hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(115deg,#ffffff05 0 1px,transparent 1px 90px)}
-.hero-title{font-size:clamp(3.1rem,10.5vw,7.6rem);line-height:.92;text-transform:uppercase;margin:.18em 0 .1em}
+.hero-title{font-family:var(--font-anton),"Arial Narrow",sans-serif;font-weight:400;font-size:clamp(2.7rem,9.4vw,6.9rem);line-height:.96;text-transform:uppercase;margin:.18em 0 .1em}
 .gold-text{background:linear-gradient(100deg,var(--gold2) 10%,var(--gold) 48%,var(--gold-deep) 95%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero-crest{filter:drop-shadow(0 14px 34px #c9a22730)}
 @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
@@ -166,7 +166,7 @@ h1,h2{text-wrap:balance}
 section h2::after{content:"";display:block;width:64px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--gold),transparent);margin-top:14px}
 .btn{box-shadow:inset 0 1px 0 #ffffff59,0 6px 20px #c9a2272b}
 .card{background:linear-gradient(165deg,var(--navy2),var(--navy) 72%);border-radius:20px;box-shadow:inset 0 1px 0 #ffffff10,0 14px 34px #00000038}
-.hero-title{letter-spacing:-.005em}
+.hero-title{letter-spacing:.01em}
 .hero-crest{filter:drop-shadow(0 18px 44px #c9a22745)}
 .stat-card{box-shadow:inset 0 1px 0 #ffffff12,0 14px 30px #00000033}
 footer a:hover{color:var(--gold-text)}

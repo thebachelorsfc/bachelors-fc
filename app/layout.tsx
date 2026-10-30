@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { Oswald, Inter } from "next/font/google";
+import { Oswald, Inter, Anton } from "next/font/google";
 const display = Oswald({ subsets:["latin"], weight:["500","600","700"], variable:"--font-display" });
+const anton = Anton({ subsets:["latin"], weight:"400", variable:"--font-anton" });
 const body = Inter({ subsets:["latin"], variable:"--font-body" });
 import "./globals.css";
 import { SITE, JSON_LD } from "@/lib/site";
@@ -32,7 +33,7 @@ export const viewport: Viewport = { themeColor: "#06060a" };
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const anthemSrc = await resolveAnthemSrc();
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
+    <html lang="en" className={`${display.variable} ${body.variable} ${anton.variable}`}>
       <body>
         <script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('bfc-theme');if(t==='light')document.documentElement.dataset.theme='light'}catch(e){}" }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
