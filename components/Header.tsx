@@ -32,10 +32,15 @@ const NAV: [string, string, keyof typeof I][] = [
   ["Grounds","/grounds","flag"],["Rules","/rules","list"],["Login","/login","user"],
 ];
 
+const fmtBugDate = (d?: string | null) => { if (!d) return ""; const dt = new Date(d + "T00:00:00"); return isNaN(dt.getTime()) ? String(d) : dt.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" }); };
+const fmtBugTime = (t?: string | null) => { if (!t) return ""; const [h, mi] = String(t).slice(0, 5).split(":").map(Number); if (isNaN(h)) return String(t); const ap = h >= 12 ? "PM" : "AM"; return `${h % 12 === 0 ? 12 : h % 12}:${String(mi || 0).padStart(2, "0")} ${ap}`; };
+
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [light, setLight] = useState(false);
   const [installed, setInstalled] = useState(false);
+  const [bug, setBug] = useState<any>(null);
+  useEffect(() => { fetch("/api/next-match").then(r => r.ok ? r.json() : null).then(j => { if (j) setBug(j.next); }).catch(() => {}); }, []);
   useEffect(() => { setLight(document.documentElement.dataset.theme === "light"); setInstalled(isStandalone()); }, []);
   useEffect(() => { document.body.style.overflow = open ? "hidden" : ""; return () => { document.body.style.overflow = ""; }; }, [open ]);
   useEffect(() => { const fn = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); }; window.addEventListener("keydown", fn); return () => window.removeEventListener("keydown", fn); }, []);
@@ -55,18 +60,24 @@ export default function Header() {
     </div></header>
     <div className={`backdrop${open ? " open" : ""}`} onClick={() => setOpen(false)} />
     <aside className={`drawer${open ? " open" : ""}`} aria-hidden={!open}>
+      <svg className="drawer-pitch" viewBox="0 0 300 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect x="14" y="14" width="272" height="592"/><line x1="14" y1="310" x2="286" y2="310"/><circle cx="150" cy="310" r="72"/><rect x="80" y="14" width="140" height="96"/><rect x="80" y="510" width="140" height="96"/><circle className="fill" cx="150" cy="310" r="4"/></svg>
       <div className="dcard" style={{display:"flex",alignItems:"center",gap:12,padding:"13px 14px"}}>
         <Image src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={40} height={47} style={{objectFit:"contain"}}/>
         <strong style={{fontFamily:"var(--font-display)",letterSpacing:".1em",fontSize:16}}>THE BACHELORS <span style={{color:"var(--gold)"}}>FC</span></strong>
         <button type="button" className="icon-btn" style={{marginLeft:"auto"}} onClick={() => setOpen(false)} aria-label="Close menu"><Close/></button>
       </div>
-      <nav className="dcard" style={{marginTop:14,overflowY:"auto",padding:"6px 8px"}}>
+      {bug && (<Link href="/#events" className={`dbug${bug.isToday ? " today" : ""}`} style={{marginTop:14}} onClick={() => setOpen(false)}>
+        <span className="dbug-tag">{bug.isToday ? "🔴 Match Today" : "⚽ Next Match"}</span>
+        <span className="dbug-main">{bug.opponent ? `The Bachelors FC vs ${bug.opponent}` : (bug.title || "The Bachelors FC")}</span>
+        <span className="dbug-meta">{fmtBugDate(bug.session_date)}{bug.session_time ? ` · 🕒 ${fmtBugTime(bug.session_time)}` : ""}{bug.ground ? ` · 📍 ${bug.ground}` : ""}</span>
+      </Link>)}
+      <nav className="dcard" style={{marginTop: bug ? 10 : 14,overflowY:"auto",padding:"6px 8px"}}>
         {NAV.map(([l,h,ic]) => <Link key={h+l} className="drow" href={h} onClick={() => setOpen(false)}><span className="dico">{I[ic]}</span>{l}<span className="dchev">›</span></Link>)}
         {!installed && <button type="button" className="drow" style={{width:"100%",background:"none",border:0,cursor:"pointer",font:"inherit",textAlign:"left"}} onClick={async () => { setOpen(false); const ok = await promptInstall(); if (!ok) { alert(isIOS() ? "Install: Safari-te Share button chap diye 'Add to Home Screen' select koro." : "Install: browser-er menu (⋮) theke 'Install and create shortcut' ba 'Add to Home screen' chap dao."); } }}><span className="dico">{I.phone}</span>Install App<span className="dchev">›</span></button>}
       </nav>
       <div style={{marginTop:14}}>
         <Link href="/join" className="btn" style={{display:"block",textAlign:"center"}} onClick={() => setOpen(false)}>Join the Squad</Link>
-        <p style={{color:"#9aa3b2",fontSize:12.5,marginTop:13,textAlign:"center"}}>Forged in Brotherhood, Driven by Purpose</p>
+        <div className="dboard"><span className="dboard-top">The Bachelors FC · Khulshi · Est. 2026</span><span className="dboard-motto">Forged in Brotherhood, Driven by Purpose</span></div>
       </div>
     </aside>
   </>);
