@@ -612,13 +612,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 .drawer-pitch{position:absolute;inset:0;width:100%;height:100%;opacity:.05;pointer-events:none}
 .drawer-pitch rect,.drawer-pitch line,.drawer-pitch circle{fill:none;stroke:#f7f5ef;stroke-width:2}
 .drawer-pitch .fill{fill:#f7f5ef;stroke:none}
-.drawer .dcard,.drawer .dbug,.drawer>div{position:relative}
-.dbug{display:block;text-decoration:none;background:linear-gradient(120deg,rgba(201,162,39,.16),rgba(201,162,39,.05));border:1px solid rgba(201,162,39,.4);border-left:4px solid var(--gold);border-radius:16px;padding:11px 13px;color:#f7f5ef}
-.dbug-tag{display:block;font-family:var(--font-display);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold2)}
-.dbug-main{display:block;font-family:var(--font-display);font-weight:600;font-size:16.5px;margin-top:3px}
-.dbug-meta{display:block;font-size:12.5px;color:#c6ccda;margin-top:2px}
-.dbug.today{background:linear-gradient(120deg,rgba(190,30,30,.28),rgba(190,30,30,.08));border-color:rgba(255,90,90,.5);border-left-color:#e5484d}
-.dbug.today .dbug-tag{color:#ffb3b3}
+.drawer .dcard,.drawer>div{position:relative}
 .dboard{margin-top:13px;border:1px solid rgba(201,162,39,.55);border-radius:12px;padding:10px 12px 11px;text-align:center;background:linear-gradient(180deg,#101d42,#0a1128);box-shadow:inset 0 0 0 3px #06060a,inset 0 0 0 4px rgba(201,162,39,.35)}
 .dboard-top{display:block;font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:#9aa3b2}
 .dboard-motto{display:block;font-family:var(--font-display);font-weight:600;font-size:13.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold2);margin-top:4px}
