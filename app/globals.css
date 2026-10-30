@@ -606,3 +606,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 @keyframes goalNet{0%,100%{transform:skewX(0)}35%{transform:skewX(2.4deg)}70%{transform:skewX(-1.2deg)}}
 .goal-text{animation-delay:1.05s}.goal-sub{animation-delay:1.25s}
 @media (prefers-reduced-motion: reduce){.doodle .draw{animation:none;stroke-dashoffset:0}.doodle .pop{animation:none;opacity:1}.doodle .goal-ball{animation:none;transform:translate(192px,2px)}.doodle .goal-net{animation:none}.goal-toast{animation:none}}
+
+/* ── Realistic 3D ball (hero) ── */
+.real-ball{position:absolute;right:14px;bottom:-30px;width:196px;height:196px;pointer-events:none}
+.real-ball canvas{display:block;position:relative;z-index:1}
+.real-ball-shadow{position:absolute;left:50%;bottom:-6px;width:62%;height:22px;transform:translateX(-50%);background:radial-gradient(ellipse at center,rgba(0,0,0,.5),rgba(0,0,0,0) 68%);border-radius:50%}
+@media(max-width:820px){.real-ball{position:relative;right:auto;bottom:auto;margin:24px auto -4px;width:158px;height:158px}}
