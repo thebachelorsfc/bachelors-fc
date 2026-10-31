@@ -4,15 +4,17 @@ import { useEffect, useState } from "react";
 // Dashboard chip: the player's Iron Man streak (consecutive sessions
 // answered IN) from /api/player/streak. Renders nothing until he has at
 // least one IN — the streak has to be earned before it is shown.
-export default function StreakChip({ token }: { token: string }) {
-  const [d, setD] = useState<{ streak: number; totalIn: number } | null>(null);
+export default function StreakChip({ token, initial }: { token: string; initial?: { streak: number; totalIn: number } | null }) {
+  const [d, setD] = useState<{ streak: number; totalIn: number } | null>(initial && initial.totalIn > 0 ? initial : null);
 
   useEffect(() => {
+    // Perf (2026-10-31): seed from the dashboard aggregate when provided.
+    if (initial !== undefined) { setD(initial && initial.totalIn > 0 ? initial : null); return; }
     fetch("/api/player/streak", { headers: { Authorization: `Bearer ${token}` } })
       .then(r => (r.ok ? r.json() : null))
       .then(j => { if (j && j.totalIn > 0) setD(j); })
       .catch(() => {});
-  }, [token]);
+  }, [token, initial]);
 
   if (!d) return null;
   return (

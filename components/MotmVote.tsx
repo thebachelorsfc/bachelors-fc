@@ -4,8 +4,8 @@ import Image from "next/image";
 
 /* Dashboard MOTM voting card — appears only while the admin has a vote open.
    One vote per player, changeable while open. Counts appear after you've voted. */
-export default function MotmVote({ token }: { token: string }) {
-  const [open, setOpen] = useState<any[]>([]);
+export default function MotmVote({ token, initial }: { token: string; initial?: any[] }) {
+  const [open, setOpen] = useState<any[]>(initial ?? []);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -14,7 +14,10 @@ export default function MotmVote({ token }: { token: string }) {
     const r = await fetch("/api/player/motm", { headers: { Authorization: `Bearer ${token}` } });
     if (r.ok) { const j = await r.json(); setOpen(j.open ?? []); }
   }, [token]);
-  useEffect(() => { load(); }, [load]);
+  // Perf (2026-10-31): the dashboard aggregate already carries the open
+  // votes — seed from it instead of fetching again on mount.
+  useEffect(() => { if (initial !== undefined) setOpen(initial); }, [initial]);
+  useEffect(() => { if (initial === undefined) load(); }, [load, initial]);
 
   async function vote(sessionId: string, candidateId: string) {
     setBusy(true); setMsg("");

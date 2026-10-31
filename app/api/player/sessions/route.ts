@@ -11,8 +11,11 @@ export async function GET(req: Request) {
   const upcoming = (sessions ?? []).filter((s: any) => !s.session_date || s.session_date >= today).slice(0, 8);
   if (!upcoming.length) return NextResponse.json({ sessions: [] });
   const ids = upcoming.map((s: any) => s.id);
-  const { data: rsvps } = await w.from("session_rsvps").select("*").in("session_id", ids);
-  const { data: players } = await w.from("players").select("id,name");
+  const [rsvpRes, plRes] = await Promise.all([
+    w.from("session_rsvps").select("*").in("session_id", ids),
+    w.from("players").select("id,name"),
+  ]);
+  const rsvps = rsvpRes.data; const players = plRes.data;
   const nameOf = new Map((players ?? []).map((p: any) => [p.id, p.name]));
   const out = upcoming.map((s: any) => {
     const list = (rsvps ?? []).filter((r: any) => r.session_id === s.id).map((r: any) => ({ player_id: r.player_id, name: nameOf.get(r.player_id) || "Player", status: r.status }));

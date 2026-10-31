@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import MemberCard from "@/components/MemberCard";
@@ -12,34 +12,51 @@ import GoalDoodle from "@/components/GoalDoodle";
 
 type Sess = any;
 const STATUS_BTN: Record<string, string> = { in: "✅ IN", out: "❌ OUT", maybe: "🤔 MAYBE" };
+// Perf (2026-10-31): last dashboard payload is cached per user so a repeat
+// visit paints instantly, then refreshes in the background.
+const CACHE_KEY = "bfc-dash-v1";
 
 export default function DashboardPage() {
   const [state, setState] = useState<"loading" | "anon" | "ready">("loading");
   const [me, setMe] = useState<any>(null);
   const [sessions, setSessions] = useState<Sess[]>([]);
+  const [motmOpen, setMotmOpen] = useState<any[]>([]);
+  const [streak, setStreak] = useState<any>(null);
   const [token, setToken] = useState("");
   const [msg, setMsg] = useState("");
   const [goalFx, setGoalFx] = useState(false);
+  const paintedRef = useRef(false);
+  const uidRef = useRef("");
+
+  const applyData = useCallback((j: any) => {
+    setMe({ email: j.email, account: j.account, player: j.player });
+    setSessions(j.sessions ?? []);
+    setMotmOpen(j.motm?.open ?? []);
+    setStreak(j.streak ?? null);
+  }, []);
 
   const load = useCallback(async (tok: string) => {
-    const h = { Authorization: `Bearer ${tok}` };
-    const r = await fetch("/api/player/me", { headers: h });
-    if (!r.ok) { setState("anon"); return; }
-    setMe(await r.json());
-    const s = await fetch("/api/player/sessions", { headers: h });
-    setSessions(s.ok ? (await s.json()).sessions ?? [] : []);
-    setState("ready");
-  }, []);
+    try {
+      const r = await fetch("/api/player/dashboard", { headers: { Authorization: `Bearer ${tok}` } });
+      if (!r.ok) { if (!paintedRef.current) setState("anon"); try { localStorage.removeItem(CACHE_KEY); } catch (e) {} return; }
+      const j = await r.json();
+      applyData(j);
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ uid: uidRef.current, j })); } catch (e) {}
+      setState("ready");
+    } catch (e) { if (!paintedRef.current) setState("anon"); }
+  }, [applyData]);
 
   useEffect(() => {
     const sb = supabaseBrowser();
     if (!sb) { setState("anon"); return; }
     sb.auth.getSession().then(({ data }) => {
       const tok = data.session?.access_token;
-      if (!tok) { setState("anon"); return; }
-      setToken(tok); load(tok);
+      if (!tok) { setState("anon"); try { localStorage.removeItem(CACHE_KEY); } catch (e) {} return; }
+      setToken(tok); uidRef.current = data.session?.user?.id ?? "";
+      try { const c = localStorage.getItem(CACHE_KEY); if (c) { const parsed = JSON.parse(c); if (parsed && parsed.uid === uidRef.current && parsed.j) { applyData(parsed.j); paintedRef.current = true; setState("ready"); } } } catch (e) {}
+      load(tok);
     });
-  }, [load]);
+  }, [load, applyData]);
 
   async function rsvp(session_id: string, status: string) {
     setMsg("");
@@ -47,7 +64,7 @@ export default function DashboardPage() {
     const j = await r.json().catch(() => ({}));
     if (r.ok) { setMsg("RSVP saved ✓"); if (status === "in") { setGoalFx(true); window.setTimeout(() => setGoalFx(false), 3200); } load(token); } else setMsg(j.error || "Could not save RSVP");
   }
-  async function logout() { await supabaseBrowser()?.auth.signOut(); location.href = "/login"; }
+  async function logout() { try { localStorage.removeItem(CACHE_KEY); } catch (e) {} await supabaseBrowser()?.auth.signOut(); location.href = "/login"; }
 
   if (state === "loading") return <main className="wrap"><p style={{ color: "var(--muted)" }}>Loading your dashboard…</p></main>;
   if (state === "anon") return (
@@ -94,9 +111,9 @@ export default function DashboardPage() {
             <h2 style={{ marginTop: 30 }}>Your membership card</h2>
             <MemberCard player={player} />
             <ShareCard player={player} />
-            <MotmVote token={token} />
+            <MotmVote token={token} initial={motmOpen} />
             <PushOptIn token={token} />
-            <StreakChip token={token} />
+            <StreakChip token={token} initial={streak} />
             <h2 style={{ marginTop: 34 }}>Upcoming sessions</h2>
             {msg && <p style={{ color: "var(--note)" }}>{msg}</p>}
             {sessions.length === 0 && <div className="card"><p style={{ color: "var(--muted)", margin: 0 }}>No upcoming sessions scheduled yet. The next session will appear here as soon as the club sets it.</p></div>}

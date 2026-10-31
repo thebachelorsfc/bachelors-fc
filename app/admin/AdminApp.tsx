@@ -2,9 +2,12 @@
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
-import PosterGenerator from "@/components/PosterGenerator";
-import TeamSheetGenerator from "@/components/TeamSheetGenerator";
-import MatchStatsPanel from "@/components/MatchStatsPanel";
+import dynamic from "next/dynamic";
+// Perf (2026-10-31): the canvas generators + stats panel are heavy and only
+// needed on demand — load their code lazily so the admin shell paints fast.
+const PosterGenerator = dynamic(() => import("@/components/PosterGenerator"), { ssr: false });
+const TeamSheetGenerator = dynamic(() => import("@/components/TeamSheetGenerator"), { ssr: false });
+const MatchStatsPanel = dynamic(() => import("@/components/MatchStatsPanel"), { ssr: false });
 const input: React.CSSProperties = { width:"100%", padding:"10px 12px", borderRadius:10, border:"1px solid var(--field-br)", background:"var(--field-bg)", color:"var(--field-tx)" };
 export default function AdminApp(){
   const [authed,setAuthed]=useState<boolean|null>(null); const [pw,setPw]=useState(""); const [tab,setTab]=useState("home");
@@ -19,9 +22,10 @@ export default function AdminApp(){
   const [prods,setProds]=useState<any[]>([]); const [pf,setPf]=useState({name:"",photo_url:"",description:"",price_bdt:"",stock:""});
   const [ords,setOrds]=useState<any[]>([]); const [fw,setFw]=useState<any[]>([]);
   const [accs,setAccs]=useState<any[]>([]); const [rsvpList,setRsvpList]=useState<any[]>([]); const [anthemCustom,setAnthemCustom]=useState<boolean|null>(null); const [anthemKey,setAnthemKey]=useState(0);
-  // Perf fix 2026-10-29: after the auth check, the ten data fetches run in
-  // PARALLEL — they used to be awaited one-by-one, making the admin crawl.
-  const load=useCallback(async()=>{ const a=await fetch("/api/applications"); if(a.status===401){ setAuthed(false); return; } setAuthed(true); setApps(await a.json()); const J=async(u:string)=>{ try{ const r=await fetch(u); return r.ok?await r.json():[]; }catch{ return []; } }; const [pl,ga,hl,sp,pr,or,ac,rv,gr,pp,fm]=await Promise.all([J("/api/players"),J("/api/gallery"),J("/api/highlights"),J("/api/social-posts"),J("/api/products"),J("/api/orders"),J("/api/admin/player-accounts"),J("/api/admin/rsvps"),J("/api/admin/grounds"),J("/api/admin/people"),J("/api/admin/fan-wall")]); setPlayers(pl); setGal(ga); setHls(hl); setPosts(sp); setProds(pr); setOrds(or); setAccs(ac); setRsvpList(rv); setGrs(gr); setPpl(pp); setFw(fm); },[]);
+  // Perf: 2026-10-29 parallelised the data fetches. 2026-10-31: the auth
+  // gate runs alongside the batch (no serial block), in two waves so the
+  // Home/Matchday/People data paints first.
+  const load=useCallback(async()=>{ const J=async(u:string)=>{ try{ const r=await fetch(u); return r.ok?await r.json():[]; }catch{ return []; } }; const gate=(async()=>{ try{ const a=await fetch("/api/applications"); if(a.status===401){ setAuthed(false); return; } setAuthed(true); setApps(await a.json()); }catch{ } })(); const wave1=Promise.all([J("/api/players"),J("/api/admin/player-accounts"),J("/api/admin/rsvps"),J("/api/orders"),J("/api/admin/fan-wall")]).then(([pl,ac,rv,or,fm])=>{ setPlayers(pl); setAccs(ac); setRsvpList(rv); setOrds(or); setFw(fm); }); const wave2=Promise.all([J("/api/gallery"),J("/api/highlights"),J("/api/social-posts"),J("/api/products"),J("/api/admin/grounds"),J("/api/admin/people")]).then(([ga,hl,sp,pr,gr,pp])=>{ setGal(ga); setHls(hl); setPosts(sp); setProds(pr); setGrs(gr); setPpl(pp); }); await Promise.all([gate,wave1,wave2]); },[]);
   const gv=(id:string)=>(document.getElementById(id) as HTMLInputElement)?.value.trim()||"";
   const createGround=async()=>{ const body={name:gv("ng-name"),area:gv("ng-area"),address:gv("ng-address"),maps_url:gv("ng-maps"),matches_played:Number(gv("ng-matches")||0),last_played:gv("ng-last")||null}; if(!body.name){ setMsg("Ground name is required"); return; } const r=await fetch("/api/admin/grounds",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); const j=await r.json().catch(()=>({})); setMsg(r.ok?`Ground added: ${body.name}`:(j.error||"Failed")); if(r.ok) load(); };
   const saveGround=async(g:any)=>{ const body={name:gv(`g-name-${g.id}`),area:gv(`g-area-${g.id}`),address:gv(`g-address-${g.id}`),maps_url:gv(`g-maps-${g.id}`),photo_url:gv(`g-photo-${g.id}`),matches_played:Number(gv(`g-matches-${g.id}`)||0),last_played:gv(`g-last-${g.id}`)||null}; const r=await fetch(`/api/admin/grounds/${g.id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); setMsg(r.ok?`Saved: ${body.name||g.name}`:"Save failed"); if(r.ok) load(); };
