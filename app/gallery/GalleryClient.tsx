@@ -1,14 +1,12 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import HighlightCard, { type HighlightLike } from "@/components/HighlightCard";
-import CardCarousel from "@/components/CardCarousel";
 
 export type GalleryLike = { id: string; photo_url: string; caption?: string | null; category: string; taken_on?: string | null };
 const CATS: [string, string][] = [["all", "All"], ["match", "Match Day"], ["training", "Training"], ["tour", "On Tour"], ["team", "Team"]];
 const CAT_LABEL: Record<string, string> = { match: "Match Day", training: "Training", tour: "On Tour", team: "Team" };
 
-export default function GalleryClient({ items, highlights }: { items: GalleryLike[]; highlights: HighlightLike[] }) {
+export default function GalleryClient({ items }: { items: GalleryLike[] }) {
   const [cat, setCat] = useState("all");
   const [open, setOpen] = useState<number | null>(null);
   const shown = useMemo(() => (cat === "all" ? items : items.filter((i) => i.category === cat)), [cat, items]);
@@ -42,19 +40,6 @@ export default function GalleryClient({ items, highlights }: { items: GalleryLik
             </figure>
           ))}
         </div>
-      )}
-
-      <h2 style={{ marginTop: 64 }}>Highlights</h2>
-      <p style={{ color: "var(--muted)", maxWidth: 640 }}>Match videos, hosted on YouTube and Facebook — playing right here.</p>
-      {highlights.length === 0 ? (
-        <div className="card" style={{ textAlign: "center", padding: "44px 22px" }}>
-          <h3 style={{ margin: "0 0 6px" }}>No highlights yet</h3>
-          <p style={{ color: "var(--muted)", margin: 0 }}>The first match video will appear here as soon as the club shares it.</p>
-        </div>
-      ) : (
-        <CardCarousel slide="min(560px,92%)">
-          {highlights.map((h) => <HighlightCard key={h.id} h={h} />)}
-        </CardCarousel>
       )}
 
       {open !== null && shown[open] && (

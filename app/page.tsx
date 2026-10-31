@@ -1,11 +1,10 @@
 import Link from "next/link"; import Image from "next/image";
 import { SITE, PILLARS, TOUR, KIT } from "@/lib/site";
 import { SEED_PLAYERS, openNumbers } from "@/lib/players";
-import { getPlayers, getHighlights, getPeople, getGrounds, getAllSessions, getGalleryItems, getSocialPosts } from "@/lib/data";
+import { getPlayers, getPeople, getGrounds, getAllSessions, getGalleryItems, getSocialPosts } from "@/lib/data";
 import { buildGroundSlides } from "@/lib/groundSlides";
 import GroundsCarousel from "@/components/GroundsCarousel";
 import GalleryPreview from "@/components/GalleryPreview";
-import HighlightCard from "@/components/HighlightCard";
 export const dynamic = "force-dynamic";
 import PlayerCard, { OpenShirt } from "@/components/PlayerCard";
 import Counter from "@/components/Counter";
@@ -23,7 +22,7 @@ import { getInPlayers } from "@/lib/rsvps";
 export default async function Home(){
   // All six reads run in PARALLEL (perf fix 2026-10-29: sequential awaits made
   // the homepage take ~5.7s server-side; one round of parallel queries ≈ 1s).
-  const [playersRaw, highlights, people, allSessions, groundsRaw, galleryItems, socialPosts]: any[] = await Promise.all([getPlayers(), getHighlights(), getPeople(), getAllSessions(), getGrounds(), getGalleryItems(), getSocialPosts()]);
+  const [playersRaw, people, allSessions, groundsRaw, galleryItems, socialPosts]: any[] = await Promise.all([getPlayers(), getPeople(), getAllSessions(), getGrounds(), getGalleryItems(), getSocialPosts()]);
   const players:any[] = playersRaw ?? SEED_PLAYERS;
   const groundSlides = buildGroundSlides(groundsRaw, allSessions);
   // Slim Next Match card (owner re-requested 2026-10-27 after the old Next
@@ -184,11 +183,6 @@ export default async function Home(){
     {people.length>0 && (<section className="wrap people-band"><p className="eyebrow">The People</p><h2>Founders &amp; Leadership</h2>
       <CardCarousel slide="min(560px,94%)">{people.map((p:any)=><PersonCard key={p.id} p={p}/>)}</CardCarousel>
     </section>)}
-    {highlights.length>0 && (<section className="wrap"><p className="eyebrow">Watch</p><h2>Highlights</h2>
-      <CardCarousel slide="min(560px,92%)">{highlights.map((h:any)=><HighlightCard key={h.id} h={h}/>)}</CardCarousel>
-      <p style={{marginTop:16}}><Link className="btn ghost" href="/gallery">Gallery & all highlights →</Link></p>
-    </section>)}
-
     <FacebookFeed posts={socialPosts}/>
     <FanWall/>
   </main>);
