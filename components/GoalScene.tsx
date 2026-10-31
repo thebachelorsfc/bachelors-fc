@@ -109,6 +109,63 @@ const RUN_ARMS = (p: number): { a: [number, number]; b: [number, number] } => ({
   b: [Math.sin(p) * 0.72 + 0.12, -0.85],
 });
 
+// Deterministic pseudo-random per spectator — same crowd every frame.
+const rnd = (n: number) => { const x = Math.sin(n * 127.1) * 43758.5453; return x - Math.floor(x); };
+// How wild the stand is: erupts at the goal (4.98), stays loud through the
+// Siu, settles before the loop restarts.
+function crowdEnergy(t: number) {
+  if (t < 4.98) return 0;
+  if (t < 5.3) return ease((t - 4.98) / 0.32);
+  if (t < 8.6) return 1;
+  return clamp(1 - (t - 8.6) / 1.0, 0, 1);
+}
+const CROWD_COLORS = ["#c9a227", "#e8e4da", "#5b6a8c", "#31405f", "#a34a3a", "#7e8db0", "#2b3a55", "#8f8578"];
+const CROWD_SKIN = ["#c98d5e", "#8a5a33", "#d9a066", "#6e4525"];
+function drawStadium(ctx: CanvasRenderingContext2D, t: number) {
+  const E = crowdEnergy(t);
+  // tiered stand backdrop
+  ctx.fillStyle = "rgba(247,245,239,0.035)";
+  ctx.fillRect(0, 30, W, 168);
+  ctx.strokeStyle = "rgba(247,245,239,0.07)"; ctx.lineWidth = 1;
+  for (let r = 0; r <= 5; r++) { const y = 58 + r * 28; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+  // floodlight masts
+  for (const fx of [52, W - 52]) {
+    ctx.strokeStyle = "rgba(247,245,239,0.28)"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(fx, 58); ctx.lineTo(fx, 16); ctx.stroke();
+    const g = ctx.createRadialGradient(fx, 14, 2, fx, 14, 30);
+    g.addColorStop(0, "rgba(255,240,190,0.20)"); g.addColorStop(1, "rgba(255,240,190,0)");
+    ctx.fillStyle = g; ctx.fillRect(fx - 30, 0, 60, 44);
+    ctx.fillStyle = "rgba(255,244,200,0.9)";
+    for (let d = 0; d < 4; d++) { ctx.beginPath(); ctx.arc(fx - 9 + d * 6, 13, 2.2, 0, Math.PI * 2); ctx.fill(); }
+  }
+  // the crowd — five rows of home fans
+  const rows = [86, 112, 138, 164, 190];
+  rows.forEach((ry, ri) => {
+    for (let cx = 16 + (ri % 2) * 7; cx < W - 8; cx += 25) {
+      const i = ri * 1000 + cx;
+      const ph = rnd(i) * Math.PI * 2;
+      const jump = E > 0 && rnd(i + 7) < 0.72 ? Math.abs(Math.sin(t * 7 + ph * 3)) * 7 * E : 0;
+      const y = ry + Math.sin(t * 1.4 + ph) * 1.1 - jump;
+      const col = CROWD_COLORS[Math.floor(rnd(i + 3) * CROWD_COLORS.length)];
+      if (E > 0.25 && rnd(i + 11) < 0.8) { // arms up, waving
+        ctx.strokeStyle = col; ctx.lineWidth = 1.6; ctx.lineCap = "round";
+        const wob = Math.sin(t * 9 + ph) * 1.6 * E;
+        ctx.beginPath(); ctx.moveTo(cx - 2.4, y - 3); ctx.lineTo(cx - 4.6, y - 8.5 + wob); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx + 2.4, y - 3); ctx.lineTo(cx + 4.6, y - 8.5 - wob); ctx.stroke();
+      }
+      ctx.fillStyle = col;
+      ctx.fillRect(cx - 2.8, y - 4, 5.6, 6.5);
+      ctx.fillStyle = CROWD_SKIN[Math.floor(rnd(i + 5) * CROWD_SKIN.length)];
+      ctx.beginPath(); ctx.arc(cx, y - 6.4, 2.5, 0, Math.PI * 2); ctx.fill();
+    }
+  });
+  // pitch-side hoarding board
+  ctx.fillStyle = "rgba(8,11,22,0.92)"; ctx.fillRect(0, 200, W, 15);
+  ctx.fillStyle = "rgba(201,162,39,0.55)"; ctx.fillRect(0, 200, W, 1.2);
+  ctx.font = "600 9.5px Oswald, sans-serif"; ctx.fillStyle = "rgba(232,199,102,0.85)"; ctx.textAlign = "center";
+  ctx.fillText("T H E   B A C H E L O R S   F C   ·   F O R G E D   I N   B R O T H E R H O O D   ·   K H U L S H I", W / 2, 211);
+}
+
 function drawScene(ctx: CanvasRenderingContext2D, t: number) {
   ctx.clearRect(0, 0, W, H);
   // pitch stripes + chalk lines
@@ -117,6 +174,8 @@ function drawScene(ctx: CanvasRenderingContext2D, t: number) {
   ctx.beginPath(); ctx.moveTo(0, GY); ctx.lineTo(W, GY); ctx.stroke();
   ctx.strokeStyle = "rgba(247,245,239,0.14)";
   ctx.beginPath(); ctx.moveTo(1010, GY - 108); ctx.lineTo(1010, GY); ctx.stroke();
+
+  drawStadium(ctx, t);
 
   // goal net (behind the keeper), posts in front of net
   const netBulge = t > 4.98 && t < 5.95 ? Math.sin((t - 4.98) / 0.97 * Math.PI) * 13 : 0;
@@ -266,7 +325,7 @@ function drawScene(ctx: CanvasRenderingContext2D, t: number) {
     for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2 + 0.4; ctx.beginPath(); ctx.moveTo(1080 + Math.cos(a) * 12 * bp, GY - 66 + Math.sin(a) * 12 * bp); ctx.lineTo(1080 + Math.cos(a) * 30 * bp, GY - 66 + Math.sin(a) * 30 * bp); ctx.stroke(); }
     const pop = t < 5.45 ? 0.6 + ease((t - 4.98) / 0.47) * 0.52 : 1.12 - Math.sin(clamp((t - 5.45) / 0.4, 0, 1) * Math.PI * 0.5) * 0.12;
     ctx.save();
-    ctx.translate(1108, 62); ctx.scale(pop, pop);
+    ctx.translate(1092, 62); ctx.scale(pop, pop);
     ctx.font = "52px Anton, 'Arial Narrow', sans-serif"; ctx.textAlign = "center";
     ctx.fillStyle = GOLD; ctx.fillText("GOAL!", 0, 0);
     ctx.strokeStyle = GOLD_D; ctx.lineWidth = 2.4;
@@ -277,6 +336,14 @@ function drawScene(ctx: CanvasRenderingContext2D, t: number) {
         const fx = 1000 + ((i * 67) % 170), fy = ((t - 5.5) * 46 + i * 29) % 130;
         ctx.fillStyle = i % 3 ? "rgba(232,199,102,0.75)" : "rgba(247,245,239,0.65)";
         ctx.save(); ctx.translate(fx, 24 + fy); ctx.rotate(t * 2 + i); ctx.fillRect(-2.6, -1.4, 5.2, 2.8); ctx.restore();
+      }
+    }
+    // the stand throws confetti too while the celebration lasts
+    if (t > 5.2 && t < 8.4) {
+      for (let i = 0; i < 18; i++) {
+        const fx = 120 + ((i * 149) % 760), fy = ((t - 5.2) * 34 + i * 41) % 150;
+        ctx.fillStyle = i % 3 ? "rgba(232,199,102,0.7)" : "rgba(247,245,239,0.55)";
+        ctx.save(); ctx.translate(fx, 40 + fy); ctx.rotate(t * 2.4 + i * 1.7); ctx.fillRect(-2.4, -1.3, 4.8, 2.6); ctx.restore();
       }
     }
   }
@@ -317,7 +384,7 @@ export default function GoalScene() {
   }, []);
   return (
     <div aria-hidden="true" style={{ marginTop: 30, background: "linear-gradient(180deg,#0a0f1f,#060811)", borderTop: "1px solid #c9a22726" }}>
-      <canvas ref={ref} style={{ display: "block", width: "100%", height: "clamp(128px,24vw,188px)" }} />
+      <canvas ref={ref} style={{ display: "block", width: "100%", height: "clamp(150px,30vw,232px)" }} />
     </div>
   );
 }
