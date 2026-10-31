@@ -157,11 +157,6 @@ export default async function Home(){
       <p style={{marginTop:16}}><Link className="btn" href="/join">Start your application →</Link></p>
     </section>
 
-    <section className="photo-band" aria-label="The brotherhood">
-      <Image src="/assets/team-photo-band.jpg" alt="The Bachelors FC team" fill sizes="100vw" style={{objectFit:"cover",objectPosition:"center 30%"}}/>
-      <div className="photo-band-in"><p className="photo-band-kick">◆ The Brotherhood ◆</p><p className="photo-band-motto">Forged in Brotherhood,<br/>Driven by Purpose</p></div>
-    </section>
-
     <section className="wrap"><p className="eyebrow">The Lineup</p><h2>Meet the Squad</h2>
       <SquadCarousel>{sortedPlayers.map((p:any)=><PlayerCard key={p.jersey_no} p={p}/>)}{openNumbers(sortedPlayers).slice(0,3).map(n=><OpenShirt key={n} n={n}/>)}</SquadCarousel>
       <p style={{marginTop:16}}><Link className="btn ghost" href="/squad">Full squad →</Link></p>
