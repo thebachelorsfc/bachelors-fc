@@ -31,7 +31,7 @@
   radial-gradient(1000px 520px at 50% -120px,#24448c66,transparent 65%),
   radial-gradient(700px 340px at 88% 6%,#c9a22717,transparent 60%),
   linear-gradient(180deg,#0a1226,#0d1834);color:#f7f5ef}
-:root[data-theme="light"] .hero p{color:#aeb6c6 !important}
+:root[data-theme="light"] .hero p{color:#d3dae8 !important}
 :root[data-theme="light"] .hero .btn.ghost{color:#f7f5ef;border-color:#ffffff3d}
 :root[data-theme="light"] .stat-card{color:#f7f5ef}
 :root[data-theme="light"] .stat-card .stat-label{color:#9aa3b2}
@@ -657,3 +657,19 @@ html.js [data-reveal].is-visible{opacity:1;transform:none}
 :root{--copy:rgba(247,245,239,.84)}
 :root[data-theme="light"]{--copy:#262b38}
 .copy{color:var(--copy);font-size:17px;line-height:1.75}
+
+/* Hero photo (2026-11-01, owner's ask — Brotherhood-style): real team photo
+   as the hero background with a slow Ken Burns zoom; a dark navy shade keeps
+   every word readable; the shade fades into the page background (--ink). */
+.hero{padding:64px 0 92px}
+.hero-bg{position:absolute;inset:0;overflow:hidden}
+.hero-bg-img{opacity:0;transition:opacity 1.4s ease}
+.hero-bg-img.on{opacity:1;animation:heroZoom 6.5s ease-out forwards}
+.hero-dots{position:absolute;left:0;right:0;bottom:16px;display:flex;gap:8px;justify-content:center;z-index:2}
+.hero-dot{width:9px;height:9px;border-radius:99px;border:0;padding:0;background:#f7f5ef59;cursor:pointer;transition:all .3s}
+.hero-dot.on{width:26px;background:var(--gold)}
+@keyframes heroZoom{from{transform:scale(1)}to{transform:scale(1.12)}}
+.hero-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,6,12,.66) 0%,rgba(4,6,12,.58) 34%,rgba(4,6,12,.8) 74%,var(--ink) 100%)}
+.hero-title{text-shadow:0 4px 34px rgba(0,0,0,.5)}
+.hero .btn.ghost{background:rgba(5,7,12,.45)}
+@media (prefers-reduced-motion: reduce){.hero-bg-img.on{animation:none}}

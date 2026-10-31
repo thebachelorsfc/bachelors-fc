@@ -3,6 +3,8 @@ import { SITE, PILLARS, TOUR, KIT } from "@/lib/site";
 import { SEED_PLAYERS, openNumbers } from "@/lib/players";
 import { getPlayers, getPeople, getGrounds, getAllSessions, getGalleryItems, getSocialPosts } from "@/lib/data";
 import { buildGroundSlides } from "@/lib/groundSlides";
+import { getHeroSlides } from "@/lib/heroSlides";
+import HeroSlides from "@/components/HeroSlides";
 import GroundsCarousel from "@/components/GroundsCarousel";
 import GalleryPreview from "@/components/GalleryPreview";
 export const dynamic = "force-dynamic";
@@ -22,7 +24,7 @@ import { getInPlayers } from "@/lib/rsvps";
 export default async function Home(){
   // All six reads run in PARALLEL (perf fix 2026-10-29: sequential awaits made
   // the homepage take ~5.7s server-side; one round of parallel queries ≈ 1s).
-  const [playersRaw, people, allSessions, groundsRaw, galleryItems, socialPosts]: any[] = await Promise.all([getPlayers(), getPeople(), getAllSessions(), getGrounds(), getGalleryItems(), getSocialPosts()]);
+  const [playersRaw, people, allSessions, groundsRaw, galleryItems, socialPosts, heroSlides]: any[] = await Promise.all([getPlayers(), getPeople(), getAllSessions(), getGrounds(), getGalleryItems(), getSocialPosts(), getHeroSlides()]);
   const players:any[] = playersRaw ?? SEED_PLAYERS;
   const groundSlides = buildGroundSlides(groundsRaw, allSessions);
   // Slim Next Match card (owner re-requested 2026-10-27 after the old Next
@@ -59,6 +61,7 @@ export default async function Home(){
   const order:Record<string,number>={FWD:0,MID:1,DEF:2,GK:3}; const sortedPlayers=[...players].sort((a:any,b:any)=>((order[a.position_code]??9)-(order[b.position_code]??9))||(a.jersey_no-b.jersey_no));
   return(<main>
     <section className={nextMatch?.session_date === todayStr ? "hero hero-matchday" : "hero"} style={{textAlign:"center"}}>
+      <HeroSlides slides={heroSlides} />
       <div className="wrap" style={{position:"relative",zIndex:1}}>
         <div className="rise rise-1"><Image className="hero-crest" src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={168} height={198} style={{objectFit:"contain"}} priority/></div>
         <h1 className="hero-title rise rise-2">Forged in<br/><span className="gold-text">Brotherhood</span></h1>
