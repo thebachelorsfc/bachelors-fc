@@ -10,7 +10,7 @@ import { useEffect, useRef } from "react";
 // a mid-air turn, wide-stance landing). Flat figures with real kits and
 // skin tones on the stays-dark navy band; pauses off-screen and honours
 // prefers-reduced-motion with a still Siu frame.
-const W = 1200, H = 300, GY = 252, LOOP = 10.4;
+const W = 1200, H = 300, GY = 252, LOOP = 10.6;
 const GOLD = "#e8c766", GOLD_D = "#c9a227", PAPER = "#f7f5ef";
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
@@ -150,21 +150,22 @@ function drawScene(ctx: CanvasRenderingContext2D, t: number) {
     const ct = crossT[i], kit = DEF_KITS[i];
     let dx = ox, pose: Pose;
     const ready: Pose = { kit, legA: [0.32, -0.42], legB: [-0.32, -0.42], armA: [0.78, -0.35], armB: [-0.78, -0.35], lean: 0.06, crouch: 5, jump: 0, rot: 0 };
-    if (t < ct - 0.85) {
+    if (t < ct - 0.95) {
       dx = ox + Math.sin(t * 1.7 + i * 2) * 2.5; pose = ready;
-    } else if (t < ct - 0.30) { // jockey: shuffle toward the ball, crouch, track
-      const p = ease((t - (ct - 0.85)) / 0.55);
-      dx = ox - 9 * p;
-      pose = { ...ready, crouch: 8, lean: 0.24, legA: [0.42, -0.55], legB: [-0.38, -0.6], armA: [0.95, -0.3], armB: [-0.95, -0.3] };
-    } else if (t < ct + 0.25) { // slide tackle — committed, and beaten
-      const p = ease((t - (ct - 0.30)) / 0.55);
-      dx = ox - 9 - 19 * p;
-      pose = { kit, legA: [lerp(0.42, 1.32, p), lerp(-0.55, -0.06, p)], legB: [lerp(-0.38, -0.35, p), lerp(-0.6, -1.95, p)], armA: [lerp(0.95, -1.15, p), -0.3], armB: [lerp(-0.95, 2.4, p), -0.3], lean: lerp(0.24, -0.55, p), crouch: lerp(8, 25, p), jump: 0, rot: 0 };
-      if (p > 0.15 && p < 0.95) dust(ctx, dx - 6, p);
+    } else if (t < ct - 0.42) { // jockey: little steps toward the ball, crouched, tracking
+      const p = ease((t - (ct - 0.95)) / 0.53);
+      dx = ox - 12 * p;
+      pose = { ...ready, crouch: 8, lean: 0.24, legA: [Math.sin(t * 6.5) * 0.4, -0.52], legB: [Math.sin(t * 6.5 + Math.PI) * 0.4, -0.52], armA: [0.98, -0.3], armB: [-0.98, -0.3] };
+    } else if (t < ct + 0.23) { // slide tackle — committed early, glides, and is beaten
+      const p = ease((t - (ct - 0.42)) / 0.65);
+      const ext = ease(clamp(p * 1.3, 0, 1));
+      dx = ox - 12 - 24 * p;
+      pose = { kit, legA: [lerp(0.42, 1.35, ext), lerp(-0.55, -0.06, ext)], legB: [lerp(-0.38, -0.35, p), lerp(-0.6, -1.95, p)], armA: [lerp(0.95, -1.15, p), -0.3], armB: [lerp(-0.95, 2.4, p), -0.3], lean: lerp(0.24, -0.5, p), crouch: lerp(8, 23, ease(clamp(p * 1.15, 0, 1))), jump: 0, rot: 0 };
+      if (p > 0.1 && p < 0.97) dust(ctx, dx - 6, p);
     } else { // down — later props himself up to watch the celebration
-      const prop = t > 7.4 ? ease(clamp((t - 7.4) / 1.2, 0, 1)) : 0;
-      dx = ox - 28;
-      pose = { kit, legA: [1.32, -0.06], legB: [-0.35, -1.95], armA: [-1.15, -0.3], armB: [2.4, -0.3], lean: lerp(-0.55, -0.3, prop), crouch: lerp(25, 21, prop), jump: 0, rot: 0 };
+      const prop = t > 7.6 ? ease(clamp((t - 7.6) / 1.2, 0, 1)) : 0;
+      dx = ox - 36;
+      pose = { kit, legA: [1.35, -0.06], legB: [-0.35, -1.95], armA: [-1.15, -0.3], armB: [2.4, -0.3], lean: lerp(-0.5, -0.28, prop), crouch: lerp(23, 20, prop), jump: 0, rot: 0 };
     }
     shadow(ctx, dx, 0);
     ctx.save(); ctx.translate(dx, 0); ctx.scale(-1, 1); person(ctx, GY, pose); ctx.restore();
@@ -174,22 +175,25 @@ function drawScene(ctx: CanvasRenderingContext2D, t: number) {
   {
     let gx = 1012, pose: Pose;
     const ready: Pose = { kit: GK_KIT, legA: [0.38, -0.5], legB: [-0.38, -0.5], armA: [0.72, -0.45], armB: [-0.72, -0.45], lean: 0.06, crouch: 8, jump: 0, rot: 0, gloves: true };
-    if (t < 4.55) { // tracks the ball with little shuffles
-      gx = 1012 + clamp((ball.x - 1012) * 0.02, -6, 6) + Math.sin(t * 2.3) * 1.5;
-      pose = { ...ready, crouch: 8 + Math.sin(t * 3) * 1.2 };
-    } else if (t < 4.75) { // sets himself as the shot comes
-      const p = ease((t - 4.55) / 0.2);
+    if (t < 4.55) { // tracks the ball with little side steps
+      gx = 1012 + clamp((ball.x - 1012) * 0.02, -6, 6) + Math.sin(t * 2.3) * 2.5;
+      pose = { ...ready, crouch: 8 + Math.sin(t * 3) * 1.2, legA: [0.38 + Math.sin(t * 5) * 0.14, -0.5], legB: [-0.38 + Math.sin(t * 5 + Math.PI) * 0.14, -0.5] };
+    } else if (t < 4.68) { // sets himself as the shot comes
+      const p = ease((t - 4.55) / 0.13);
       pose = { ...ready, crouch: lerp(8, 12.5, p), armA: [lerp(0.72, 0.92, p), -0.3], armB: [lerp(-0.72, -0.92, p), -0.3] };
-    } else if (t < 5.17) { // the dive — full stretch, just not enough
-      const p = ease((t - 4.75) / 0.42);
+    } else if (t < 5.23) { // the dive — slower, higher arc, full stretch
+      const p = ease((t - 4.68) / 0.55);
       gx = lerp(1012, 1034, p);
-      pose = { kit: GK_KIT, legA: [-0.25, -0.5], legB: [0.4, -1.0], armA: [Math.PI - 0.18, -0.05], armB: [Math.PI + 0.18, -0.05], lean: 0, crouch: 0, jump: Math.sin(p * Math.PI * 0.85) * 26 + p * 4, rot: p * 1.15, gloves: true };
-    } else if (t < 5.55) { // crashes down inside the goal
-      const p = ease((t - 5.17) / 0.38);
+      pose = { kit: GK_KIT, legA: [-0.25, -0.5], legB: [0.4, -1.0], armA: [Math.PI - 0.18, -0.05], armB: [Math.PI + 0.18, -0.05], lean: 0, crouch: 0, jump: Math.sin(p * Math.PI * 0.85) * 30 + p * 4, rot: p * 1.15, gloves: true };
+    } else if (t < 5.35) { // held at full stretch for a beat
+      gx = 1034;
+      pose = { kit: GK_KIT, legA: [-0.25, -0.5], legB: [0.4, -1.0], armA: [Math.PI - 0.18, -0.05], armB: [Math.PI + 0.18, -0.05], lean: 0, crouch: 0, jump: 17.2, rot: 1.15, gloves: true };
+    } else if (t < 5.7) { // crashes down inside the goal
+      const p = ease((t - 5.35) / 0.35);
       gx = lerp(1034, 1042, p);
-      pose = { kit: GK_KIT, legA: [-0.2, -0.4], legB: [0.35, -0.9], armA: [Math.PI - 0.3, -0.2], armB: [Math.PI + 0.3, -0.2], lean: 0, crouch: 0, jump: lerp(15.8, 0, p), rot: lerp(1.15, 1.45, p), gloves: true };
+      pose = { kit: GK_KIT, legA: [-0.2, -0.4], legB: [0.35, -0.9], armA: [Math.PI - 0.3, -0.2], armB: [Math.PI + 0.3, -0.2], lean: 0, crouch: 0, jump: lerp(17.2, 0, p), rot: lerp(1.15, 1.45, p), gloves: true };
     } else { // stays down, beaten
-      const prop = t > 7.4 ? ease(clamp((t - 7.4) / 1.2, 0, 1)) : 0;
+      const prop = t > 7.6 ? ease(clamp((t - 7.6) / 1.2, 0, 1)) : 0;
       gx = 1042;
       pose = { kit: GK_KIT, legA: [-0.2, -0.4], legB: [0.35, -0.9], armA: [Math.PI - 0.3, -0.2], armB: [Math.PI + 0.3, -0.2], lean: 0, crouch: 0, jump: 0, rot: lerp(1.45, 1.32, prop), gloves: true };
     }
@@ -226,14 +230,14 @@ function drawScene(ctx: CanvasRenderingContext2D, t: number) {
       const p = ease((t - 6.15) / 0.3);
       hx = 706; flip = -1;
       pose = { kit: HERO_KIT, legA: [lerp(0.2, 0.3, p), lerp(-0.3, -1.05, p)], legB: [lerp(-0.2, -0.3, p), lerp(-0.3, -1.05, p)], armA: [lerp(0.3, -0.78, p), -0.3], armB: [lerp(-0.3, -0.78, p), -0.3], lean: lerp(0.1, 0.28, p), crouch: lerp(3, 11, p), jump: 0, rot: 0 };
-    } else if (t < 7.2) { // THE jump — 180° turn at the top
-      const jp = (t - 6.45) / 0.75;
+    } else if (t < 7.35) { // THE jump — 180° turn at the top
+      const jp = (t - 6.45) / 0.9;
       hx = 706; flip = Math.cos(jp * Math.PI) * -1; // -1 (facing left) → +1
       if (Math.abs(flip) < 0.12) flip = 0.12 * Math.sign(flip || 1);
       const armUp = Math.sin(Math.min(jp * 1.15, 1) * Math.PI * 0.5);
       pose = { kit: HERO_KIT, legA: [lerp(0.35, 0.48, jp), lerp(-1.25, -0.2, jp)], legB: [lerp(-0.35, -0.48, jp), lerp(-1.25, -0.2, jp)], armA: [lerp(-0.78, 2.55, armUp), -0.15], armB: [lerp(-0.78, -2.55, armUp), -0.15], lean: 0.05, crouch: 0, jump: Math.sin(jp * Math.PI) * 54, rot: 0 };
     } else { // landing + the hold: feet wide, arms swept down, chest out
-      const st = t - 7.2;
+      const st = t - 7.35;
       hx = 706; flip = 1;
       const settle = ease(clamp(st / 0.3, 0, 1));
       pose = { kit: HERO_KIT, legA: [0.52, -0.12], legB: [-0.52, -0.12], armA: [0.98, -0.08], armB: [-0.98, -0.08], lean: -0.10, crouch: lerp(6, 1, settle), jump: Math.sin(t * 2.2) * 1.1, rot: 0 };
