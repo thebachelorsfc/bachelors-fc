@@ -198,7 +198,7 @@ footer a:hover{color:var(--gold-text)}
 
 /* — Footer social strip (2026-10-28, Real Madrid-style): one centred row
    of large solid glyphs, no circles/chips — the club's four real links — */
-.social-strip{display:flex;justify-content:space-evenly;align-items:flex-start;gap:6px;margin-top:26px;padding:24px 10px 4px;border-top:1px solid var(--line)}
+.social-strip{display:flex;justify-content:space-evenly;align-items:flex-start;gap:6px;margin-top:6px;padding:14px 10px 4px}
 .social-big{display:inline-flex;flex-direction:column;align-items:center;text-decoration:none;-webkit-tap-highlight-color:transparent}
 .soc-med{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:transparent;border:1.5px solid var(--gold);color:var(--gold-text);transition:transform .22s ease,background .22s ease,box-shadow .22s ease}
 .soc-med svg{width:26px;height:26px;display:block;fill:currentColor}
