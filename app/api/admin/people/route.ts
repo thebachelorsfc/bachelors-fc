@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"; import { store, newId } from "@/lib/store"; import { isAdmin } from "@/lib/auth"; import { supabaseWrite } from "@/lib/supabase/admin";
 export const dynamic = "force-dynamic";
-const FIELDS = ["name", "role", "quote", "speech", "photo_url", "facebook_url", "instagram_url", "linkedin_url", "whatsapp"] as const;
+const FIELDS = ["name", "role", "quote", "speech", "photo_url", "facebook_url", "instagram_url", "linkedin_url", "whatsapp", "email", "telegram_url"] as const;
 export async function GET() { if (!isAdmin()) return NextResponse.json({ error: "Admin login required" }, { status: 401 });
   const sb = supabaseWrite(); if (sb) { const { data } = await sb.from("people").select("*").order("sort_order", { ascending: true }).order("created_at", { ascending: true }); return NextResponse.json(data || []); }
   return NextResponse.json(await store.people()); }

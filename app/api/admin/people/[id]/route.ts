@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"; import { store, newId } from "@/lib/store"; import { isAdmin } from "@/lib/auth"; import { supabaseWrite } from "@/lib/supabase/admin"; import { promises as fs } from "fs"; import path from "path";
 export const dynamic = "force-dynamic";
-const FIELDS = ["name", "role", "quote", "speech", "photo_url", "facebook_url", "instagram_url", "linkedin_url", "whatsapp"] as const;
+const FIELDS = ["name", "role", "quote", "speech", "photo_url", "facebook_url", "instagram_url", "linkedin_url", "whatsapp", "email", "telegram_url"] as const;
 // Upload a photo for a person (replaces the current photo).
 export async function POST(req: Request, { params }: { params: { id: string } }) { if (!isAdmin()) return NextResponse.json({ error: "Admin login required" }, { status: 401 });
   const fd = await req.formData(); const file = fd.get("photo");

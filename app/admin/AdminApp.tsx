@@ -26,7 +26,7 @@ export default function AdminApp(){
   const createGround=async()=>{ const body={name:gv("ng-name"),area:gv("ng-area"),address:gv("ng-address"),maps_url:gv("ng-maps"),matches_played:Number(gv("ng-matches")||0),last_played:gv("ng-last")||null}; if(!body.name){ setMsg("Ground name is required"); return; } const r=await fetch("/api/admin/grounds",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); const j=await r.json().catch(()=>({})); setMsg(r.ok?`Ground added: ${body.name}`:(j.error||"Failed")); if(r.ok) load(); };
   const saveGround=async(g:any)=>{ const body={name:gv(`g-name-${g.id}`),area:gv(`g-area-${g.id}`),address:gv(`g-address-${g.id}`),maps_url:gv(`g-maps-${g.id}`),photo_url:gv(`g-photo-${g.id}`),matches_played:Number(gv(`g-matches-${g.id}`)||0),last_played:gv(`g-last-${g.id}`)||null}; const r=await fetch(`/api/admin/grounds/${g.id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); setMsg(r.ok?`Saved: ${body.name||g.name}`:"Save failed"); if(r.ok) load(); };
   const delGround=async(g:any)=>{ if(!confirm(`Delete ground "${g.name}"?`)) return; await fetch(`/api/admin/grounds/${g.id}`,{method:"DELETE"}); setMsg(`Deleted: ${g.name}`); load(); };
-  const PF=["name","role","quote","speech","photo_url","facebook_url","instagram_url","linkedin_url","whatsapp"];
+  const PF=["name","role","quote","speech","photo_url","facebook_url","instagram_url","linkedin_url","whatsapp","email","telegram_url"];
   const createPerson=async()=>{ const body:any={}; for(const k of PF) body[k]=gv(`np-${k}`); body.sort_order=Number(gv("np-sort")||0); if(!body.name){ setMsg("Person name is required"); return; } const r=await fetch("/api/admin/people",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); const j=await r.json().catch(()=>({})); setMsg(r.ok?`Person added: ${body.name} — live on the People page`:(j.error||"Failed")); if(r.ok) load(); };
   const savePerson=async(p:any)=>{ const body:any={}; for(const k of PF) body[k]=gv(`pp-${k}-${p.id}`); body.sort_order=Number(gv(`pp-sort-${p.id}`)||0); const r=await fetch(`/api/admin/people/${p.id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); setMsg(r.ok?`Saved: ${body.name||p.name}`:"Save failed"); if(r.ok) load(); };
   const delPerson=async(p:any)=>{ if(!confirm(`Delete "${p.name}" from the People page?`)) return; await fetch(`/api/admin/people/${p.id}`,{method:"DELETE"}); setMsg(`Deleted: ${p.name}`); load(); };
@@ -207,6 +207,8 @@ export default function AdminApp(){
           <input style={input} id="np-instagram_url" placeholder="Instagram profile link"/>
           <input style={input} id="np-linkedin_url" placeholder="LinkedIn profile link"/>
           <input style={input} id="np-whatsapp" placeholder="WhatsApp number (01…) — optional chat button"/>
+          <input style={input} id="np-email" placeholder="Email address — optional mail button"/>
+          <input style={input} id="np-telegram_url" placeholder="Telegram link (t.me/…) — optional"/>
         </div>
         <button style={{marginTop:12}} onClick={createPerson}>Add person</button>
       </div>
@@ -225,6 +227,8 @@ export default function AdminApp(){
           <input style={input} id={`pp-instagram_url-${p.id}`} defaultValue={p.instagram_url||""} placeholder="Instagram profile link"/>
           <input style={input} id={`pp-linkedin_url-${p.id}`} defaultValue={p.linkedin_url||""} placeholder="LinkedIn profile link"/>
           <input style={input} id={`pp-whatsapp-${p.id}`} defaultValue={p.whatsapp||""} placeholder="WhatsApp number (01…)"/>
+          <input style={input} id={`pp-email-${p.id}`} defaultValue={p.email||""} placeholder="Email address"/>
+          <input style={input} id={`pp-telegram_url-${p.id}`} defaultValue={p.telegram_url||""} placeholder="Telegram link (t.me/…)"/>
         </div>
         <div style={{display:"flex",gap:8,marginTop:12,flexWrap:"wrap"}}><button onClick={()=>savePerson(p)}>Save</button><button className="danger" onClick={()=>delPerson(p)}>Delete</button></div>
       </div>)}
