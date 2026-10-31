@@ -5,7 +5,9 @@ export default function HighlightCard({ h }: { h: HighlightLike }) {
   return (
     <article className="card" style={{ padding: 14 }}>
       <div style={v.kind === "facebook-post" ? { position: "relative", width: "100%", height: 560, borderRadius: 12, overflow: "hidden", background: "#fff" } : { position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: 12, overflow: "hidden", background: "#000" }}>
-        {v.kind === "link" ? (
+        {v.kind === "file" ? (
+          <video src={v.embed} controls playsInline preload="metadata" title={h.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", background: "#000" }} />
+        ) : v.kind === "link" ? (
           <a href={h.video_url} target="_blank" rel="noreferrer" style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", color: "var(--gold2)", fontWeight: 700, letterSpacing: ".08em" }}>▶ Watch video</a>
         ) : (
           <iframe src={v.embed} title={h.title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }} />
