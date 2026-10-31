@@ -198,11 +198,18 @@ footer a:hover{color:var(--gold-text)}
 
 /* — Footer social strip (2026-10-28, Real Madrid-style): one centred row
    of large solid glyphs, no circles/chips — the club's four real links — */
-.social-strip{display:flex;justify-content:center;align-items:center;gap:clamp(32px,8vw,58px);margin-top:28px;padding-top:24px;border-top:1px solid var(--line)}
-.social-big{display:inline-flex;color:var(--gold-text);text-decoration:none;opacity:.94;transition:transform .18s ease,opacity .18s ease,filter .18s ease}
-.social-big svg{width:27px;height:27px;display:block;fill:currentColor}
-.social-big:hover{transform:translateY(-3px);opacity:1;filter:drop-shadow(0 8px 14px #c9a22745)}
-.social-big:active{transform:scale(.93)}
+.social-strip{position:relative;overflow:hidden;display:flex;justify-content:space-evenly;align-items:flex-start;gap:6px;margin-top:26px;padding:22px 10px 16px;border-radius:20px;background:linear-gradient(180deg,#101d42,#070b18);border:1px solid #c9a2274d;box-shadow:inset 0 0 0 3px #06060a,inset 0 0 0 4px #c9a2272e,0 18px 38px #00000030}
+.social-strip::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 90% at 50% 0%,#e8c7661f,transparent 70%);pointer-events:none}
+.social-strip::after{content:"";position:absolute;top:0;bottom:0;left:-30%;width:36%;background:linear-gradient(100deg,transparent,#ffffff14,transparent);transform:skewX(-18deg);transition:left .8s ease;pointer-events:none}
+.social-strip:hover::after{left:110%}
+.social-big{position:relative;z-index:1;display:inline-flex;flex-direction:column;align-items:center;text-decoration:none;-webkit-tap-highlight-color:transparent}
+.soc-med{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(120% 120% at 30% 20%,#e8c7662b,#0a1128);border:1.5px solid #c9a22780;color:var(--gold2);box-shadow:inset 0 1px 0 #ffffff24,0 8px 20px #00000045;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+.soc-med svg{width:26px;height:26px;display:block;fill:currentColor}
+.soc-lab{margin-top:9px;font-family:var(--font-display);font-size:9px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#9aa3b2;transition:color .22s ease}
+.social-big:hover .soc-med{transform:translateY(-4px);border-color:var(--gold2);box-shadow:inset 0 1px 0 #ffffff24,0 14px 28px #c9a22738}
+.social-big:hover .soc-lab{color:var(--gold2)}
+.social-big:active .soc-med{transform:scale(.93)}
+@media (max-width:420px){.soc-med{width:52px;height:52px}.soc-med svg{width:23px;height:23px}.soc-lab{font-size:8px;letter-spacing:.16em}}
 
 /* — Social posts carousel (Brotherhood-style) — */
 .soc-wrap{position:relative}
