@@ -126,16 +126,30 @@ h3{font-size:clamp(1.18rem,2.4vw,1.38rem);line-height:1.18;letter-spacing:.02em;
 .icon-btn:hover{border-color:var(--gold);color:var(--gold2)}
 .backdrop{position:fixed;inset:0;background:#02030acc;backdrop-filter:blur(3px);z-index:80;opacity:0;pointer-events:none;transition:opacity .3s ease}
 .backdrop.open{opacity:1;pointer-events:auto}
-.drawer{position:fixed;top:0;right:0;height:100dvh;width:min(360px,92vw);background:linear-gradient(200deg,#0d1730,#05070f);color:#f7f5ef;z-index:90;transform:translateX(106%);transition:transform .38s cubic-bezier(.2,.7,.2,1);display:flex;flex-direction:column;padding:16px 14px;box-shadow:-20px 0 60px #00000066}
+.drawer{position:fixed;top:0;right:0;height:100dvh;width:min(360px,92vw);background:linear-gradient(200deg,#0d1730,#05070f);color:#f7f5ef;z-index:90;transform:translateX(106%);transition:transform .38s cubic-bezier(.2,.7,.2,1);display:flex;flex-direction:column;padding:16px 14px;box-shadow:-20px 0 60px #00000066;border-left:1px solid #c9a2272e}
+.dbrand{font-family:var(--font-anton);font-weight:400;letter-spacing:.07em;font-size:17px}
+.drawer .dcard>img{filter:drop-shadow(0 5px 16px #c9a22747)}
+.drawer nav::-webkit-scrollbar{width:5px}
+.drawer nav::-webkit-scrollbar-thumb{background:#c9a22740;border-radius:99px}
+.drawer nav::-webkit-scrollbar-track{background:transparent}
+.djoin{font-family:var(--font-display);font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:15px;padding:.95rem 1.4rem;box-shadow:inset 0 1px 0 #ffffff59,0 10px 26px #c9a22738}
 .drawer.open{transform:none}
 .drawer .icon-btn{color:#f7f5ef;border-color:#ffffff2a}
 .dcard{background:#ffffff09;border:1px solid #ffffff12;border-radius:22px}
-.drow{display:flex;align-items:center;gap:13px;padding:11px 10px;text-decoration:none;color:#f2efe6;font-size:16.5px;font-weight:500;border-radius:14px}
+.drow{display:flex;align-items:center;gap:13px;padding:11px 10px;text-decoration:none;color:#f2efe6;font-family:var(--font-display);font-size:15.5px;font-weight:500;letter-spacing:.05em;border-radius:14px;position:relative;transition:background .2s ease,color .2s ease,transform .15s ease}
 .drow + .drow{border-top:1px solid #ffffff09}
-.drow:hover{background:#ffffff0d;color:var(--gold2)}
-.dico{width:34px;height:34px;flex:none;border-radius:11px;background:#c9a22717;border:1px solid #c9a2272b;display:inline-flex;align-items:center;justify-content:center}
+.drow:hover{background:#c9a22712;color:var(--gold2)}
+.drow:active{transform:scale(.985)}
+.drow.on{color:var(--gold2);background:linear-gradient(90deg,#c9a2271f,#c9a22708)}
+.drow.on::before{content:"";position:absolute;left:0;top:22%;height:56%;width:3px;border-radius:99px;background:linear-gradient(180deg,var(--gold2),var(--gold))}
+.drow.on .dico{background:linear-gradient(160deg,var(--gold2),var(--gold));border-color:#e8c76688;box-shadow:0 4px 14px #c9a22745}
+.drow.on .dico svg{stroke:#131313;color:#131313}
+.drow.on .dchev{color:var(--gold2)}
+.dico{width:36px;height:36px;flex:none;border-radius:11px;background:radial-gradient(120% 120% at 30% 20%,#e8c7662e,#c9a22714);border:1px solid #c9a22738;box-shadow:inset 0 1px 0 #ffffff1f;display:inline-flex;align-items:center;justify-content:center;transition:border-color .2s ease,box-shadow .2s ease}
+.drow:hover .dico{border-color:#c9a22766;box-shadow:inset 0 1px 0 #ffffff1f,0 4px 12px #c9a22730}
 .dico svg{width:19px;height:19px;stroke:var(--gold2);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.dchev{margin-left:auto;color:#8b93a5;font-size:22px;line-height:1}
+.dchev{margin-left:auto;color:#7d8496;font-size:20px;line-height:1;transition:color .2s ease,transform .2s ease}
+.drow:hover .dchev{color:var(--gold2);transform:translateX(2px)}
 @media (max-width:560px){.brand strong{font-size:13.5px;letter-spacing:.07em}.brand{gap:8px}.brand img{width:29px;height:34px}.head-row{gap:8px;padding:10px 14px}.head-join{padding:.45rem .7rem;font-size:.68rem}.icon-btn{width:36px;height:36px}}
 @media (max-width:420px){.brand strong{font-size:12.5px}.head-row{padding:10px 12px}.head-join{padding:.42rem .6rem;font-size:.64rem}}
 html,body{overflow-x:clip}
@@ -614,9 +628,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 .drawer-pitch rect,.drawer-pitch line,.drawer-pitch circle{fill:none;stroke:#f7f5ef;stroke-width:2}
 .drawer-pitch .fill{fill:#f7f5ef;stroke:none}
 .drawer .dcard,.drawer>div{position:relative}
-.dboard{margin-top:13px;border:1px solid rgba(201,162,39,.55);border-radius:12px;padding:10px 12px 11px;text-align:center;background:linear-gradient(180deg,#101d42,#0a1128);box-shadow:inset 0 0 0 3px #06060a,inset 0 0 0 4px rgba(201,162,39,.35)}
-.dboard-top{display:block;font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:#9aa3b2}
-.dboard-motto{display:block;font-family:var(--font-display);font-weight:600;font-size:13.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold2);margin-top:4px}
+
 
 /* ── Record book + Who's In stack ── */
 .rec-val{font-family:var(--font-anton);font-weight:400;font-size:2.7rem;line-height:1.05;color:var(--gold-text);margin:6px 0 8px}

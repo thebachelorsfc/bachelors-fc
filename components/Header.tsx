@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link"; import Image from "next/image";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { isIOS, isStandalone, promptInstall } from "@/lib/install";
 
 const Moon = () => (<svg viewBox="0 0 24 24"><path d="M20 13.6A8.6 8.6 0 1 1 10.4 4 7 7 0 0 0 20 13.6Z"/></svg>);
@@ -33,6 +34,7 @@ const NAV: [string, string, keyof typeof I][] = [
 ];
 
 export default function Header() {
+  const path = usePathname();
   const [open, setOpen] = useState(false);
   const [light, setLight] = useState(false);
   const [installed, setInstalled] = useState(false);
@@ -58,16 +60,15 @@ export default function Header() {
       <svg className="drawer-pitch" viewBox="0 0 300 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect x="14" y="14" width="272" height="592"/><line x1="14" y1="310" x2="286" y2="310"/><circle cx="150" cy="310" r="72"/><rect x="80" y="14" width="140" height="96"/><rect x="80" y="510" width="140" height="96"/><circle className="fill" cx="150" cy="310" r="4"/></svg>
       <div className="dcard" style={{display:"flex",alignItems:"center",gap:12,padding:"13px 14px"}}>
         <Image src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={40} height={47} style={{objectFit:"contain"}}/>
-        <strong style={{fontFamily:"var(--font-display)",letterSpacing:".1em",fontSize:16}}>THE BACHELORS <span style={{color:"var(--gold)"}}>FC</span></strong>
+        <strong className="dbrand">THE BACHELORS <span style={{color:"var(--gold)"}}>FC</span></strong>
         <button type="button" className="icon-btn" style={{marginLeft:"auto"}} onClick={() => setOpen(false)} aria-label="Close menu"><Close/></button>
       </div>
       <nav className="dcard" style={{marginTop:14,overflowY:"auto",padding:"6px 8px"}}>
-        {NAV.map(([l,h,ic]) => <Link key={h+l} className="drow" href={h} onClick={() => setOpen(false)}><span className="dico">{I[ic]}</span>{l}<span className="dchev">›</span></Link>)}
+        {NAV.map(([l,h,ic]) => <Link key={h+l} className={`drow${!h.startsWith("/#") && path === h ? " on" : ""}`} href={h} aria-current={!h.startsWith("/#") && path === h ? "page" : undefined} onClick={() => setOpen(false)}><span className="dico">{I[ic]}</span>{l}<span className="dchev">›</span></Link>)}
         {!installed && <button type="button" className="drow" style={{width:"100%",background:"none",border:0,cursor:"pointer",font:"inherit",textAlign:"left"}} onClick={async () => { setOpen(false); const ok = await promptInstall(); if (!ok) { alert(isIOS() ? "Install: Safari-te Share button chap diye 'Add to Home Screen' select koro." : "Install: browser-er menu (⋮) theke 'Install and create shortcut' ba 'Add to Home screen' chap dao."); } }}><span className="dico">{I.phone}</span>Install App<span className="dchev">›</span></button>}
       </nav>
       <div style={{marginTop:14}}>
-        <Link href="/join" className="btn" style={{display:"block",textAlign:"center"}} onClick={() => setOpen(false)}>Join the Squad</Link>
-        <div className="dboard"><span className="dboard-top">The Bachelors FC · Khulshi · Est. 2026</span><span className="dboard-motto">Forged in Brotherhood, Driven by Purpose</span></div>
+        <Link href="/join" className="btn djoin" style={{display:"block",textAlign:"center"}} onClick={() => setOpen(false)}>Join the Squad</Link>
       </div>
     </aside>
   </>);
