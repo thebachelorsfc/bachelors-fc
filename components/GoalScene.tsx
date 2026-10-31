@@ -383,7 +383,7 @@ export default function GoalScene() {
     return () => { running = false; cancelAnimationFrame(raf); io.disconnect(); window.removeEventListener("resize", onResize); };
   }, []);
   return (
-    <div aria-hidden="true" style={{ marginTop: 30, background: "linear-gradient(180deg,#0a0f1f,#060811)", borderTop: "1px solid #c9a22726" }}>
+    <div aria-hidden="true" style={{ background: "linear-gradient(180deg,#0a0f1f,#060811)", borderTop: "1px solid #c9a22726" }}>
       <canvas ref={ref} style={{ display: "block", width: "100%", height: "clamp(150px,30vw,232px)" }} />
     </div>
   );
