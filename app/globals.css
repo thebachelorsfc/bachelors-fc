@@ -664,7 +664,7 @@ html.js [data-reveal].is-visible{opacity:1;transform:none}
 .hero{padding:64px 0 92px}
 .hero-bg{position:absolute;inset:0;overflow:hidden}
 .hero-bg-img{opacity:0;transition:opacity 1.4s ease}
-.hero-bg-img.on{opacity:1;animation:heroZoom 6.5s ease-out forwards}
+.hero-bg-img.on{opacity:1;animation:heroZoom 14s ease-in-out infinite alternate}
 .hero-dots{position:absolute;left:0;right:0;bottom:16px;display:flex;gap:8px;justify-content:center;z-index:2}
 .hero-dot{width:9px;height:9px;border-radius:99px;border:0;padding:0;background:#f7f5ef59;cursor:pointer;transition:all .3s}
 .hero-dot.on{width:26px;background:var(--gold)}
