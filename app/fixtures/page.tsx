@@ -65,7 +65,7 @@ export default async function Fixtures() {
             <div className="card">
               <div className="eyebrow">To Be Announced</div>
               <h3>Next fixture — to be announced</h3>
-              <p style={{ color: "var(--muted)" }}>No match is scheduled right now. When the next battle is set, it will appear here first.</p>
+              <p className="copy">No match is scheduled right now. When the next battle is set, it will appear here first.</p>
             </div>
           </CardCarousel>
         )}
@@ -73,7 +73,7 @@ export default async function Fixtures() {
       {played.length > 0 && (
         <section>
           <h2>Played</h2>
-          <p style={{ color: "var(--muted)", maxWidth: 560, marginBottom: 18 }}>Friendlies are for enjoyment and brotherhood — out of respect for our opponents, we never publish scorelines.</p>
+          <p className="copy" style={{maxWidth: 560, marginBottom: 18}}>Friendlies are for enjoyment and brotherhood — out of respect for our opponents, we never publish scorelines.</p>
           <CardCarousel slide="min(340px,86%)">
             {played.map(s => {
               const motm: any = s.motm_player_id ? pmap.get(s.motm_player_id) : null;

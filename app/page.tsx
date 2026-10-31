@@ -82,7 +82,7 @@ export default async function Home(){
     </section>
 
     <section className="wrap"><p className="eyebrow">Why we exist</p><h2>Character over trophies</h2>
-      <p style={{color:"var(--muted)",maxWidth:720}}>Bachelor life is its own quiet battle. No partner, no family of your own yet — just time, energy, and choices that can go either way. We built The Bachelors FC because that energy deserved a better outlet than loneliness, comparison, and the habits that follow. Through real football, we grow discipline. Through brotherhood, we grow leadership. Every session, every match, every story — documented, so it never stays confined to just us.</p>
+      <p className="copy" style={{maxWidth:720}}>Bachelor life is its own quiet battle. No partner, no family of your own yet — just time, energy, and choices that can go either way. We built The Bachelors FC because that energy deserved a better outlet than loneliness, comparison, and the habits that follow. Through real football, we grow discipline. Through brotherhood, we grow leadership. Every session, every match, every story — documented, so it never stays confined to just us.</p>
       <CardCarousel slide="min(320px,84%)">{PILLARS.map(p=><div className="card" key={p.no}><div className="eyebrow">{p.no} / {p.title}</div><h3>{p.sub}</h3><p style={{color:"var(--muted)"}}>{p.text}</p></div>)}</CardCarousel>
     </section>
 
@@ -90,7 +90,7 @@ export default async function Home(){
       <section className="wrap">
         <p className="eyebrow">Club Anthem</p>
         <h2>Our Anthem</h2>
-        <p style={{ color: "var(--muted)", maxWidth: 640 }}>The song of the brotherhood — press play, sing along, and feel what this club stands for.</p>
+        <p className="copy" style={{maxWidth: 640}}>The song of the brotherhood — press play, sing along, and feel what this club stands for.</p>
         <AnthemPlayer />
       </section>
     )}
@@ -104,7 +104,7 @@ export default async function Home(){
     </section>
 
     <section className="wrap" id="events"><p className="eyebrow">Mark the date</p><h2>Events</h2>
-      <p style={{color:"var(--muted)",maxWidth:680}}>Matchdays, friendlies and brotherhood days — what is coming up next for the club{captain ? ", led on the pitch by our captain" : ""}. The full record lives in Fixtures &amp; Results.</p>
+      <p className="copy" style={{maxWidth:680}}>Matchdays, friendlies and brotherhood days — what is coming up next for the club{captain ? ", led on the pitch by our captain" : ""}. The full record lives in Fixtures &amp; Results.</p>
       <CardCarousel slide="min(340px,88%)">
         {captain && (<div className="ev-cap">
           <div className="ev-cap-photo">
@@ -145,7 +145,7 @@ export default async function Home(){
     </section>
 
     <section className="wrap"><p className="eyebrow">Join Us</p><h2>How to Join</h2>
-      <p style={{color:"var(--muted)",maxWidth:680}}>Three steps between you and the shirt — no trials by fire, no politics. Just football, brotherhood and purpose.</p>
+      <p className="copy" style={{maxWidth:680}}>Three steps between you and the shirt — no trials by fire, no politics. Just football, brotherhood and purpose.</p>
       <CardCarousel slide="min(320px,84%)">
         <div className="card join-card"><span className="step-no">01</span><div className="step-ico"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5a3 3 0 0 1 6 0"/><path d="M9 12h6M9 16h4"/></svg></div><h3>Apply in 3 minutes</h3><p style={{color:"var(--muted)"}}>Fill the Join form with your details and a photo — and set a password. Your player account is created with the same application; no separate sign-up.</p></div>
         <div className="card join-card"><span className="step-no">02</span><div className="step-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5"/><path d="M16 5.4a3.2 3.2 0 0 1 0 5.9M17.8 14.9c1.7.6 2.7 1.9 3 4.1"/></svg></div><h3>Review &amp; trial</h3><p style={{color:"var(--muted)"}}>Every application is reviewed by hand. If it fits the club, you are invited to a trial session — show up, play your game and meet the brotherhood.</p></div>
@@ -169,13 +169,13 @@ export default async function Home(){
     </section>
 
     {groundSlides.length>0 && (<section className="wrap"><p className="eyebrow">Our Grounds</p><h2>Where we play</h2>
-      <p style={{color:"var(--muted)",maxWidth:720}}>No stadium of our own — these are the turfs and fields around Chittagong where the brotherhood shows up, session after session.</p>
+      <p className="copy" style={{maxWidth:720}}>No stadium of our own — these are the turfs and fields around Chittagong where the brotherhood shows up, session after session.</p>
       <GroundsCarousel grounds={groundSlides}/>
       <p style={{marginTop:16}}><Link className="btn ghost" href="/grounds">All grounds →</Link></p>
     </section>)}
 
     {galleryItems.length>0 && (<section className="wrap"><p className="eyebrow">The Club Album</p><h2>Gallery</h2>
-      <p style={{color:"var(--muted)",maxWidth:680}}>Legacy: documented, not forgotten. The brotherhood, in frames — tap any photo to view it full screen.</p>
+      <p className="copy" style={{maxWidth:680}}>Legacy: documented, not forgotten. The brotherhood, in frames — tap any photo to view it full screen.</p>
       <GalleryPreview items={galleryItems.slice(0,8)}/>
       <p style={{marginTop:16}}><Link className="btn ghost" href="/gallery">Full gallery →</Link></p>
     </section>)}

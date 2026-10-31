@@ -48,7 +48,7 @@ export default function FanWall() {
     <section className="wrap" id="fanwall">
       <p className="eyebrow">Fan Wall</p>
       <h2>Words on the Wall</h2>
-      <p style={{ color: "var(--muted)", maxWidth: 680 }}>
+      <p className="copy" style={{maxWidth: 680}}>
         This club runs on brotherhood — and on the people who cheer for it. Leave a message for the boys;
         every note is read by the club first, then pinned here.
       </p>
@@ -68,7 +68,7 @@ export default function FanWall() {
       {msgs !== null && msgs.length === 0 && (
         <div className="card" style={{ maxWidth: 560 }}>
           <h3>The wall is empty — for now</h3>
-          <p style={{ color: "var(--muted)", marginBottom: 0 }}>No messages yet. Be the first name on the wall of the brotherhood.</p>
+          <p className="copy" style={{marginBottom: 0}}>No messages yet. Be the first name on the wall of the brotherhood.</p>
         </div>
       )}
 

@@ -651,3 +651,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 html.js [data-reveal]{opacity:0;transform:translate3d(0,22px,0);transition:opacity .7s ease-out,transform .7s ease-out;transition-delay:calc(var(--d,0)*90ms)}
 html.js [data-reveal].is-visible{opacity:1;transform:none}
 @media (prefers-reduced-motion: reduce){html.js [data-reveal]{opacity:1 !important;transform:none !important;transition:none !important}}
+
+/* Body copy — old-site text style (2026-10-31, owner's ask): warm + bright,
+   17px, airy 1.75 leading, for intro/descriptive paragraphs site-wide. */
+:root{--copy:rgba(247,245,239,.84)}
+:root[data-theme="light"]{--copy:#262b38}
+.copy{color:var(--copy);font-size:17px;line-height:1.75}

@@ -29,7 +29,7 @@ export default function GalleryClient({ items }: { items: GalleryLike[] }) {
       {shown.length === 0 ? (
         <div className="card" style={{ textAlign: "center", padding: "44px 22px" }}>
           <h3 style={{ margin: "0 0 6px" }}>Photos are on the way</h3>
-          <p style={{ color: "var(--muted)", margin: 0 }}>Match, training, tour and team photos will live here — the gallery fills up as the club shares its moments.</p>
+          <p className="copy" style={{margin: 0}}>Match, training, tour and team photos will live here — the gallery fills up as the club shares its moments.</p>
         </div>
       ) : (
         <div className="gallery-grid">

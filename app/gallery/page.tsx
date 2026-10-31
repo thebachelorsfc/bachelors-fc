@@ -9,7 +9,7 @@ export default async function GalleryPage() {
       <section style={{ paddingBottom: 24 }}>
         <p className="eyebrow">The Club Album</p>
         <h1>Gallery</h1>
-        <p style={{ color: "var(--muted)", maxWidth: 680 }}>Legacy: documented, not forgotten. Every match day, every training night, every tour — the brotherhood, in frames.</p>
+        <p className="copy" style={{maxWidth: 680}}>Legacy: documented, not forgotten. Every match day, every training night, every tour — the brotherhood, in frames.</p>
         <GalleryClient items={items} />
       </section>
     </main>

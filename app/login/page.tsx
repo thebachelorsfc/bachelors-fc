@@ -37,7 +37,7 @@ export default function LoginPage() {
       <section style={{ maxWidth: 460, margin: "0 auto", paddingBottom: 40 }}>
         <p className="eyebrow">Players Only</p>
         <h1>Player login</h1>
-        <p style={{ color: "var(--muted)" }}>Squad members: log in to RSVP for sessions — IN, OUT or MAYBE — and see who&apos;s playing.</p>
+        <p className="copy">Squad members: log in to RSVP for sessions — IN, OUT or MAYBE — and see who&apos;s playing.</p>
         <div className="card login-card">
           <div className="login-head">
             <img className="login-crest" src="/assets/logo-transparent.png" alt="The Bachelors FC crest" />

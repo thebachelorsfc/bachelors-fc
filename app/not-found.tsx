@@ -9,7 +9,7 @@ export default function NotFound() {
       <p className="eyebrow">404 · Full time</p>
       <h1 style={{ marginTop: 14 }}>This page is offside</h1>
       <OffsideDoodle />
-      <p style={{ color: "var(--muted)", maxWidth: 520, margin: "18px auto 0" }}>
+      <p className="copy" style={{maxWidth: 520, margin: "18px auto 0"}}>
         The page you&apos;re looking for has wandered off the pitch — it may have moved, or it never existed. No harm done; the brotherhood is one tap away.
       </p>
       <p style={{ marginTop: 22, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>

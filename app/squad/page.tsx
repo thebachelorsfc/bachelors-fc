@@ -6,9 +6,9 @@ export default async function Squad() {
   const order: Record<string, number> = { FWD: 0, MID: 1, DEF: 2, GK: 3 };
   const sorted = [...players].sort((a: any, b: any) => ((order[a.position_code] ?? 9) - (order[b.position_code] ?? 9)) || (a.jersey_no - b.jersey_no));
   return (<main className="wrap"><section><p className="eyebrow">The Lineup</p><h1>Meet the Squad</h1>
-    <p style={{ color: "var(--muted)" }}>The faces of The Bachelors FC — {players.length} players and counting.</p>
+    <p className="copy">The faces of The Bachelors FC — {players.length} players and counting.</p>
     <h2 style={{ fontSize: 22, marginTop: 30 }}>Our Shape</h2>
-    <p style={{ color: "var(--muted)", marginTop: 4 }}>How the brotherhood lines up — the live squad, by position.</p>
+    <p className="copy" style={{marginTop: 4}}>How the brotherhood lines up — the live squad, by position.</p>
     <FormationPitch players={sorted} />
     <SquadCarousel>{sorted.map((p: any) => <PlayerCard key={p.jersey_no} p={p} />)}</SquadCarousel>
     {openNumbers(players).length > 0 && (<><h2 style={{ fontSize: 22, marginTop: 28 }}>Open shirts</h2>

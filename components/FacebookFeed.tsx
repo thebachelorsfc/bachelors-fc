@@ -15,7 +15,7 @@ export default function FacebookFeed({ posts = [] }: { posts?: any[] }) {
     <section className="wrap" id="facebook">
       <p className="eyebrow">On Social</p>
       <h2>Latest from the club</h2>
-      <p style={{ color: "var(--muted)", maxWidth: 620, marginTop: 6 }}>
+      <p className="copy" style={{maxWidth: 620, marginTop: 6}}>
         Matchday moments, results and announcements — straight from our Facebook page.
       </p>
       <p style={{ marginTop: 18 }}>

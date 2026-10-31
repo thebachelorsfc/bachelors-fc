@@ -14,7 +14,7 @@ export default async function StorePage() {
       <section style={{ paddingBottom: 30 }}>
         <p className="eyebrow">Club Store</p>
         <h1>Wear the badge</h1>
-        <p style={{ color: "var(--muted)", maxWidth: 680 }}>The BFC home kit — white and navy pinstripes, gold crest on the chest. Not just fabric: what eleven men chose to belong to.</p>
+        <p className="copy" style={{maxWidth: 680}}>The BFC home kit — white and navy pinstripes, gold crest on the chest. Not just fabric: what eleven men chose to belong to.</p>
         {!anyPriced && products.length > 0 && (
           <div className="card" style={{ marginTop: 18, borderColor: "var(--line-gold)" }}>
             <strong>Showcase mode:</strong> <span style={{ color: "var(--muted)" }}>The kit is on display, not on sale — yet. When the club opens orders, prices and ordering will appear right here.</span>
@@ -23,7 +23,7 @@ export default async function StorePage() {
         {products.length === 0 ? (
           <div className="card" style={{ textAlign: "center", padding: "44px 22px", marginTop: 20 }}>
             <h3 style={{ margin: "0 0 6px" }}>The store is being stocked</h3>
-            <p style={{ color: "var(--muted)", margin: 0 }}>Club gear will appear here soon.</p>
+            <p className="copy" style={{margin: 0}}>Club gear will appear here soon.</p>
           </div>
         ) : (
           <>
