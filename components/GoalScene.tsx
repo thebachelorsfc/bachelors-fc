@@ -2,13 +2,18 @@
 import { useEffect, useRef } from "react";
 
 // Footer goal scene (owner, 2026-10-31; v2 same day at his ask for more
-// realism): a looping canvas vignette above the footer's social bar. A BFC
-// player in the white home kit dribbles at three defenders — each jockeys,
-// commits to a slide tackle and misses as the ball is knocked past him —
-// then finishes into the top corner past a diving goalkeeper, and lands
-// Cristiano Ronaldo's trademark "Siu" celebration (sprint, high jump with
-// a mid-air turn, wide-stance landing). Flat figures with real kits and
-// skin tones on the stays-dark navy band; pauses off-screen and honours
+// realism; v3 refinement same evening, again at his ask): a looping canvas
+// vignette above the footer's social bar. A BFC player in the white home
+// kit dribbles at three defenders who genuinely defend — the first lunges
+// with a standing tackle and stumbles past, the second slides and hauls
+// himself back up, the third turns and chases, lunging desperately as the
+// shot is struck — then the finish beats a goalkeeper standing on his
+// line under a bold white goal frame, diving full-stretch and missing by
+// a whisker. Every beaten man ends on his feet (or knees) with his hands
+// on his head — nobody lies flat. The scorer lands Cristiano Ronaldo's
+// trademark "Siu" celebration (sprint, high jump with a mid-air turn,
+// wide-stance landing). Flat figures with real kits and skin tones on the
+// stays-dark navy band; pauses off-screen and honours
 // prefers-reduced-motion with a still Siu frame.
 const W = 1200, H = 300, GY = 252, LOOP = 10.6;
 const GOLD = "#e8c766", GOLD_D = "#c9a227", PAPER = "#f7f5ef";
@@ -100,6 +105,21 @@ function dust(ctx: CanvasRenderingContext2D, x: number, p: number, n = 4) {
   for (let i = 0; i < n; i++) { ctx.beginPath(); ctx.arc(x - 14 + i * 10, GY - 2 - p * 7, 3 + p * 8, 0, Math.PI * 2); ctx.fill(); }
 }
 
+// Field-wise blend between two poses — used for recoveries (a beaten
+// defender hauling himself upright, the keeper propping himself up).
+function mixPose(a: Pose, b: Pose, p: number): Pose {
+  const L = (u: number, v: number) => lerp(u, v, p);
+  return {
+    kit: b.kit, gloves: b.gloves ?? a.gloves,
+    legA: [L(a.legA[0], b.legA[0]), L(a.legA[1], b.legA[1])],
+    legB: [L(a.legB[0], b.legB[0]), L(a.legB[1], b.legB[1])],
+    armA: [L(a.armA[0], b.armA[0]), L(a.armA[1], b.armA[1])],
+    armB: [L(a.armB[0], b.armB[0]), L(a.armB[1], b.armB[1])],
+    lean: L(a.lean, b.lean), crouch: L(a.crouch, b.crouch),
+    jump: L(a.jump, b.jump), rot: L(a.rot, b.rot),
+  };
+}
+
 const RUN_LEGS = (p: number): { a: [number, number]; b: [number, number] } => ({
   a: [Math.sin(p) * 0.88, -0.45 - Math.max(0, -Math.cos(p)) * 0.75],
   b: [Math.sin(p + Math.PI) * 0.88, -0.45 - Math.max(0, Math.cos(p)) * 0.75],
@@ -177,11 +197,19 @@ function drawScene(ctx: CanvasRenderingContext2D, t: number) {
 
   drawStadium(ctx, t);
 
-  // goal net (behind the keeper), posts in front of net
+  // goal net (behind the keeper), posts in front of net. A soft light pool
+  // inside the goalmouth + a chalk goal line make the goal unmistakable at
+  // footer scale (owner: "goal post thaka lagbe" — it must read instantly).
   const netBulge = t > 4.98 && t < 5.95 ? Math.sin((t - 4.98) / 0.97 * Math.PI) * 13 : 0;
-  ctx.strokeStyle = "rgba(247,245,239,0.30)"; ctx.lineWidth = 1.4;
+  const glow = ctx.createLinearGradient(1052, 0, 1184, 0);
+  glow.addColorStop(0, "rgba(247,245,239,0.075)"); glow.addColorStop(1, "rgba(247,245,239,0.015)");
+  ctx.fillStyle = glow;
+  ctx.beginPath(); ctx.moveTo(1052, GY); ctx.lineTo(1052, GY - 96); ctx.lineTo(1176, GY - 88); ctx.lineTo(1176, GY); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = "rgba(247,245,239,0.38)"; ctx.lineWidth = 1.4;
   for (let i = 0; i <= 4; i++) { const y = GY - 96 + i * 24; ctx.beginPath(); ctx.moveTo(1052, y); ctx.lineTo(1176, y + 8); ctx.stroke(); }
   for (let i = 0; i <= 5; i++) { const x = 1052 + i * 25; ctx.beginPath(); ctx.moveTo(x, GY - 96 + (x - 1052) * 0.065 + netBulge * (i / 5)); ctx.lineTo(x, GY); ctx.stroke(); }
+  ctx.strokeStyle = "rgba(247,245,239,0.55)"; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(1052, GY); ctx.lineTo(1176, GY); ctx.stroke(); // goal line
 
   // ---- timeline anchors -------------------------------------------------
   const opps = [395, 615, 835];
@@ -205,65 +233,146 @@ function drawScene(ctx: CanvasRenderingContext2D, t: number) {
   else ball = { x: 1096, y: GY - 8 };
 
   // ---- defenders --------------------------------------------------------
+  // Each man genuinely defends (owner's refinement): all three jockey on
+  // their toes, then each commits differently — #1 lunges with a standing
+  // tackle and stumbles past, #2 slides and hauls himself back up, #3
+  // turns and chases, lunging desperately as the shot is struck. Beaten,
+  // they recover to their feet: hands on hips while the move develops,
+  // hands on head the moment it goes in. Nobody lies flat any more.
   opps.forEach((ox, i) => {
     const ct = crossT[i], kit = DEF_KITS[i];
-    let dx = ox, pose: Pose;
+    let dx = ox, flip = -1, pose: Pose;
     const ready: Pose = { kit, legA: [0.32, -0.42], legB: [-0.32, -0.42], armA: [0.78, -0.35], armB: [-0.78, -0.35], lean: 0.06, crouch: 5, jump: 0, rot: 0 };
+    const hipsPose: Pose = { kit, legA: [0.26, -0.3], legB: [-0.26, -0.3], armA: [0.62, -1.75], armB: [-0.62, -1.75], lean: -0.04, crouch: 3, jump: 0, rot: 0 };
+    const headPose: Pose = { kit, legA: [0.22, -0.18], legB: [-0.22, -0.18], armA: [2.72, -0.85], armB: [-2.72, -0.85], lean: 0.02, crouch: 4, jump: 0, rot: 0 };
+    const neutralPose: Pose = { kit, legA: [0.24, -0.28], legB: [-0.24, -0.28], armA: [0.45, -0.3], armB: [-0.45, -0.3], lean: 0, crouch: 4, jump: 0, rot: 0 };
+    const watchPose = (): Pose => {
+      if (t < 4.98) return hipsPose;
+      if (t < 8.8) return mixPose(hipsPose, headPose, ease(clamp((t - 4.98) / 0.5, 0, 1)));
+      if (t < 9.8) return mixPose(headPose, neutralPose, ease((t - 8.8) / 1.0));
+      return neutralPose;
+    };
     if (t < ct - 0.95) {
       dx = ox + Math.sin(t * 1.7 + i * 2) * 2.5; pose = ready;
-    } else if (t < ct - 0.42) { // jockey: little steps toward the ball, crouched, tracking
-      const p = ease((t - (ct - 0.95)) / 0.53);
+    } else if (t < ct - 0.35) { // jockey: backpedals on quick little steps, crouched, arms wide, tracking the ball
+      const p = ease((t - (ct - 0.95)) / 0.6);
       dx = ox - 12 * p;
       pose = { ...ready, crouch: 8, lean: 0.24, legA: [Math.sin(t * 6.5) * 0.4, -0.52], legB: [Math.sin(t * 6.5 + Math.PI) * 0.4, -0.52], armA: [0.98, -0.3], armB: [-0.98, -0.3] };
-    } else if (t < ct + 0.23) { // slide tackle — committed early, glides, and is beaten
-      const p = ease((t - (ct - 0.42)) / 0.65);
+    } else if (i === 0 && t < ct + 0.3) { // #1 standing tackle — lunges in with a poking leg, no slide
+      const p = ease((t - (ct - 0.35)) / 0.65);
+      dx = ox - 12 - 6 * p;
+      pose = { kit, legA: [lerp(0.4, 1.18, p), lerp(-0.5, -0.08, p)], legB: [lerp(-0.4, -0.62, p), lerp(-0.5, -0.25, p)], armA: [lerp(0.98, 1.5, p), -0.45], armB: [lerp(-0.98, -1.35, p), -0.45], lean: lerp(0.24, 0.52, p), crouch: lerp(8, 10, p), jump: 0, rot: 0 };
+    } else if (i === 0 && t < ct + 1.05) { // #1 beaten — stumbles past, windmilling, gathers himself
+      const p = clamp((t - (ct + 0.3)) / 0.75, 0, 1);
+      dx = ox - 18 + 16 * ease(p);
+      const wob = Math.sin(p * Math.PI * 3) * (1 - p);
+      pose = { kit, legA: [0.55 * Math.sin(p * 9), -0.5], legB: [0.55 * Math.sin(p * 9 + Math.PI), -0.5], armA: [1.9 + wob * 0.7, -0.3], armB: [-1.9 - wob * 0.7, -0.3], lean: 0.35 + wob * 0.25, crouch: 7, jump: 0, rot: 0 };
+    } else if (i === 0 && t < ct + 1.75) { // #1 turns toward the goal and settles, hands finding his hips
+      const p = ease((t - (ct + 1.05)) / 0.7);
+      flip = 1; dx = ox - 2;
+      pose = mixPose({ kit, legA: [0.3, -0.35], legB: [-0.3, -0.35], armA: [1.2, -0.4], armB: [-1.2, -0.4], lean: 0.15, crouch: 6, jump: 0, rot: 0 }, hipsPose, p);
+    } else if (i === 0) {
+      flip = 1; dx = ox - 2; pose = watchPose();
+    } else if (i === 1 && t < ct + 0.23) { // #2 slide tackle — commits, glides along the turf, and is beaten
+      const p = ease((t - (ct - 0.35)) / 0.58);
       const ext = ease(clamp(p * 1.3, 0, 1));
       dx = ox - 12 - 24 * p;
       pose = { kit, legA: [lerp(0.42, 1.35, ext), lerp(-0.55, -0.06, ext)], legB: [lerp(-0.38, -0.35, p), lerp(-0.6, -1.95, p)], armA: [lerp(0.95, -1.15, p), -0.3], armB: [lerp(-0.95, 2.4, p), -0.3], lean: lerp(0.24, -0.5, p), crouch: lerp(8, 23, ease(clamp(p * 1.15, 0, 1))), jump: 0, rot: 0 };
       if (p > 0.1 && p < 0.97) dust(ctx, dx - 6, p);
-    } else { // down — later props himself up to watch the celebration
-      const prop = t > 7.6 ? ease(clamp((t - 7.6) / 1.2, 0, 1)) : 0;
-      dx = ox - 36;
-      pose = { kit, legA: [1.35, -0.06], legB: [-0.35, -1.95], armA: [-1.15, -0.3], armB: [2.4, -0.3], lean: lerp(-0.5, -0.28, prop), crouch: lerp(23, 20, prop), jump: 0, rot: 0 };
+    } else if (i === 1 && t < ct + 1.05) { // #2 down for only a beat — pushes up to one knee
+      const p = ease((t - (ct + 0.23)) / 0.82);
+      dx = ox - 36 + 3 * p;
+      pose = mixPose(
+        { kit, legA: [1.35, -0.06], legB: [-0.35, -1.95], armA: [-1.15, -0.3], armB: [2.4, -0.3], lean: -0.5, crouch: 23, jump: 0, rot: 0 },
+        { kit, legA: [0.8, -1.95], legB: [-0.15, -0.5], armA: [0.5, -0.2], armB: [-0.7, -0.35], lean: 0.12, crouch: 14, jump: 0, rot: 0 }, p);
+    } else if (i === 1 && t < ct + 1.95) { // #2 hauls himself all the way back to his feet
+      const p = ease((t - (ct + 1.05)) / 0.9);
+      dx = ox - 33 + 3 * p;
+      pose = mixPose(
+        { kit, legA: [0.8, -1.95], legB: [-0.15, -0.5], armA: [0.5, -0.2], armB: [-0.7, -0.35], lean: 0.12, crouch: 14, jump: 0, rot: 0 },
+        hipsPose, p);
+    } else if (i === 1) {
+      flip = 1; dx = ox - 30; pose = watchPose();
+    } else if (i === 2 && t < 4.28) { // #3 turns and CHASES — a full recovery sprint after the scorer
+      const p = ease(clamp((t - (ct - 0.35)) / (4.28 - (ct - 0.35)), 0, 1));
+      flip = 1; dx = lerp(ox - 12, 880, p);
+      const L = RUN_LEGS(t * 9.5), A = RUN_ARMS(t * 9.5);
+      pose = { kit, legA: L.a, legB: L.b, armA: A.a, armB: A.b, lean: 0.34, crouch: 2, jump: Math.abs(Math.sin(t * 9.5)) * 2.5, rot: 0 };
+    } else if (i === 2 && t < 4.62) { // #3 desperate lunge as the shot is struck — stretches, gets nothing
+      const p = ease((t - 4.28) / 0.34);
+      flip = 1; dx = lerp(880, 890, p);
+      pose = { kit, legA: [lerp(0.5, 1.28, p), lerp(-0.4, -0.05, p)], legB: [lerp(-0.45, -0.5, p), lerp(-0.5, -0.3, p)], armA: [lerp(0.6, 1.65, p), -0.2], armB: [lerp(-0.6, -1.1, p), -0.2], lean: lerp(0.3, 0.58, p), crouch: lerp(2, 11, p), jump: 0, rot: 0 };
+    } else if (i === 2 && t < 5.15) { // #3 momentum dumps him onto his knees by the box
+      const p = ease((t - 4.62) / 0.53);
+      flip = 1; dx = lerp(890, 892, p);
+      pose = mixPose(
+        { kit, legA: [1.28, -0.05], legB: [-0.5, -0.3], armA: [1.65, -0.2], armB: [-1.1, -0.2], lean: 0.58, crouch: 11, jump: 0, rot: 0 },
+        { kit, legA: [0.85, -2.0], legB: [0.25, -1.55], armA: [0.55, -0.25], armB: [-0.55, -0.25], lean: 0.32, crouch: 19, jump: 0, rot: 0 }, p);
+    } else if (i === 2 && t < 6.35) { // #3 climbs up, hands going to his head as the Siu lands
+      const p = ease((t - 5.15) / 1.2);
+      flip = 1; dx = 892;
+      pose = mixPose(
+        { kit, legA: [0.85, -2.0], legB: [0.25, -1.55], armA: [0.55, -0.25], armB: [-0.55, -0.25], lean: 0.32, crouch: 19, jump: 0, rot: 0 },
+        headPose, p);
+    } else { // #3 stays standing, watching
+      flip = 1; dx = 892; pose = watchPose();
     }
-    shadow(ctx, dx, 0);
-    ctx.save(); ctx.translate(dx, 0); ctx.scale(-1, 1); person(ctx, GY, pose); ctx.restore();
+    shadow(ctx, dx, pose.jump);
+    ctx.save(); ctx.translate(dx, 0); ctx.scale(flip, 1); person(ctx, GY, pose); ctx.restore();
   });
 
   // ---- goalkeeper -------------------------------------------------------
+  // Unmistakably a keeper (owner's refinement): drawn a touch larger, in
+  // green with white gloves, standing ON his line in front of the posts.
+  // He bounces on his toes tracking the run, edges out and coils as the
+  // scorer closes in, then dives full-stretch for the top corner — beaten
+  // by a whisker — crashes inside his goal and props himself up, slumped.
   {
-    let gx = 1012, pose: Pose;
-    const ready: Pose = { kit: GK_KIT, legA: [0.38, -0.5], legB: [-0.38, -0.5], armA: [0.72, -0.45], armB: [-0.72, -0.45], lean: 0.06, crouch: 8, jump: 0, rot: 0, gloves: true };
-    if (t < 4.55) { // tracks the ball with little side steps
-      gx = 1012 + clamp((ball.x - 1012) * 0.02, -6, 6) + Math.sin(t * 2.3) * 2.5;
-      pose = { ...ready, crouch: 8 + Math.sin(t * 3) * 1.2, legA: [0.38 + Math.sin(t * 5) * 0.14, -0.5], legB: [-0.38 + Math.sin(t * 5 + Math.PI) * 0.14, -0.5] };
-    } else if (t < 4.68) { // sets himself as the shot comes
+    let gx = 1044, pose: Pose;
+    const ready: Pose = { kit: GK_KIT, legA: [0.4, -0.5], legB: [-0.4, -0.5], armA: [0.78, -0.5], armB: [-0.78, -0.5], lean: 0.04, crouch: 8, jump: 0, rot: 0, gloves: true };
+    const stretch: Pose = { kit: GK_KIT, legA: [-0.3, -0.45], legB: [0.45, -1.05], armA: [Math.PI - 0.12, -0.04], armB: [Math.PI + 0.16, -0.04], lean: 0, crouch: 0, jump: 23.2, rot: 1.28, gloves: true };
+    const crash: Pose = { kit: GK_KIT, legA: [-0.2, -0.4], legB: [0.35, -0.9], armA: [Math.PI - 0.35, -0.25], armB: [Math.PI + 0.35, -0.25], lean: 0, crouch: 0, jump: 0, rot: 1.5, gloves: true };
+    if (t < 3.3) { // on his line, bouncing on his toes, shuffling with the play
+      gx = 1044 + Math.sin(t * 2.1) * 3 + clamp((ball.x - 700) * 0.004, -2, 3);
+      pose = { ...ready, crouch: 8 + Math.sin(t * 3.2) * 1.4, legA: [0.4 + Math.sin(t * 5.2) * 0.13, -0.5], legB: [-0.4 + Math.sin(t * 5.2 + Math.PI) * 0.13, -0.5] };
+    } else if (t < 4.55) { // the scorer is closing in — keeper edges out a step, crouches deeper, arms wide
+      const p = ease((t - 3.3) / 1.25);
+      gx = lerp(1044, 1036, p);
+      pose = { ...ready, crouch: lerp(8, 13, p), armA: [lerp(0.78, 1.0, p), -0.35], armB: [lerp(-0.78, -1.0, p), -0.35], legA: [lerp(0.4, 0.52, p), -0.55], legB: [lerp(-0.4, -0.52, p), -0.55] };
+    } else if (t < 4.68) { // sets himself, coiled, as the shot is struck
       const p = ease((t - 4.55) / 0.13);
-      pose = { ...ready, crouch: lerp(8, 12.5, p), armA: [lerp(0.72, 0.92, p), -0.3], armB: [lerp(-0.72, -0.92, p), -0.3] };
-    } else if (t < 5.23) { // the dive — slower, higher arc, full stretch
-      const p = ease((t - 4.68) / 0.55);
-      gx = lerp(1012, 1034, p);
-      pose = { kit: GK_KIT, legA: [-0.25, -0.5], legB: [0.4, -1.0], armA: [Math.PI - 0.18, -0.05], armB: [Math.PI + 0.18, -0.05], lean: 0, crouch: 0, jump: Math.sin(p * Math.PI * 0.85) * 30 + p * 4, rot: p * 1.15, gloves: true };
-    } else if (t < 5.35) { // held at full stretch for a beat
-      gx = 1034;
-      pose = { kit: GK_KIT, legA: [-0.25, -0.5], legB: [0.4, -1.0], armA: [Math.PI - 0.18, -0.05], armB: [Math.PI + 0.18, -0.05], lean: 0, crouch: 0, jump: 17.2, rot: 1.15, gloves: true };
-    } else if (t < 5.7) { // crashes down inside the goal
-      const p = ease((t - 5.35) / 0.35);
-      gx = lerp(1034, 1042, p);
-      pose = { kit: GK_KIT, legA: [-0.2, -0.4], legB: [0.35, -0.9], armA: [Math.PI - 0.3, -0.2], armB: [Math.PI + 0.3, -0.2], lean: 0, crouch: 0, jump: lerp(17.2, 0, p), rot: lerp(1.15, 1.45, p), gloves: true };
-    } else { // stays down, beaten
-      const prop = t > 7.6 ? ease(clamp((t - 7.6) / 1.2, 0, 1)) : 0;
-      gx = 1042;
-      pose = { kit: GK_KIT, legA: [-0.2, -0.4], legB: [0.35, -0.9], armA: [Math.PI - 0.3, -0.2], armB: [Math.PI + 0.3, -0.2], lean: 0, crouch: 0, jump: 0, rot: lerp(1.45, 1.32, prop), gloves: true };
+      gx = 1036;
+      pose = { ...ready, crouch: lerp(13, 15.5, p), armA: [lerp(1.0, 1.12, p), -0.3], armB: [lerp(-1.0, -1.12, p), -0.3], legA: [0.52, -0.55], legB: [-0.52, -0.55] };
+    } else if (t < 5.18) { // THE DIVE — launches up and across his goal, full stretch
+      const p = ease((t - 4.68) / 0.5);
+      gx = lerp(1036, 1058, p);
+      pose = { ...stretch, jump: Math.sin(p * Math.PI * 0.82) * 34 + p * 5, rot: p * 1.28 };
+    } else if (t < 5.32) { // held at full stretch — fingertips a whisker from the ball as it rips past
+      gx = 1058; pose = stretch;
+    } else if (t < 5.72) { // crashes down inside the goalmouth
+      const p = ease((t - 5.32) / 0.4);
+      gx = lerp(1058, 1068, p);
+      pose = { ...crash, jump: lerp(23.2, 0, p), rot: lerp(1.28, 1.5, p) };
+    } else if (t < 6.7) { // pushes himself up on one arm, slumped and beaten
+      const p = ease((t - 5.72) / 0.98);
+      gx = 1068;
+      pose = mixPose(crash, { kit: GK_KIT, legA: [-0.15, -0.35], legB: [0.3, -0.85], armA: [2.05, -0.35], armB: [2.75, -0.3], lean: 0, crouch: 3, jump: 0, rot: 1.08, gloves: true }, p);
+    } else { // stays propped, watching the celebration from his turf
+      gx = 1068;
+      pose = { kit: GK_KIT, legA: [-0.15, -0.35], legB: [0.3, -0.85], armA: [2.05, -0.35], armB: [2.75, -0.3], lean: 0, crouch: 3, jump: 0, rot: 1.08, gloves: true };
     }
-    shadow(ctx, gx, pose.jump);
-    ctx.save(); ctx.translate(gx, 0); person(ctx, GY, pose); ctx.restore();
+    shadow(ctx, gx, pose.jump, 19);
+    ctx.save(); ctx.translate(gx, GY); ctx.scale(1.1, 1.1); ctx.translate(0, -GY); person(ctx, GY, pose); ctx.restore();
   }
 
-  // goal posts (front of the net, keeper dives across them)
-  ctx.strokeStyle = PAPER; ctx.lineWidth = 4.5; ctx.lineCap = "round";
+  // goal posts (front of the net, keeper dives across them) — bold white
+  // with a soft halo, so the frame reads instantly at footer scale
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "rgba(247,245,239,0.16)"; ctx.lineWidth = 11;
+  ctx.beginPath(); ctx.moveTo(1052, GY); ctx.lineTo(1052, GY - 96); ctx.lineTo(1176, GY - 88); ctx.lineTo(1176, GY); ctx.stroke();
+  ctx.strokeStyle = PAPER; ctx.lineWidth = 5.5;
   ctx.beginPath(); ctx.moveTo(1052, GY); ctx.lineTo(1052, GY - 96); ctx.lineTo(1176, GY - 88); ctx.stroke();
-  ctx.lineWidth = 3.5;
+  ctx.lineWidth = 4.5;
   ctx.beginPath(); ctx.moveTo(1176, GY - 88); ctx.lineTo(1176, GY); ctx.stroke();
 
   // ---- hero -------------------------------------------------------------
