@@ -644,3 +644,10 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold) !i
 .nm-who-fallback{color:#e8c766;font-size:12px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-display)}
 .nm-who-text{font-size:13px;color:var(--muted)}
 .nm-who-text strong{color:var(--gold-text)}
+
+/* Scroll reveal (2026-10-31) — old-site motion, bidirectional: blocks rise +
+   fade in every time they enter the screen, either scroll direction.
+   Hiding applies only to elements RevealInit tagged under html.js. */
+html.js [data-reveal]{opacity:0;transform:translate3d(0,22px,0);transition:opacity .7s ease-out,transform .7s ease-out;transition-delay:calc(var(--d,0)*90ms)}
+html.js [data-reveal].is-visible{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){html.js [data-reveal]{opacity:1 !important;transform:none !important;transition:none !important}}
