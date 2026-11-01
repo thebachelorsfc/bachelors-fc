@@ -71,6 +71,7 @@ export default function AdminApp(){
     setHeroQueue(items); setHeroBusy(true); setHeroNote(""); setHeroProg({done:0,total:items.length}); setTimeout(()=>{ const el=document.getElementById("hero-card"); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); },350);
     const sb=supabaseBrowser();
     let okCount=0;
+    const uploaded:any[]=[];
     for(let ix=0;ix<items.length;ix++){
       const it=items[ix]; const f=it.file as File;
       const setIt=(patch:any)=>{ Object.assign(it,patch); setHeroQueue([...items]); };
@@ -86,14 +87,32 @@ export default function AdminApp(){
         if(!r1.ok||!j1.token) throw new Error(r1.status===401?"Admin session expired - log out, log in again, then retry":(j1.error||"could not start upload"));
         const { error:upErr }=await sb.storage.from("gallery").uploadToSignedUrl(j1.path, j1.token, blob, { contentType: ext==="jpg"?"image/jpeg":(f.type||"image/jpeg") });
         if(upErr) throw new Error(upErr.message);
-        const r=await fetch("/api/admin/hero-slides",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"add",path:j1.path,url:j1.url})});
-        const j=await r.json().catch(()=>({}));
-        if(!j.slides) throw new Error(j.error||"save failed");
-        setHeroSlides(j.slides); setIt({state:"done"}); okCount++; setHeroProg({done:okCount,total:items.length});
+        uploaded.push({url:j1.url,path:j1.path,ix}); setIt({state:"uploaded"});
       }catch(e:any){ setIt({state:"error",note:String((e&&e.message)||e)}); }
     }
+    // Save phase (2026-11-01): ONE list write for the whole batch, then verify
+    // against the server's returned list - a photo only gets its Live badge if
+    // the server confirms it is in the list. One retry for anything missing.
+    if(uploaded.length>0){
+      setHeroNote("Saving the list...");
+      let slidesNow:any[]|null=null;
+      for(let attempt=0;attempt<2;attempt++){
+        const send=attempt===0?uploaded:uploaded.filter((u:any)=>!(slidesNow||[]).some((x:any)=>x.path===u.path));
+        if(send.length===0) break;
+        try{
+          const r=await fetch("/api/admin/hero-slides",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"addMany",items:send.map((u:any)=>({url:u.url,path:u.path}))})});
+          const j=await r.json().catch(()=>({}));
+          if(j.slides){ slidesNow=j.slides; setHeroSlides(j.slides); }
+        }catch{ /* one retry below */ }
+      }
+      for(const u of uploaded){
+        const it=items[u.ix]; const live=!!(slidesNow||[]).some((x:any)=>x.path===u.path);
+        if(live){ it.state="done"; okCount++; } else { it.state="error"; it.note="Uploaded but not saved in the list - close and reopen the Hero tab, it fixes itself"; }
+      }
+      setHeroQueue([...items]); setHeroProg({done:okCount,total:items.length});
+    }
     setHeroBusy(false); setTimeout(()=>{ const el=document.getElementById("hero-card"); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); },150);
-    setHeroNote((okCount>0?`Done - ${okCount} photo${okCount>1?"s are":" is"} now live on the homepage hero.`:"Upload did not finish - see the note under the photo.")+extra);
+    setHeroNote((okCount>0?`Done - ${okCount} photo${okCount>1?"s are":" is"} now live on the homepage hero.${uploaded.length>okCount?" Kichu photo save hoyni - note dekho.":""}`:"Upload did not finish - see the note under the photo.")+extra);
     setMsg(okCount>0?`Hero: ${okCount} photo(s) uploaded`:"Hero upload finished with errors - see the Hero card");
   };
   useEffect(()=>{ if(tab==="anthem"){ fetch("/api/admin/anthem").then(r=>r.json()).then(j=>setAnthemCustom(!!j.custom)).catch(()=>setAnthemCustom(false)); } },[tab]);
@@ -336,7 +355,7 @@ export default function AdminApp(){
       : heroNote ? <div style={{border:`1px solid ${heroNote.startsWith("Done")?"var(--ok)":"var(--bad)"}`,color:heroNote.startsWith("Done")?"var(--ok)":"var(--bad)",borderRadius:12,padding:"12px 14px",fontSize:16,margin:"12px 0"}}>{heroNote.startsWith("Done")?"✓ ":"⚠ "}{heroNote}</div>
       : <div style={{border:"1px solid var(--line-gold)",color:"var(--muted)",borderRadius:12,padding:"12px 14px",fontSize:15,margin:"12px 0"}}>{heroSlides.length>0?`Homepage-e ekhon ${heroSlides.length} ta photo-r slideshow cholche`:"Homepage-e ekhon built-in team photo cholche — notun photo upload korlei slideshow shuru hobe"}</div>}
       {heroSlides.length<5 ? <label className="btn" style={{cursor:heroBusy?"wait":"pointer",opacity:heroBusy?.65:1}}>{heroBusy?`Uploading ${Math.min(heroProg.done+1,Math.max(heroProg.total,1))} of ${heroProg.total}...`:"Upload hero photos"}<input type="file" accept="image/*" multiple style={{display:"none"}} disabled={heroBusy} onChange={e=>{ const fl=Array.from(e.target.files||[]); e.target.value=""; onHeroPick(fl as any); }}/></label> : <p style={{color:"var(--muted)",margin:0}}>All 5 slots are full — remove one to add another.</p>}
-      {heroQueue.length>0 && <div className="grid" style={{gridTemplateColumns:"repeat(auto-fill,minmax(100px,1fr))",marginTop:12}}>{heroQueue.map((q:any)=><div key={q.id} style={{position:"relative"}}><img src={q.preview} alt="" style={{width:"100%",height:74,objectFit:"cover",borderRadius:10,border:"1px solid var(--line-gold)",opacity:q.state==="error"?.45:1}}/><span style={{position:"absolute",left:6,bottom:6,fontSize:11,padding:"2px 8px",borderRadius:99,background:"#06060acc",color:q.state==="done"?"#8be09a":q.state==="error"?"#ff9c9c":"#e8c766"}}>{q.state==="done"?"Live":q.state==="uploading"?"Uploading":q.state==="error"?"Failed":"Waiting"}</span>{q.note && <p style={{fontSize:11,color:"var(--bad)",marginTop:4}}>{q.note}</p>}</div>)}</div>}
+      {heroQueue.length>0 && <div className="grid" style={{gridTemplateColumns:"repeat(auto-fill,minmax(100px,1fr))",marginTop:12}}>{heroQueue.map((q:any)=><div key={q.id} style={{position:"relative"}}><img src={q.preview} alt="" style={{width:"100%",height:74,objectFit:"cover",borderRadius:10,border:"1px solid var(--line-gold)",opacity:q.state==="error"?.45:1}}/><span style={{position:"absolute",left:6,bottom:6,fontSize:11,padding:"2px 8px",borderRadius:99,background:"#06060acc",color:q.state==="done"?"#8be09a":q.state==="error"?"#ff9c9c":"#e8c766"}}>{q.state==="done"?"Live":q.state==="uploading"?"Uploading":q.state==="uploaded"?"Saving":q.state==="error"?"Failed":"Waiting"}</span>{q.note && <p style={{fontSize:11,color:"var(--bad)",marginTop:4}}>{q.note}</p>}</div>)}</div>}
       <div className="grid" style={{gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",margin:"14px 0"}}>
         {heroSlides.map((s:any,i:number)=><div key={s.path} style={{position:"relative"}}><Image src={s.url} alt={`Hero photo ${i+1}`} width={300} height={180} style={{width:"100%",height:110,objectFit:"cover",borderRadius:12,border:"1px solid var(--line-gold)"}}/><div style={{display:"flex",gap:6,marginTop:6}}><button className="btn ghost" style={{padding:".3rem .6rem"}} disabled={i===0} onClick={async()=>{ const r=await fetch("/api/admin/hero-slides",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"move",path:s.path,dir:-1})}); const j=await r.json().catch(()=>({})); if(j.slides) setHeroSlides(j.slides); }}>←</button><button className="btn ghost" style={{padding:".3rem .6rem"}} disabled={i===heroSlides.length-1} onClick={async()=>{ const r=await fetch("/api/admin/hero-slides",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"move",path:s.path,dir:1})}); const j=await r.json().catch(()=>({})); if(j.slides) setHeroSlides(j.slides); }}>→</button><button className="btn ghost" style={{padding:".3rem .6rem",marginLeft:"auto"}} onClick={async()=>{ if(!confirm("Remove this hero photo?")) return; const r=await fetch("/api/admin/hero-slides",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"remove",path:s.path})}); const j=await r.json().catch(()=>({})); if(j.slides){ setHeroSlides(j.slides); setMsg("Hero photo removed"); } }}>✕</button></div></div>)}
         {heroSlides.length===0 && <p style={{color:"var(--muted)",margin:0}}>No hero photos yet — the built-in team photo is showing.</p>}
