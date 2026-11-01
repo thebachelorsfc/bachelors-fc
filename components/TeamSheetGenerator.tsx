@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /* Team Sheet Generator — Admin → Sessions → 📋 Team Sheet.
    A 1080×1350 canvas graphic in the matchday-poster language: the session's
@@ -28,22 +28,37 @@ function fmtTime(t?: string | null): string | null {
   const ap = h >= 12 ? "PM" : "AM";
   return `${h % 12 === 0 ? 12 : h % 12}:${String(mi || 0).padStart(2, "0")} ${ap}`;
 }
-async function loadImg(src: string): Promise<HTMLImageElement | null> {
-  try {
-    const r = await fetch(src);
-    if (!r.ok) return null;
-    const url = URL.createObjectURL(await r.blob());
-    const img = new Image();
-    img.src = url;
-    await img.decode();
-    return img;
-  } catch { return null; }
+// Image loading hardened (2026-11-01): fetch with an 8s timeout (a dead-slow
+// connection used to hang the render - and the Download button - forever) and
+// a per-session promise cache, so a photo is fetched at most once and any
+// re-render is instant. A photo that cannot load becomes the navy # disc.
+const imgCache = new Map<string, Promise<HTMLImageElement | null>>();
+function loadImg(src: string): Promise<HTMLImageElement | null> {
+  const hit = imgCache.get(src);
+  if (hit) return hit;
+  const p = (async () => {
+    try {
+      const ctl = new AbortController();
+      const to = setTimeout(() => ctl.abort(), 8000);
+      const r = await fetch(src, { signal: ctl.signal });
+      clearTimeout(to);
+      if (!r.ok) return null;
+      const url = URL.createObjectURL(await r.blob());
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      return img;
+    } catch { return null; }
+  })();
+  imgCache.set(src, p);
+  return p;
 }
 
 export default function TeamSheetGenerator({ session, players, onClose }: { session: any; players: any[]; onClose: () => void }) {
   const [preview, setPreview] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
+  const cvRef = useRef<HTMLCanvasElement | null>(null);
 
   const inIds = new Set((session.players || []).filter((p: any) => p.status === "in").map((p: any) => p.id));
   const lineup = inIds.size > 0 ? players.filter(p => inIds.has(p.id)) : players;
@@ -187,7 +202,7 @@ export default function TeamSheetGenerator({ session, players, onClose }: { sess
     let live = true;
     setBusy(true);
     render().then(cv => {
-      if (live && cv) setPreview(cv.toDataURL("image/jpeg", 0.88));
+      if (live && cv) { cvRef.current = cv; setPreview(cv.toDataURL("image/jpeg", 0.88)); }
       if (live) setBusy(false);
     });
     return () => { live = false; };
@@ -195,7 +210,9 @@ export default function TeamSheetGenerator({ session, players, onClose }: { sess
 
   async function download() {
     setBusy(true); setNote("");
-    const cv = await render();
+    // Use the canvas the preview already rendered - re-rendering here used to
+    // re-fetch every photo and hang the button on "Preparing..." offline.
+    const cv = cvRef.current || await render();
     if (cv) {
       const a = document.createElement("a");
       a.download = `bfc-team-sheet-${session.session_date || "session"}.png`;

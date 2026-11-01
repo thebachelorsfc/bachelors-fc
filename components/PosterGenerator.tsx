@@ -32,16 +32,30 @@ function fmtTime(t?: string | null): string | null {
   return `${h % 12 === 0 ? 12 : h % 12}:${String(mi || 0).padStart(2, "0")} ${ap}`;
 }
 
-async function loadImg(src: string): Promise<HTMLImageElement | null> {
-  try {
-    const r = await fetch(src);
-    if (!r.ok) return null;
-    const url = URL.createObjectURL(await r.blob());
-    const img = new Image();
-    img.src = url;
-    await img.decode();
-    return img;
-  } catch { return null; }
+// Image loading hardened (2026-11-01): fetch with an 8s timeout (a dead-slow
+// connection used to hang the render - and the Download button - forever) and
+// a per-session promise cache, so a photo is fetched at most once and any
+// re-render is instant. A photo that cannot load becomes the navy # disc.
+const imgCache = new Map<string, Promise<HTMLImageElement | null>>();
+function loadImg(src: string): Promise<HTMLImageElement | null> {
+  const hit = imgCache.get(src);
+  if (hit) return hit;
+  const p = (async () => {
+    try {
+      const ctl = new AbortController();
+      const to = setTimeout(() => ctl.abort(), 8000);
+      const r = await fetch(src, { signal: ctl.signal });
+      clearTimeout(to);
+      if (!r.ok) return null;
+      const url = URL.createObjectURL(await r.blob());
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      return img;
+    } catch { return null; }
+  })();
+  imgCache.set(src, p);
+  return p;
 }
 
 export default function PosterGenerator({ session, grounds, inCount, onClose }: { session: any; grounds: any[]; inCount: number; onClose: () => void }) {
