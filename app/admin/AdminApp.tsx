@@ -9,6 +9,27 @@ const PosterGenerator = dynamic(() => import("@/components/PosterGenerator"), { 
 const TeamSheetGenerator = dynamic(() => import("@/components/TeamSheetGenerator"), { ssr: false });
 const MatchStatsPanel = dynamic(() => import("@/components/MatchStatsPanel"), { ssr: false });
 const input: React.CSSProperties = { width:"100%", padding:"10px 12px", borderRadius:10, border:"1px solid var(--field-br)", background:"var(--field-bg)", color:"var(--field-tx)" };
+// Hero upload speed-up (2026-11-01): phone photos are 3-8 MB - shrink them in
+// the browser to at most 1920px JPEG before uploading, so an upload is a few
+// hundred KB instead of several MB on a slow connection. Falls back to the
+// original file whenever anything about the resize fails.
+async function shrinkHeroPhoto(f: File): Promise<{ blob: Blob; ext: string }> {
+  const origExt = (f.name.split(".").pop() || "jpg").toLowerCase();
+  try {
+    let bmp: ImageBitmap;
+    try { bmp = await createImageBitmap(f, { imageOrientation: "from-image" } as any); }
+    catch { bmp = await createImageBitmap(f); }
+    const max = 1920;
+    const scale = Math.min(1, max / Math.max(bmp.width, bmp.height));
+    if (scale >= 1 && f.size < 900 * 1024) { bmp.close(); return { blob: f, ext: origExt }; }
+    const cv = document.createElement("canvas");
+    cv.width = Math.max(1, Math.round(bmp.width * scale)); cv.height = Math.max(1, Math.round(bmp.height * scale));
+    const ctx = cv.getContext("2d"); if (!ctx) { bmp.close(); return { blob: f, ext: origExt }; }
+    ctx.drawImage(bmp, 0, 0, cv.width, cv.height); bmp.close();
+    const blob = await new Promise<Blob | null>((res) => cv.toBlob(res, "image/jpeg", 0.82));
+    return blob ? { blob, ext: "jpg" } : { blob: f, ext: origExt };
+  } catch { return { blob: f, ext: origExt }; }
+}
 export default function AdminApp(){
   const [authed,setAuthed]=useState<boolean|null>(null); const [pw,setPw]=useState(""); const [tab,setTab]=useState("home");
   const [apps,setApps]=useState<any[]>([]); const [players,setPlayers]=useState<any[]>([]); const [msg,setMsg]=useState(""); const [grs,setGrs]=useState<any[]>([]); const [ppl,setPpl]=useState<any[]>([]);
@@ -20,7 +41,7 @@ export default function AdminApp(){
   const [posts,setPosts]=useState<any[]>([]); const [spUrl,setSpUrl]=useState("");
   const [prods,setProds]=useState<any[]>([]); const [pf,setPf]=useState({name:"",photo_url:"",description:"",price_bdt:"",stock:""});
   const [ords,setOrds]=useState<any[]>([]); const [fw,setFw]=useState<any[]>([]);
-  const [heroSlides,setHeroSlides]=useState<any[]>([]); const [accs,setAccs]=useState<any[]>([]); const [rsvpList,setRsvpList]=useState<any[]>([]); const [anthemCustom,setAnthemCustom]=useState<boolean|null>(null); const [anthemKey,setAnthemKey]=useState(0);
+  const [heroSlides,setHeroSlides]=useState<any[]>([]); const [heroQueue,setHeroQueue]=useState<any[]>([]); const [heroBusy,setHeroBusy]=useState(false); const [heroNote,setHeroNote]=useState(""); const [accs,setAccs]=useState<any[]>([]); const [rsvpList,setRsvpList]=useState<any[]>([]); const [anthemCustom,setAnthemCustom]=useState<boolean|null>(null); const [anthemKey,setAnthemKey]=useState(0);
   // Perf: 2026-10-29 parallelised the data fetches. 2026-10-31: the auth
   // gate runs alongside the batch (no serial block), in two waves so the
   // Home/Matchday/People data paints first.
@@ -37,6 +58,44 @@ export default function AdminApp(){
   const upGroundPhoto=async(id:string,file:File)=>{ const fd=new FormData(); fd.append("photo",file); const r=await fetch(`/api/admin/grounds/${id}`,{method:"POST",body:fd}); setMsg(r.ok?"Ground photo updated":"Photo upload failed"); if(r.ok) load(); };
   useEffect(()=>{ load(); },[load]);
   useEffect(()=>{ if(tab==="hero"){ fetch("/api/admin/hero-slides").then(r=>r.json()).then(j=>setHeroSlides(j.slides||[])).catch(()=>{}); } },[tab]);
+  // Hero multi-upload (2026-11-01): pick several photos at once; each shows a
+  // local preview instantly, is shrunk, then uploads one by one with progress
+  // written inside the Hero card (the page-top message is too easy to miss).
+  const onHeroPick=async(files:FileList|null)=>{
+    if(!files||files.length===0||heroBusy) return;
+    const room=Math.max(0,5-heroSlides.length);
+    const picked=Array.from(files).slice(0,room);
+    if(picked.length===0){ setHeroNote("All 5 slots are full - remove one first."); return; }
+    const extra=files.length>room?` Only ${room} slot${room>1?"s were":" was"} free, so the rest were skipped.`:"";
+    const items=picked.map((f,ix)=>({ id:`${Date.now()}-${ix}`, file:f, preview:URL.createObjectURL(f), state:"waiting", note:"" }));
+    setHeroQueue(items); setHeroBusy(true); setHeroNote("");
+    const sb=supabaseBrowser();
+    let okCount=0;
+    for(let ix=0;ix<items.length;ix++){
+      const it=items[ix]; const f=it.file as File;
+      const setIt=(patch:any)=>{ Object.assign(it,patch); setHeroQueue([...items]); };
+      setHeroNote(`Uploading photo ${ix+1} of ${items.length}...`);
+      if(/hei[cf]/i.test(f.type||"")||/\.hei[cf]$/i.test(f.name)){ setIt({state:"error",note:"HEIC photo - export/share it as JPG, then try again"}); continue; }
+      if(f.size>25*1024*1024){ setIt({state:"error",note:"Too large (over 25 MB)"}); continue; }
+      if(!sb){ setIt({state:"error",note:"Storage unavailable"}); continue; }
+      setIt({state:"uploading"});
+      try{
+        const { blob, ext }=await shrinkHeroPhoto(f);
+        const r1=await fetch("/api/admin/hero-slides",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"url",ext})});
+        const j1=await r1.json().catch(()=>({}));
+        if(!r1.ok||!j1.token) throw new Error(r1.status===401?"Admin session expired - log out, log in again, then retry":(j1.error||"could not start upload"));
+        const { error:upErr }=await sb.storage.from("gallery").uploadToSignedUrl(j1.path, j1.token, blob, { contentType: ext==="jpg"?"image/jpeg":(f.type||"image/jpeg") });
+        if(upErr) throw new Error(upErr.message);
+        const r=await fetch("/api/admin/hero-slides",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"add",path:j1.path,url:j1.url})});
+        const j=await r.json().catch(()=>({}));
+        if(!j.slides) throw new Error(j.error||"save failed");
+        setHeroSlides(j.slides); setIt({state:"done"}); okCount++;
+      }catch(e:any){ setIt({state:"error",note:String((e&&e.message)||e)}); }
+    }
+    setHeroBusy(false);
+    setHeroNote((okCount>0?`Done - ${okCount} photo${okCount>1?"s are":" is"} now live on the homepage hero.`:"Upload did not finish - see the note under the photo.")+extra);
+    setMsg(okCount>0?`Hero: ${okCount} photo(s) uploaded`:"Hero upload finished with errors - see the Hero card");
+  };
   useEffect(()=>{ if(tab==="anthem"){ fetch("/api/admin/anthem").then(r=>r.json()).then(j=>setAnthemCustom(!!j.custom)).catch(()=>setAnthemCustom(false)); } },[tab]);
   async function login(){ const r=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})}); if(r.ok){ setMsg(""); load(); } else setMsg("Wrong password"); }
   async function setStatus(id:string,status:string){ await fetch(`/api/applications/${id}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status})}); load(); }
@@ -277,8 +336,10 @@ export default function AdminApp(){
         {heroSlides.map((s:any,i:number)=><div key={s.path} style={{position:"relative"}}><Image src={s.url} alt={`Hero photo ${i+1}`} width={300} height={180} style={{width:"100%",height:110,objectFit:"cover",borderRadius:12,border:"1px solid var(--line-gold)"}}/><div style={{display:"flex",gap:6,marginTop:6}}><button className="btn ghost" style={{padding:".3rem .6rem"}} disabled={i===0} onClick={async()=>{ const r=await fetch("/api/admin/hero-slides",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"move",path:s.path,dir:-1})}); const j=await r.json().catch(()=>({})); if(j.slides) setHeroSlides(j.slides); }}>←</button><button className="btn ghost" style={{padding:".3rem .6rem"}} disabled={i===heroSlides.length-1} onClick={async()=>{ const r=await fetch("/api/admin/hero-slides",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"move",path:s.path,dir:1})}); const j=await r.json().catch(()=>({})); if(j.slides) setHeroSlides(j.slides); }}>→</button><button className="btn ghost" style={{padding:".3rem .6rem",marginLeft:"auto"}} onClick={async()=>{ if(!confirm("Remove this hero photo?")) return; const r=await fetch("/api/admin/hero-slides",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"remove",path:s.path})}); const j=await r.json().catch(()=>({})); if(j.slides){ setHeroSlides(j.slides); setMsg("Hero photo removed"); } }}>✕</button></div></div>)}
         {heroSlides.length===0 && <p style={{color:"var(--muted)",margin:0}}>No hero photos yet — the built-in team photo is showing.</p>}
       </div>
-      {heroSlides.length<5 ? <label className="btn" style={{cursor:"pointer"}}>⬆ Upload hero photo<input type="file" accept="image/*" style={{display:"none"}} onChange={async e=>{ const f=e.target.files?.[0]; e.target.value=""; if(!f) return; if(/hei[cf]/i.test(f.type||"")||/\.hei[cf]$/i.test(f.name)){ setMsg("That is an HEIC photo — browsers can't show it. Share/export it as JPG from your gallery, then try again."); return; } if(f.size>15*1024*1024){ setMsg("Photo too large — keep it under 15 MB"); return; } setMsg("Uploading hero photo…"); const ext=(f.name.split(".").pop()||"jpg").toLowerCase(); const r1=await fetch("/api/admin/hero-slides",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"url",ext})}); const j1=await r1.json().catch(()=>({})); if(!r1.ok||!j1.token){ setMsg(r1.status===401?"Admin session expired (12 hours) — Log out and log in again, then retry.":(j1.error||"Upload failed — could not start")); return; } const sb2=supabaseBrowser(); if(!sb2){ setMsg("Upload failed — storage unavailable"); return; } const { error:upErr }=await sb2.storage.from("gallery").uploadToSignedUrl(j1.path, j1.token, f, { contentType: f.type||"image/jpeg" }); if(upErr){ setMsg(`Upload failed — ${upErr.message}`); return; } const r=await fetch("/api/admin/hero-slides",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"add",path:j1.path,url:j1.url})}); const j=await r.json().catch(()=>({})); if(j.slides){ setHeroSlides(j.slides); setMsg("Hero photo is live ✓ — it joins the homepage slideshow"); } else setMsg(j.error||"Photo uploaded but the save failed"); }}/></label> : <p style={{color:"var(--muted)",margin:0}}>All 5 slots are full — remove one to add another.</p>}
-      <p style={{color:"var(--muted)",fontSize:13,marginTop:12}}>Wide photos look best (the hero crops to fill the screen). Changes appear on the homepage within a few seconds.</p>
+      {heroSlides.length<5 ? <label className="btn" style={{cursor:heroBusy?"wait":"pointer",opacity:heroBusy?.65:1}}>{heroBusy?"Uploading - please wait":"Upload hero photos"}<input type="file" accept="image/*" multiple style={{display:"none"}} disabled={heroBusy} onChange={e=>{ const fl=e.target.files; e.target.value=""; onHeroPick(fl); }}/></label> : <p style={{color:"var(--muted)",margin:0}}>All 5 slots are full — remove one to add another.</p>}
+      {heroNote && <p style={{marginTop:10,color:"var(--gold-text)",fontSize:14}}>{heroNote}</p>}
+      {heroQueue.length>0 && <div className="grid" style={{gridTemplateColumns:"repeat(auto-fill,minmax(100px,1fr))",marginTop:12}}>{heroQueue.map((q:any)=><div key={q.id} style={{position:"relative"}}><img src={q.preview} alt="" style={{width:"100%",height:74,objectFit:"cover",borderRadius:10,border:"1px solid var(--line-gold)",opacity:q.state==="error"?.45:1}}/><span style={{position:"absolute",left:6,bottom:6,fontSize:11,padding:"2px 8px",borderRadius:99,background:"#06060acc",color:q.state==="done"?"#8be09a":q.state==="error"?"#ff9c9c":"#e8c766"}}>{q.state==="done"?"Live":q.state==="uploading"?"Uploading":q.state==="error"?"Failed":"Waiting"}</span>{q.note && <p style={{fontSize:11,color:"var(--bad)",marginTop:4}}>{q.note}</p>}</div>)}</div>}
+      <p style={{color:"var(--muted)",fontSize:13,marginTop:12}}>Tip: pick several photos at once - each one is auto-shrunk before upload, so it stays fast even on a slow connection. Wide photos look best (the hero crops to fill the screen).</p>
     </div>}
     {tab==="store" && <div><div className="grid" style={{marginBottom:16}}>{prods.map((p,i)=><div className="card" key={p.id}><div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}><strong>{p.name}</strong>{p.price_bdt?<span className="eyebrow">On sale · ৳{p.price_bdt}</span>:<span className="eyebrow">Showcase</span>}</div>
       <div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",marginTop:12}}>
