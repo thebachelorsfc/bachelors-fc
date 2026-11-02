@@ -21,7 +21,10 @@ async function shrinkHeroPhoto(f: File): Promise<{ blob: Blob; ext: string }> {
     catch { bmp = await createImageBitmap(f); }
     const max = 1920;
     const scale = Math.min(1, max / Math.max(bmp.width, bmp.height));
-    if (scale >= 1 && f.size < 900 * 1024) { bmp.close(); return { blob: f, ext: origExt }; }
+    // No small-file skip (2026-11-02): one owner photo carried a malformed
+    // EXIF block that made the site image optimizer reject it with a 400 at
+    // every size. Always re-encoding through canvas guarantees a clean,
+    // optimizer-safe JPEG, whatever the phone produced.
     const cv = document.createElement("canvas");
     cv.width = Math.max(1, Math.round(bmp.width * scale)); cv.height = Math.max(1, Math.round(bmp.height * scale));
     const ctx = cv.getContext("2d"); if (!ctx) { bmp.close(); return { blob: f, ext: origExt }; }

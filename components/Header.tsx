@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link"; import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { isIOS, isStandalone, promptInstall } from "@/lib/install";
 
@@ -40,6 +40,10 @@ export default function Header() {
   const [installed, setInstalled] = useState(false);
   useEffect(() => { setLight(document.documentElement.dataset.theme === "light"); setInstalled(isStandalone()); }, []);
   useEffect(() => { document.body.style.overflow = open ? "hidden" : ""; return () => { document.body.style.overflow = ""; }; }, [open ]);
+  // A11y (2026-11-02): a closed drawer is aria-hidden, so its links/buttons
+  // must also leave the tab order - inert does exactly that, invisibly.
+  const drawerRef = useRef<HTMLElement | null>(null);
+  useEffect(() => { const el = drawerRef.current; if (!el) return; if (open) el.removeAttribute("inert"); else el.setAttribute("inert", ""); }, [open ]);
   useEffect(() => { const fn = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); }; window.addEventListener("keydown", fn); return () => window.removeEventListener("keydown", fn); }, []);
   const toggleTheme = () => {
     const next = !light; setLight(next);
@@ -56,7 +60,7 @@ export default function Header() {
       </div>
     </div></header>
     <div className={`backdrop${open ? " open" : ""}`} onClick={() => setOpen(false)} />
-    <aside className={`drawer${open ? " open" : ""}`} aria-hidden={!open}>
+    <aside ref={drawerRef} className={`drawer${open ? " open" : ""}`} aria-hidden={!open}>
       <svg className="drawer-pitch" viewBox="0 0 300 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect x="14" y="14" width="272" height="592"/><line x1="14" y1="310" x2="286" y2="310"/><circle cx="150" cy="310" r="72"/><rect x="80" y="14" width="140" height="96"/><rect x="80" y="510" width="140" height="96"/><circle className="fill" cx="150" cy="310" r="4"/></svg>
       <div className="dcard" style={{display:"flex",alignItems:"center",gap:12,padding:"13px 14px"}}>
         <Image src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={40} height={47} style={{objectFit:"contain"}}/>

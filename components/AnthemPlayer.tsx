@@ -27,7 +27,7 @@ export default function AnthemPlayer() {
         </div>
         <div className={`anthem-eq${playing ? " on" : ""}`} aria-hidden="true"><span /><span /><span /><span /><span /></div>
       </div>
-      <div className="anthem-track" onClick={seek} role="progressbar" aria-valuemin={0} aria-valuemax={Math.round(dur)} aria-valuenow={Math.round(cur)}>
+      <div className="anthem-track" onClick={seek} role="progressbar" aria-label="Club anthem progress" aria-valuemin={0} aria-valuemax={Math.round(dur)} aria-valuenow={Math.round(cur)}>
         <div className="anthem-fill" style={{ width: dur ? `${(cur / dur) * 100}%` : "0%" }} />
       </div>
       <div className="anthem-times"><span>{fmt(cur)}</span><span>{fmt(dur)}</span></div>

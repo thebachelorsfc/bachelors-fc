@@ -7,6 +7,11 @@ import { useEffect, useState } from "react";
 // Admin → Content → Hero. Reduced motion: first photo, still.
 export default function HeroSlides({ slides }: { slides: { url: string }[] }) {
   const [i, setI] = useState(0);
+  // Perf (2026-11-02): only the first photo loads with the page; the rest
+  // mount ~900ms later (long before the first 5.2s crossfade), so they stop
+  // competing for bandwidth during the critical first paint. Invisible.
+  const [ready, setReady] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setReady(true), 900); return () => clearTimeout(t); }, []);
   useEffect(() => {
     if (slides.length < 2) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -15,7 +20,7 @@ export default function HeroSlides({ slides }: { slides: { url: string }[] }) {
   }, [slides.length]);
   return (<>
     <div className="hero-bg" aria-hidden="true">
-      {slides.map((s, k) => (<Image key={s.url} className={"hero-bg-img" + (k === i ? " on" : "")} src={s.url} alt="" fill priority={k === 0} sizes="100vw" style={{ objectFit: "cover", objectPosition: "center 30%" }} />))}
+      {slides.map((s, k) => (k === 0 || ready || k === i) ? (<Image key={s.url} className={"hero-bg-img" + (k === i ? " on" : "")} src={s.url} alt="" fill priority={k === 0} sizes="100vw" style={{ objectFit: "cover", objectPosition: "center 30%" }} />) : null)}
     </div>
     <div className="hero-shade" aria-hidden="true"></div>
     {slides.length > 1 && (<div className="hero-dots">{slides.map((s, k) => (<button key={s.url} type="button" aria-label={`Show photo ${k + 1}`} className={"hero-dot" + (k === i ? " on" : "")} onClick={() => setI(k)} />))}</div>)}

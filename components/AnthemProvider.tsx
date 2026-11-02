@@ -23,6 +23,28 @@ export default function AnthemProvider({ src, children }: { src: string; childre
   const [started, setStarted] = useState(false);
   const [cur, setCur] = useState(0);
   const [dur, setDur] = useState(0);
+  // Perf (2026-11-02): the anthem file (~3.6 MB) used to download with the
+  // page even under preload="metadata". Now its src is only assigned once
+  // the page has settled (load + a breath) or the moment play is pressed -
+  // nothing about the player looks or behaves differently.
+  const [armed, setArmed] = useState(false);
+  const wantPlayRef = useRef(false);
+  useEffect(() => {
+    if (armed) return;
+    let timer: any = null;
+    const arm = () => { timer = setTimeout(() => setArmed(true), 2200); };
+    if (document.readyState === "complete") arm(); else window.addEventListener("load", arm);
+    return () => { if (timer) clearTimeout(timer); window.removeEventListener("load", arm); };
+  }, [armed]);
+  useEffect(() => {
+    const a = audioRef.current; if (!a || !armed || !src) return;
+    const want = new URL(src, window.location.href).href;
+    if (a.src !== want) { a.src = src; a.load(); }
+    if (wantPlayRef.current) {
+      wantPlayRef.current = false;
+      a.play().then(() => { setPlaying(true); setStarted(true); }).catch(() => setPlaying(false));
+    }
+  }, [armed, src]);
   const pathname = usePathname();
   // Mini player is draggable (2026-10-28, owner): the visitor can drag it
   // anywhere on screen; the spot is remembered on this device.
@@ -91,6 +113,7 @@ export default function AnthemProvider({ src, children }: { src: string; childre
 
   function toggle() {
     const a = audioRef.current; if (!a) return;
+    if (!armed) { wantPlayRef.current = true; setArmed(true); return; }
     if (playing) { a.pause(); setPlaying(false); }
     else { a.play().then(() => { setPlaying(true); setStarted(true); }).catch(() => setPlaying(false)); }
   }
@@ -113,7 +136,7 @@ export default function AnthemProvider({ src, children }: { src: string; childre
 
   return (
     <Ctx.Provider value={{ playing, cur, dur, started, toggle, seekFrac, skip, stop }}>
-      {src && <audio ref={audioRef} src={src} preload="metadata"
+      {src && <audio ref={audioRef} preload="metadata"
         onTimeUpdate={(e) => setCur(e.currentTarget.currentTime)}
         onLoadedMetadata={(e) => { const d = e.currentTarget.duration; if (isFinite(d) && d > 0) setDur(d); }}
         onDurationChange={(e) => { const d = e.currentTarget.duration; if (isFinite(d) && d > 0) setDur(d); }}
