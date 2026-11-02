@@ -666,7 +666,7 @@ html.js [data-reveal].is-visible{opacity:1;transform:none}
 .hero-bg-img{opacity:0;transition:opacity 1.4s ease}
 .hero-bg-img.on{opacity:1;animation:heroZoom 14s ease-in-out infinite alternate}
 .hero-dots{position:absolute;left:0;right:0;bottom:7px;display:flex;gap:0;justify-content:center;z-index:2}
-.hero-dot{width:26px;height:26px;margin:0 -4.5px;border-radius:99px;border:0;padding:0;background:none;cursor:pointer;display:grid;place-items:center}
+.hero-dot{width:26px;height:26px;margin:0;border-radius:99px;border:0;padding:0;background:none;cursor:pointer;display:grid;place-items:center}
 .hero-dot::before{content:"";width:9px;height:9px;border-radius:99px;background:#f7f5ef59;transition:all .3s}
 .hero-dot.on::before{width:26px;background:var(--gold)}
 @keyframes heroZoom{from{transform:scale(1)}to{transform:scale(1.12)}}
