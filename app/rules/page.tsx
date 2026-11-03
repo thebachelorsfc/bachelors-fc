@@ -1,5 +1,5 @@
 import type { Metadata } from "next"; import CardCarousel from "@/components/CardCarousel";
-export const metadata: Metadata = { title: "Rules | The Bachelors FC", alternates: { canonical: "/rules" } };
+export const metadata: Metadata = { title: "Rules & Privacy | The Bachelors FC", alternates: { canonical: "/rules" } };
 // Official club rules & policy — owner's own text, supplied 2026-10-26. Keep verbatim.
 // NOTE: section 3 has one line still to come from the owner — the fee amount + payment method.
 const SECTIONS: { no: string; title: string; points: string[] }[] = [
@@ -56,7 +56,7 @@ const PRIV_CHOICES: string[] = [
   "If you leave the club, ask us to remove your personal details from public pages; match history already published as a club record may remain in anonymised or summary form.",
 ];
 export default function Rules() {
-  return (<main className="wrap"><section><p className="eyebrow">Rules &amp; Policy</p><h1>Club Rules</h1>
+  return (<main className="wrap"><section><p className="eyebrow">Rules &amp; Privacy</p><h1>Rules &amp; Privacy</h1>
     <p className="copy" style={{maxWidth: 720}}>Every great club runs on rules. Ours are few, fair and slightly funny. Read them once, follow them always, and the Managing Dictator will have very little to dictate.</p>
     <div style={{ marginTop: 24 }}><CardCarousel slide="min(560px,94%)">{SECTIONS.map(s => (<div className="card rule-sec" key={s.no}>
       <div className="rule-head"><span className="rule-no">{s.no}</span><h2>{s.title}</h2></div>
