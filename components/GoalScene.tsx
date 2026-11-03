@@ -462,6 +462,10 @@ function drawScene(ctx: CanvasRenderingContext2D, t: number) {
   if (fade < 1) { ctx.fillStyle = `rgba(6,8,17,${1 - fade})`; ctx.fillRect(0, 0, W, H); }
 }
 
+// Frame renderer shared with the dashboard RSVP toast (GoalToast), which
+// plays a cropped, time-compressed cut of this same scene.
+export function drawGoalSceneFrame(ctx: CanvasRenderingContext2D, t: number) { drawScene(ctx, t); }
+
 export default function GoalScene() {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {

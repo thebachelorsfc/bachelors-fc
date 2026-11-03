@@ -8,7 +8,7 @@ import MotmVote from "@/components/MotmVote";
 import PushOptIn from "@/components/PushOptIn";
 import ShareCard from "@/components/ShareCard";
 import StreakChip from "@/components/StreakChip";
-import GoalDoodle from "@/components/GoalDoodle";
+import GoalToast from "@/components/GoalToast";
 
 type Sess = any;
 const STATUS_BTN: Record<string, string> = { in: "✅ IN", out: "❌ OUT", maybe: "🤔 MAYBE" };
@@ -62,7 +62,7 @@ export default function DashboardPage() {
     setMsg("");
     const r = await fetch("/api/player/rsvp", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ session_id, status }) });
     const j = await r.json().catch(() => ({}));
-    if (r.ok) { setMsg("RSVP saved ✓"); if (status === "in") { setGoalFx(true); window.setTimeout(() => setGoalFx(false), 3200); } load(token); } else setMsg(j.error || "Could not save RSVP");
+    if (r.ok) { setMsg("RSVP saved ✓"); if (status === "in") { setGoalFx(true); window.setTimeout(() => setGoalFx(false), 4500); } load(token); } else setMsg(j.error || "Could not save RSVP");
   }
   async function logout() { try { localStorage.removeItem(CACHE_KEY); } catch (e) {} await supabaseBrowser()?.auth.signOut(); location.href = "/login"; }
 
@@ -143,7 +143,7 @@ export default function DashboardPage() {
           </>
         )}
       </section>
-      {goalFx && <GoalDoodle />}
+      {goalFx && <GoalToast />}
     </main>
   );
 }
