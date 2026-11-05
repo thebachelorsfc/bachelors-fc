@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import RecoveryRedirect from "@/components/RecoveryRedirect";
 import AnthemProvider from "@/components/AnthemProvider";
 import { resolveAnthemSrc } from "@/lib/anthem";
+import { getTickerItems } from "@/lib/ticker";
 import TopButton from "@/components/TopButton";
 import { Analytics } from "@vercel/analytics/next";
 import SwRegister from "@/components/SwRegister";
@@ -33,12 +34,13 @@ export const viewport: Viewport = { themeColor: "#06060a" };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const anthemSrc = await resolveAnthemSrc();
+  const tickerText = (await getTickerItems()).join(" ✦ ") + " ✦ ";
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${anton.variable}`}>
       <body>
         <script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('bfc-theme');if(t==='light')document.documentElement.dataset.theme='light'}catch(e){}" }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
-        <div className="ticker" aria-hidden="true"><div className="ticker-track">{[0,1].map(k=><span key={k}>Forged in Brotherhood ✦ Driven by Purpose ✦ United, Not Alone ✦ Khulshi · Chittagong ✦ Est. 2026 ✦ No Sponsors · No Stadium · Just Us ✦ Forged in Brotherhood ✦ Driven by Purpose ✦ United, Not Alone ✦ Khulshi · Chittagong ✦ Est. 2026 ✦ </span>)}</div></div>
+        <div className="ticker" aria-hidden="true"><div className="ticker-track">{[0,1].map(k=><span key={k}>{tickerText.repeat(2)}</span>)}</div></div>
         <AnthemProvider src={anthemSrc}><Header />{children}<Footer /><TopButton /></AnthemProvider><RecoveryRedirect /><Analytics /><SwRegister /><RevealInit />
       </body>
     </html>

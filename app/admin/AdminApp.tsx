@@ -44,7 +44,7 @@ export default function AdminApp(){
   const [posts,setPosts]=useState<any[]>([]); const [spUrl,setSpUrl]=useState("");
   const [prods,setProds]=useState<any[]>([]); const [pf,setPf]=useState({name:"",photo_url:"",description:"",price_bdt:"",stock:""});
   const [ords,setOrds]=useState<any[]>([]); const [fw,setFw]=useState<any[]>([]);
-  const [heroSlides,setHeroSlides]=useState<any[]>([]); const [heroQueue,setHeroQueue]=useState<any[]>([]); const [heroProg,setHeroProg]=useState({done:0,total:0}); const [heroBusy,setHeroBusy]=useState(false); const [heroNote,setHeroNote]=useState(""); const [accs,setAccs]=useState<any[]>([]); const [rsvpList,setRsvpList]=useState<any[]>([]); const [anthemCustom,setAnthemCustom]=useState<boolean|null>(null); const [anthemKey,setAnthemKey]=useState(0);
+  const [heroSlides,setHeroSlides]=useState<any[]>([]); const [heroQueue,setHeroQueue]=useState<any[]>([]); const [heroProg,setHeroProg]=useState({done:0,total:0}); const [heroBusy,setHeroBusy]=useState(false); const [heroNote,setHeroNote]=useState(""); const [accs,setAccs]=useState<any[]>([]); const [rsvpList,setRsvpList]=useState<any[]>([]); const [anthemCustom,setAnthemCustom]=useState<boolean|null>(null); const [anthemKey,setAnthemKey]=useState(0); const [tickerItems,setTickerItems]=useState<string[]>([]); const [tickerCustom,setTickerCustom]=useState(false); const [tickerNote,setTickerNote]=useState(""); const [tickerBusy,setTickerBusy]=useState(false);
   // Perf: 2026-10-29 parallelised the data fetches. 2026-10-31: the auth
   // gate runs alongside the batch (no serial block), in two waves so the
   // Home/Matchday/People data paints first.
@@ -61,6 +61,7 @@ export default function AdminApp(){
   const upGroundPhoto=async(id:string,file:File)=>{ const fd=new FormData(); fd.append("photo",file); const r=await fetch(`/api/admin/grounds/${id}`,{method:"POST",body:fd}); setMsg(r.ok?"Ground photo updated":"Photo upload failed"); if(r.ok) load(); };
   useEffect(()=>{ load(); },[load]);
   useEffect(()=>{ if(tab==="hero"){ fetch("/api/admin/hero-slides").then(r=>r.json()).then(j=>setHeroSlides(j.slides||[])).catch(()=>{}); } },[tab]);
+  useEffect(()=>{ if(tab==="ticker"){ fetch("/api/admin/ticker").then(r=>r.json()).then(j=>{ setTickerItems(j.items||[]); setTickerCustom(!!j.custom); }).catch(()=>{}); } },[tab]);
   // Hero multi-upload (2026-11-01): pick several photos at once; each shows a
   // local preview instantly, is shrunk, then uploads one by one with progress
   // written inside the Hero card (the page-top message is too easy to miss).
@@ -141,7 +142,7 @@ export default function AdminApp(){
     {(()=>{ const GROUPS:{id:string;label:string;tabs:[string,string][]}[]=[
       {id:"matchday",label:"⚽ Matchday",tabs:[["sessions","Sessions"]]},
       {id:"people",label:"👥 People",tabs:[["applications","Applications"],["players","Players"],["accounts","Accounts"],["people","People"]]},
-      {id:"content",label:"🖼 Content",tabs:[["gallery","Gallery"],["social","Social"],["fanwall","Fan Wall"],["anthem","Anthem"],["hero","Hero"]]},
+      {id:"content",label:"🖼 Content",tabs:[["gallery","Gallery"],["social","Social"],["fanwall","Fan Wall"],["anthem","Anthem"],["hero","Hero"],["ticker","Ticker"]]},
       {id:"club",label:"🏪 Club",tabs:[["grounds","Grounds"],["store","Store"],["orders","Orders"]]},
     ]; const active=GROUPS.find(g=>g.tabs.some(([id])=>id===tab)); const pendOrds=ords.filter((o:any)=>o.status==="pending").length; const pendFw=fw.filter((m:any)=>m.status==="pending").length; const chip=(on:boolean):React.CSSProperties=>on?{}:{background:"var(--chip-bg)",color:"var(--chip-tx)",border:"1px solid var(--chip-br)"};
     return (<>
@@ -364,6 +365,20 @@ export default function AdminApp(){
         {heroSlides.length===0 && <p style={{color:"var(--muted)",margin:0}}>No hero photos yet — the built-in team photo is showing.</p>}
       </div>
       <p style={{color:"var(--muted)",fontSize:13,marginTop:12}}>Tip: pick several photos at once - each one is auto-shrunk before upload, so it stays fast even on a slow connection. Wide photos look best (the hero crops to fill the screen).</p>
+    </div>}
+    {tab==="ticker" && <div className="card"><h3>📜 Top Ticker Text</h3>
+      <p style={{color:"var(--muted)"}}>The scrolling line at the very top of every page. Each box below is one phrase — the site joins them with ✦ and scrolls them. Edit, add or remove phrases, then Save. The change goes live within about a minute.</p>
+      {tickerNote ? <div style={{border:`1px solid ${tickerNote.startsWith("Saved")?"var(--ok)":"var(--bad)"}`,color:tickerNote.startsWith("Saved")?"var(--ok)":"var(--bad)",borderRadius:12,padding:"12px 14px",fontSize:16,margin:"12px 0"}}>{tickerNote.startsWith("Saved")?"✓ ":"⚠ "}{tickerNote}</div>
+      : <div style={{border:"1px solid var(--line-gold)",color:"var(--muted)",borderRadius:12,padding:"12px 14px",fontSize:15,margin:"12px 0"}}>{tickerCustom?"Ei phrase gulo ekhon site-e cholche":"Ekhon built-in default phrase cholche — Save dile tomar gulo live hobe"}</div>}
+      <div style={{display:"grid",gap:10}}>
+        {tickerItems.map((t,i)=><div key={i} style={{display:"flex",gap:8,alignItems:"center"}}><span style={{color:"var(--gold-text)",fontWeight:700,minWidth:22,textAlign:"right"}}>{i+1}.</span><input style={{...input,flex:1}} value={t} maxLength={80} onChange={e=>{ const c=[...tickerItems]; c[i]=e.target.value; setTickerItems(c); }} placeholder="Phrase likho…"/><button className="btn ghost" style={{padding:".4rem .7rem"}} disabled={tickerItems.length<=1} onClick={()=>setTickerItems(tickerItems.filter((_,x)=>x!==i))}>✕</button></div>)}
+      </div>
+      <div style={{display:"flex",gap:8,marginTop:14,flexWrap:"wrap"}}>
+        <button className="btn ghost" disabled={tickerItems.length>=12||tickerBusy} onClick={()=>setTickerItems([...tickerItems,""])}>+ Add phrase</button>
+        <button className="btn" disabled={tickerBusy} onClick={async()=>{ setTickerBusy(true); setTickerNote(""); const r=await fetch("/api/admin/ticker",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"save",items:tickerItems})}); const j=await r.json().catch(()=>({})); setTickerBusy(false); if(r.ok&&j.items){ setTickerItems(j.items); setTickerCustom(true); setTickerNote("Saved — notun ticker ~1 minute er modhye site-e live hobe"); setMsg("Ticker saved ✓"); } else { setTickerNote(j.error||"Save hoyni — abar try koro"); } }}>{tickerBusy?"Saving…":"Save ticker"}</button>
+        {tickerCustom && <button className="btn ghost" disabled={tickerBusy} onClick={async()=>{ if(!confirm("Built-in default phrase ferot anbe?")) return; const r=await fetch("/api/admin/ticker",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"reset"})}); const j=await r.json().catch(()=>({})); if(r.ok&&j.items){ setTickerItems(j.items); setTickerCustom(false); setTickerNote("Saved — default phrase ferot esheche"); setMsg("Ticker reset to default ✓"); } }}>↩ Reset to default</button>}
+      </div>
+      <p style={{color:"var(--muted)",fontSize:13,marginTop:12}}>Tip: choto phrase bhalo lage — jemon "Next Match: Friday 6 AM" ba "New Jersey — ৳500". Ekbare sorboccho 12 ta phrase.</p>
     </div>}
     {tab==="store" && <div><div className="grid" style={{marginBottom:16}}>{prods.map((p,i)=><div className="card" key={p.id}><div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}><strong>{p.name}</strong>{p.price_bdt?<span className="eyebrow">On sale · ৳{p.price_bdt}</span>:<span className="eyebrow">Showcase</span>}</div>
       <div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",marginTop:12}}>
