@@ -35,12 +35,18 @@ export const viewport: Viewport = { themeColor: "#06060a" };
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const anthemSrc = await resolveAnthemSrc();
   const tickerText = (await getTickerItems()).join(" ✦ ") + " ✦ ";
+  // Scroll speed stays constant no matter how much text the owner saves:
+  // the CSS animation moves half the track in a fixed time, so a longer
+  // line would run faster — scale the duration with the text length
+  // (~0.25s per character of one pass, a touch slower than the old fixed
+  // 30s loop so it is comfortable to read).
+  const tickerDur = Math.max(24, Math.round(tickerText.length * 2 * 0.25));
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${anton.variable}`}>
       <body>
         <script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('bfc-theme');if(t==='light')document.documentElement.dataset.theme='light'}catch(e){}" }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
-        <div className="ticker" aria-hidden="true"><div className="ticker-track">{[0,1].map(k=><span key={k}>{tickerText.repeat(2)}</span>)}</div></div>
+        <div className="ticker" aria-hidden="true"><div className="ticker-track" style={{ animationDuration: `${tickerDur}s` }}>{[0,1].map(k=><span key={k}>{tickerText.repeat(2)}</span>)}</div></div>
         <AnthemProvider src={anthemSrc}><Header />{children}<Footer /><TopButton /></AnthemProvider><RecoveryRedirect /><Analytics /><SwRegister /><RevealInit />
       </body>
     </html>
