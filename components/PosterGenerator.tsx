@@ -75,141 +75,149 @@ export default function PosterGenerator({ session, grounds, inCount, onClose }: 
     const S = H / 1350; // vertical breathing scale
     const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
     const ctx = cv.getContext("2d"); if (!ctx) return null;
-    try { await (document as any).fonts.load('700 90px Oswald'); await (document as any).fonts.load('600 40px Oswald'); await (document as any).fonts.load('italic 400 30px Inter'); } catch {}
+    try { await (document as any).fonts.load('240px Anton'); await (document as any).fonts.load('104px Anton'); await (document as any).fonts.load('700 90px Oswald'); await (document as any).fonts.load('600 40px Oswald'); await (document as any).fonts.load('italic 400 30px Inter'); await (document as any).fonts.load('400 28px Inter'); } catch {}
 
+    // Editorial Matchday design (2026-11-06): full-bleed duotone ground photo,
+    // giant cropped Anton type, left-aligned asymmetric info column, hairline
+    // rules, no centred template layout, no URL pill.
+    const X = 64, XR = W - 64;
     const foil = (x0: number, x1: number) => {
       const fg = ctx.createLinearGradient(x0, 0, x1, 0);
       fg.addColorStop(0, "#8f6f14"); fg.addColorStop(0.35, GOLD2); fg.addColorStop(0.55, "#fff2b0"); fg.addColorStop(0.8, GOLD); fg.addColorStop(1, "#8f6f14");
       return fg;
     };
-    const center = (text: string, y: number, font: string, fill: string | CanvasGradient) => {
-      ctx.font = font; ctx.fillStyle = fill; ctx.textAlign = "center";
-      ctx.fillText(text, W / 2, y); ctx.textAlign = "left";
+    const spaced = (v: string) => { try { (ctx as any).letterSpacing = v; } catch {} };
+    const left = (text: string, x: number, y: number, font: string, fill: string | CanvasGradient) => {
+      ctx.font = font; ctx.fillStyle = fill; ctx.textAlign = "left"; ctx.fillText(text, x, y);
     };
-    const fit = (text: string, maxW: number, start: number, weight = 700) => {
-      let s = start; ctx.font = `${weight} ${s}px Oswald`;
-      while (ctx.measureText(text).width > maxW && s > 30) { s -= 4; ctx.font = `${weight} ${s}px Oswald`; }
+    const right = (text: string, x: number, y: number, font: string, fill: string | CanvasGradient) => {
+      ctx.font = font; ctx.fillStyle = fill; ctx.textAlign = "right"; ctx.fillText(text, x, y); ctx.textAlign = "left";
+    };
+    const fitA = (text: string, maxW: number, start: number) => {
+      let s = start; ctx.font = `${s}px Anton`;
+      while (ctx.measureText(text).width > maxW && s > 40) { s -= 6; ctx.font = `${s}px Anton`; }
       return s;
     };
+    const hairline = (y: number, alpha = 0.4) => {
+      ctx.strokeStyle = `rgba(212,175,55,${alpha})`; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(X, y); ctx.lineTo(XR, y); ctx.stroke();
+    };
 
-    // ── backdrop: ground photo (darkened) or navy + crest watermark ──
+    // ── backdrop: ground photo duotone, or navy + crest watermark ──
     const photo = matched?.photo_url ? await loadImg(matched.photo_url) : null;
     const crest = await loadImg("/assets/logo-transparent.png");
     if (photo) {
       const s = Math.max(W / photo.width, H / photo.height);
       ctx.drawImage(photo, (W - photo.width * s) / 2, (H - photo.height * s) / 2, photo.width * s, photo.height * s);
+      // navy-gold grade: deep navy shadows, lighter middle so the photo lives
       const ov = ctx.createLinearGradient(0, 0, 0, H);
-      ov.addColorStop(0, "rgba(5,7,18,0.88)"); ov.addColorStop(0.5, "rgba(5,7,18,0.82)"); ov.addColorStop(1, "rgba(5,7,18,0.96)");
+      ov.addColorStop(0, "rgba(7,10,24,0.66)"); ov.addColorStop(0.42, "rgba(7,10,24,0.34)");
+      ov.addColorStop(0.74, "rgba(5,6,14,0.80)"); ov.addColorStop(1, "rgba(4,5,11,0.95)");
       ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "rgba(10,17,44,0.20)"; ctx.fillRect(0, 0, W, H);
+      try { ctx.globalCompositeOperation = "overlay"; ctx.fillStyle = "rgba(212,175,55,0.10)"; ctx.fillRect(0, 0, W, H); ctx.globalCompositeOperation = "source-over"; } catch {}
     } else {
       const g = ctx.createLinearGradient(0, 0, W, H);
       g.addColorStop(0, "#0d173f"); g.addColorStop(0.55, "#0a1230"); g.addColorStop(1, "#05060a");
       ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-      if (crest) { ctx.globalAlpha = 0.08; const cw = 760; ctx.drawImage(crest, (W - cw) / 2, H * 0.30, cw, cw); ctx.globalAlpha = 1; }
+      ctx.strokeStyle = "rgba(255,255,255,0.030)"; ctx.lineWidth = 5;
+      for (let x = 30; x < W - 20; x += 26) { ctx.beginPath(); ctx.moveTo(x, 26); ctx.lineTo(x, H - 26); ctx.stroke(); }
+      if (crest) { ctx.globalAlpha = 0.07; const cw = 780; ctx.drawImage(crest, W - cw + 130, H * 0.30, cw, cw); ctx.globalAlpha = 1; }
     }
-    // pinstripes + sheen
-    ctx.strokeStyle = "rgba(255,255,255,0.030)"; ctx.lineWidth = 5;
-    for (let x = 30; x < W - 20; x += 26) { ctx.beginPath(); ctx.moveTo(x, 26); ctx.lineTo(x, H - 26); ctx.stroke(); }
-    ctx.save(); ctx.beginPath(); (ctx as any).roundRect(0, 0, W, H, 40); ctx.clip();
-    const sh = ctx.createLinearGradient(180, 0, 1080, 0);
-    sh.addColorStop(0, "rgba(255,255,255,0)"); sh.addColorStop(0.5, "rgba(255,246,200,0.05)"); sh.addColorStop(1, "rgba(255,255,255,0)");
-    ctx.fillStyle = sh; ctx.fillRect(0, 0, W, H); ctx.restore();
-    // frame + corner diamonds
-    ctx.strokeStyle = GOLD; ctx.globalAlpha = 0.85; ctx.lineWidth = 3;
-    ctx.beginPath(); (ctx as any).roundRect(7, 7, W - 14, H - 14, 36); ctx.stroke();
-    ctx.globalAlpha = 0.22; ctx.lineWidth = 1;
-    ctx.beginPath(); (ctx as any).roundRect(20, 20, W - 40, H - 40, 28); ctx.stroke();
-    ctx.globalAlpha = 1; ctx.fillStyle = GOLD;
-    [[34, 34], [W - 34, 34], [34, H - 34], [W - 34, H - 34]].forEach(([cx, cy]) => {
-      ctx.save(); ctx.translate(cx, cy); ctx.rotate(Math.PI / 4); ctx.globalAlpha = 0.55; ctx.fillRect(-7, -7, 14, 14); ctx.restore();
-    });
-    ctx.globalAlpha = 1;
 
-    // ── header: crest + kicker pill ──
-    let y = 56 * S;
-    if (crest) { const cw = 150 * Math.min(S, 1.2); ctx.drawImage(crest, (W - cw) / 2, y, cw, cw); y += cw + 34 * S; }
+    // ── top bar: crest + club name left, city right ──
+    const ty0 = 56;
+    if (crest) ctx.drawImage(crest, X, ty0, 84, 84);
+    spaced("3px");
+    left("THE BACHELORS FC", X + 104, ty0 + 40, "600 31px Oswald", PAPER);
+    spaced("0px");
+    left("FOOTBALL CLUB · EST. 2026", X + 104, ty0 + 74, "400 21px Inter", MUTE);
+    spaced("4px");
+    right("KHULSHI, CHITTAGONG", XR, ty0 + 40, "600 21px Oswald", GOLD2);
+    spaced("0px");
+    hairline(ty0 + 116);
+
+    // ── kicker tag (solid block, left aligned) ──
     const isToday = session.session_date && session.session_date === dhakaToday();
     const kicker = session.opponent ? (isToday ? "MATCH TODAY" : "MATCHDAY") : "CLUB SESSION";
-    ctx.font = "600 33px Oswald";
-    const kw = ctx.measureText(kicker.split("").join("  ")).width + 72;
-    ctx.strokeStyle = GOLD; ctx.lineWidth = 1.6;
-    ctx.fillStyle = isToday ? "rgba(160,30,30,0.85)" : "rgba(6,8,16,0.72)";
-    ctx.beginPath(); (ctx as any).roundRect((W - kw) / 2, y, kw, 58, 29); ctx.fill(); ctx.stroke();
-    center(kicker.split("").join("  "), y + 41, "600 33px Oswald", isToday ? "#ffd9d9" : GOLD2);
-    y += 58 + 44 * S;
+    const tagY = ty0 + 116 + Math.round(42 * S), tagH = 54;
+    ctx.font = "600 29px Oswald"; spaced("6px");
+    const kw = ctx.measureText(kicker).width + 52; spaced("0px");
+    ctx.fillStyle = isToday ? "#a01e1e" : "rgba(212,175,55,0.16)";
+    ctx.beginPath(); (ctx as any).roundRect(X, tagY, kw, tagH, 6); ctx.fill();
+    if (!isToday) { ctx.strokeStyle = GOLD; ctx.lineWidth = 1.4; ctx.stroke(); }
+    spaced("6px");
+    left(kicker, X + 26, tagY + 38, "600 29px Oswald", isToday ? "#ffe1e1" : GOLD2);
+    spaced("0px");
 
-    // ── headline ──
-    center("THE BACHELORS FC", y + 80, `700 ${fit("THE BACHELORS FC", 920, 84)}px Oswald`, PAPER);
-    y += 80 + 22 * S;
+    // ── giant headline, cropped at the left edge ──
+    let cur = tagY + tagH + Math.round(26 * S);
+    const headLines = session.opponent
+      ? ["MATCH", "DAY"]
+      : String(session.title || "Club Session").toUpperCase().split(/\s+/).filter(Boolean).slice(0, 2);
+    const HS = Math.min(...headLines.map(l => fitA(l, W - X - 30, size === "story" ? 264 : 222)), size === "story" ? 264 : 222);
+    headLines.forEach((ln, i) => {
+      cur += HS * 0.88;
+      left(ln, X - 6, cur, `${HS}px Anton`, i === 0 ? PAPER : foil(X, XR));
+    });
+    cur += Math.round(30 * S);
+
+    // ── opponent ──
     if (session.opponent) {
-      // VS diamond
-      const dc = y + 52, ds = 96;
-      ctx.save(); ctx.translate(W / 2, dc); ctx.rotate(Math.PI / 4);
-      ctx.fillStyle = foil(W / 2 - ds / 2, W / 2 + ds / 2); ctx.fillRect(-ds / 2, -ds / 2, ds, ds); ctx.restore();
-      center("VS", dc + 21, "700 46px Oswald", "#0a0a12");
-      y = dc + 48 + 20 * S;
+      spaced("5px");
+      left("VERSUS", X, cur + 22, "600 23px Oswald", MUTE);
+      spaced("0px");
+      cur += Math.round(38 * S);
       const opp = String(session.opponent).toUpperCase();
-      const os = fit(opp, 920, 96);
-      center(opp, y + os, `700 ${os}px Oswald`, foil(W / 2 - 300, W / 2 + 300));
-      y += os + 32 * S;
-    } else if (session.title) {
-      const t = String(session.title).toUpperCase();
-      const ts = fit(t, 900, 76);
-      center(t, y + ts, `700 ${ts}px Oswald`, foil(W / 2 - 300, W / 2 + 300));
-      y += ts + 32 * S;
+      const os = fitA(opp, W - 2 * X, 102);
+      left(opp, X - 2, cur + os * 0.84, `${os}px Anton`, PAPER);
+      cur += os * 0.84 + Math.round(20 * S);
+      ctx.fillStyle = GOLD; ctx.fillRect(X, cur, 118, 6);
+      cur += Math.round(30 * S);
     }
 
-    // ── players-in chip ──
+    // ── players-in line ──
     if (inCount > 0) {
-      const label = `${inCount} PLAYERS ALREADY IN`;
-      ctx.font = "600 30px Oswald";
-      const cw2 = ctx.measureText(label).width + 110;
-      ctx.fillStyle = "rgba(212,175,55,0.14)"; ctx.strokeStyle = "rgba(212,175,55,0.55)"; ctx.lineWidth = 1.4;
-      ctx.beginPath(); (ctx as any).roundRect((W - cw2) / 2, y, cw2, 54, 27); ctx.fill(); ctx.stroke();
-      // drawn check mark
       ctx.strokeStyle = GOLD2; ctx.lineWidth = 5; ctx.lineCap = "round";
-      const chx = (W - cw2) / 2 + 30, chy = y + 27;
-      ctx.beginPath(); ctx.moveTo(chx - 11, chy); ctx.lineTo(chx - 3, chy + 9); ctx.lineTo(chx + 13, chy - 10); ctx.stroke();
-      center(label, y + 39, "600 30px Oswald", GOLD2);
-      y += 54 + 28 * S;
+      const chy = cur + 16;
+      ctx.beginPath(); ctx.moveTo(X + 2, chy); ctx.lineTo(X + 10, chy + 9); ctx.lineTo(X + 26, chy - 9); ctx.stroke();
+      spaced("2px");
+      left(`${inCount} PLAYERS ALREADY IN`, X + 42, cur + 24, "600 27px Oswald", GOLD2);
+      spaced("0px");
+      cur += 24 + Math.round(20 * S);
     }
 
-    // ── info panel (post size merges date+time into one row so everything breathes) ──
+    // ── info column, anchored to the bottom ──
     const tm = fmtTime(session.session_time);
     const rows: [string, string, string?][] = [];
     if (size === "post" && tm && session.session_date) rows.push(["DATE & TIME", `${fmtDate(session.session_date)} — ${tm}`]);
     else {
       rows.push(["DATE", fmtDate(session.session_date)]);
-      if (tm) rows.push(["TIME", tm]);
+      if (tm) rows.push(["KICK-OFF", tm]);
     }
-    if (groundName) rows.push(["VENUE", groundName, matched?.address || undefined]);
-    const panelH = rows.reduce((a, r) => a + 100 + (r[2] ? 30 : 0), 0) + 20;
-    const panelY = size === "post" ? y + 10 : Math.max(y + 10, H * 0.56);
-    ctx.fillStyle = "rgba(5,7,14,0.58)"; ctx.strokeStyle = "rgba(212,175,55,0.38)"; ctx.lineWidth = 1.4;
-    ctx.beginPath(); (ctx as any).roundRect(100, panelY, W - 200, panelH, 24); ctx.fill(); ctx.stroke();
-    let ry = panelY + 26;
-    rows.forEach(([k, v, sub], i) => {
-      center(k.split("").join(" "), ry + 24, "600 24px Oswald", GOLD2);
-      const vs = fit(v.toUpperCase(), 800, 40, 600);
-      center(v.toUpperCase(), ry + 24 + vs + 8, `600 ${vs}px Oswald`, PAPER);
-      ry += 24 + vs + 8;
-      if (sub) { center(sub, ry + 28, "400 27px Inter", MUTE); ry += 30; }
-      if (i < rows.length - 1) { ctx.strokeStyle = "rgba(212,175,55,0.16)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(150, ry + 14); ctx.lineTo(W - 150, ry + 14); ctx.stroke(); ry += 28; }
+    if (groundName) rows.push(["VENUE", groundName.toUpperCase(), matched?.address || undefined]);
+    const rowH = (r: [string, string, string?]) => 92 + (r[2] ? 34 : 0);
+    const blockH = rows.reduce((a, r) => a + rowH(r), 0);
+    let ry = Math.max(cur + Math.round(26 * S), H - 148 - blockH);
+    rows.forEach(r => {
+      hairline(ry, 0.35);
+      spaced("4px");
+      left(r[0], X, ry + 30, "600 21px Oswald", GOLD2);
+      spaced("0px");
+      let vs = 38; ctx.font = `600 ${vs}px Oswald`;
+      while (ctx.measureText(r[1]).width > W - 2 * X && vs > 24) { vs -= 2; ctx.font = `600 ${vs}px Oswald`; }
+      left(r[1], X, ry + 30 + vs + 6, `600 ${vs}px Oswald`, PAPER);
+      if (r[2]) left(r[2], X, ry + 30 + vs + 6 + 32, "400 25px Inter", MUTE);
+      ry += rowH(r);
     });
 
-    const panelBottom = panelY + panelH;
-
-    // ── footer: motto + URL pill (post flows after the panel; story anchors to H) ──
-    const mottoY = size === "post" ? panelBottom + 56 : H - 218;
-    const pillY = size === "post" ? panelBottom + 84 : H - 188;
-    center("Forged in Brotherhood, Driven by Purpose", mottoY, "italic 400 30px Inter", MUTE);
-    const url = "BACHELORS-FC.VERCEL.APP";
-    ctx.font = "700 41px Oswald";
-    const uw = ctx.measureText(url).width + 96;
-    ctx.fillStyle = foil((W - uw) / 2, (W + uw) / 2);
-    ctx.beginPath(); (ctx as any).roundRect((W - uw) / 2, pillY, uw, 76, 38); ctx.fill();
-    center(url, pillY + 52, "700 41px Oswald", "#0a0a12");
-    center("U N I T E D ,  N O T  A L O N E   ·   K H U L S H I ,  C H I T T A G O N G", size === "post" ? pillY + 122 : H - 66, "600 23px Oswald", GOLD2);
+    // ── footer: hairline, motto left, URL right ──
+    hairline(H - 118, 0.5);
+    left("Forged in Brotherhood, Driven by Purpose", X, H - 64, "italic 400 27px Inter", MUTE);
+    right("BACHELORS-FC.VERCEL.APP", XR, H - 64, "700 25px Oswald", GOLD2);
+    spaced("5px");
+    left("UNITED, NOT ALONE", X, H - 28, "600 18px Oswald", GOLD2);
+    spaced("0px");
 
     return cv;
   }, [session, matched, inCount, size]);
