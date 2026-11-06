@@ -7,7 +7,7 @@ export const HERO_FALLBACK: HeroSlide[] = [{ url: "/assets/team-photo-band.jpg",
 const SB = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://gpjkjrvxacgojwmfukdy.supabase.co";
 export async function getHeroSlides(): Promise<HeroSlide[]> {
   try {
-    const r = await fetch(`${SB}/storage/v1/object/public/gallery/hero/slides.json?t=${Date.now()}`, { cache: "no-store" });
+    const r = await fetch(`${SB}/storage/v1/object/public/gallery/hero/slides.json`, { next: { revalidate: 60 } });
     if (!r.ok) return HERO_FALLBACK;
     const j = await r.json();
     const slides = Array.isArray(j?.slides) ? j.slides.filter((s: any) => s && typeof s.url === "string" && typeof s.path === "string") : [];

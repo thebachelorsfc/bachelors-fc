@@ -7,7 +7,7 @@ import { getHeroSlides } from "@/lib/heroSlides";
 import HeroSlides from "@/components/HeroSlides";
 import GroundsCarousel from "@/components/GroundsCarousel";
 import GalleryPreview from "@/components/GalleryPreview";
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 import PlayerCard, { OpenShirt } from "@/components/PlayerCard";
 import Counter from "@/components/Counter";
 import FacebookFeed from "@/components/FacebookFeed";
@@ -20,11 +20,21 @@ import PersonCard from "@/components/PersonCard";
 import Leaderboard from "@/components/Leaderboard";
 import CapBadge from "@/components/CapBadge";
 import { getInPlayers } from "@/lib/rsvps";
+import { unstable_cache } from "next/cache";
+
+// Phase 1 (owner-approved 2026-11-06): the shared Supabase client forces
+// no-store, so this route can never be static — instead the whole data
+// bundle is cached for 60s. Repeat visits skip every database read and
+// render from cache; data can lag at most ~60s, same rule as the ticker.
+// Nothing visual changes.
+const getHomeData = unstable_cache(async () => {
+  const [playersRaw, people, allSessions, groundsRaw, galleryItems, socialPosts, heroSlides]: any[] = await Promise.all([getPlayers(), getPeople(), getAllSessions(), getGrounds(), getGalleryItems(), getSocialPosts(), getHeroSlides()]);
+  return { playersRaw, people, allSessions, groundsRaw, galleryItems, socialPosts, heroSlides };
+}, ["home-data-v1"], { revalidate: 60 });
+const getInCached = unstable_cache(async (id: string) => (await getInPlayers([id]))[id] || [], ["home-nm-in-v1"], { revalidate: 60 });
 
 export default async function Home(){
-  // All six reads run in PARALLEL (perf fix 2026-10-29: sequential awaits made
-  // the homepage take ~5.7s server-side; one round of parallel queries ≈ 1s).
-  const [playersRaw, people, allSessions, groundsRaw, galleryItems, socialPosts, heroSlides]: any[] = await Promise.all([getPlayers(), getPeople(), getAllSessions(), getGrounds(), getGalleryItems(), getSocialPosts(), getHeroSlides()]);
+  const { playersRaw, people, allSessions, groundsRaw, galleryItems, socialPosts, heroSlides } = await getHomeData();
   const players:any[] = playersRaw ?? SEED_PLAYERS;
   const groundSlides = buildGroundSlides(groundsRaw, allSessions);
   // Slim Next Match card (owner re-requested 2026-10-27 after the old Next
@@ -45,7 +55,7 @@ export default async function Home(){
   const nmSlide:any = nextMatch ? groundSlides.find((g:any)=>{ if (nextMatch.ground_id && g.id === nextMatch.ground_id) return true; const sg = String(nextMatch.ground || "").trim().toLowerCase(); const gn = String(g.name || "").trim().toLowerCase(); return !!sg && !!gn && (sg.includes(gn) || gn.includes(sg)); }) : null;
   const nmDirections = nextMatch ? (nmSlide?.directions || (nextMatch.ground ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(nextMatch.ground + ", Chittagong")}` : "")) : "";
   const nmDate = nextMatch ? new Date(nextMatch.session_date + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }) : "";
-  const nmIn = nextMatch ? ((await getInPlayers([nextMatch.id]))[nextMatch.id] || []) : [];
+  const nmIn = nextMatch ? await getInCached(nextMatch.id) : [];
   const nmTime = nextMatch?.session_time ? (()=>{ const [h,m] = String(nextMatch.session_time).slice(0,5).split(":").map(Number); const ap = h >= 12 ? "PM" : "AM"; const hh = h % 12 === 0 ? 12 : h % 12; return `${hh}:${String(m).padStart(2,"0")} ${ap}`; })() : "";
   // Events section (owner, 2026-10-29): the captain (Admin → Players "Make ©
   // Captain", migration 013) headlines it; the events are the real sessions —
