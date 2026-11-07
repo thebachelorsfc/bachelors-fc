@@ -222,6 +222,17 @@ footer a:hover{color:var(--gold-text)}
 .soc-dots{display:flex;gap:7px;justify-content:center;margin-top:4px}
 .soc-dots button{width:8px;height:8px;border-radius:99px;border:none;background:#c9a22740;cursor:pointer;padding:0;transition:all .2s ease}
 .soc-dots button.on{width:26px;background:var(--gold)}
+/* FB embed fallback — shown while an embed loads, and kept if Facebook
+   refuses/slows the embed on this device or network (owner-approved
+   2026-11-07, replaces the raw "refused to connect" error page).
+   The card stays dark in both themes, so fixed light colours are fine. */
+.soc-fallback{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:28px 30px;background:linear-gradient(180deg,#101a36,#0a1130);line-height:1.5;z-index:2}
+.soc-fb-badge{display:inline-flex;align-items:center;justify-content:center;width:58px;height:58px;border-radius:50%;background:var(--gold);color:#0a0f1e;font-weight:800;font-size:34px;line-height:1}
+.soc-fb-title{font-family:var(--font-display);font-weight:600;font-size:21px;color:#f7f5ef;margin:6px 0 0}
+.soc-fb-sub{color:#b9c0d4;font-size:14.5px;max-width:340px;margin:0}
+.soc-fb-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.soc-fb-btn{display:inline-block;background:var(--gold);color:#0a0f1e;font-weight:700;font-size:14.5px;padding:11px 20px;border-radius:99px;text-decoration:none}
+.soc-fb-retry{background:transparent;color:#f7f5ef;border:1px solid #f7f5ef55;font-weight:600;font-size:14.5px;padding:11px 20px;border-radius:99px;cursor:pointer}
 @media (max-width:640px){.soc-arrow{display:none}.soc-body{height:520px}}
 
 /* — Grounds carousel (same premium motion as the social carousel) — */
