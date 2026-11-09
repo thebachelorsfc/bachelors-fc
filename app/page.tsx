@@ -18,6 +18,8 @@ import SquadCarousel from "@/components/SquadCarousel";
 import CardCarousel from "@/components/CardCarousel";
 import PersonCard from "@/components/PersonCard";
 import Leaderboard from "@/components/Leaderboard";
+import RecordBook from "@/components/RecordBook";
+import { computeStreaks } from "@/lib/streaks";
 import CapBadge from "@/components/CapBadge";
 import { getInPlayers } from "@/lib/rsvps";
 
@@ -27,7 +29,7 @@ import { getInPlayers } from "@/lib/rsvps";
 // rule the ticker already uses. Nothing visual changes; every other page
 // and API keeps the live no-store client.
 export default async function Home(){
-  const [playersRaw, people, allSessions, groundsRaw, galleryItems, socialPosts, heroSlides]: any[] = await Promise.all([getPlayers(true), getPeople(true), getAllSessions(true), getGrounds(true), getGalleryItems(true), getSocialPosts(true), getHeroSlides()]);
+  const [playersRaw, people, allSessions, groundsRaw, galleryItems, socialPosts, heroSlides, streaks]: any[] = await Promise.all([getPlayers(true), getPeople(true), getAllSessions(true), getGrounds(true), getGalleryItems(true), getSocialPosts(true), getHeroSlides(), computeStreaks()]);
   const players:any[] = playersRaw ?? SEED_PLAYERS;
   const groundSlides = buildGroundSlides(groundsRaw, allSessions);
   // Slim Next Match card (owner re-requested 2026-10-27 after the old Next
@@ -168,6 +170,8 @@ export default async function Home(){
     <section className="wrap" id="leaderboard"><p className="eyebrow">Top Performers</p><h2>Leaderboard</h2>
       <Leaderboard/>
     </section>
+
+    <RecordBook players={players} streaks={streaks} />
 
     {groundSlides.length>0 && (<section className="wrap"><p className="eyebrow">Our Grounds</p><h2>Where we play</h2>
       <p className="copy" style={{maxWidth:720}}>No stadium of our own — these are the turfs and fields around Chittagong where the brotherhood shows up, session after session.</p>
