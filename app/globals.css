@@ -688,3 +688,13 @@ html.js [data-reveal].is-visible{opacity:1;transform:none}
 .hero-title{text-shadow:0 4px 34px rgba(0,0,0,.5)}
 .hero .btn.ghost{background:rgba(5,7,12,.45)}
 @media (prefers-reduced-motion: reduce){.hero-bg-img.on{animation:none}}
+
+/* — Cross-browser gradient-text hardening (2026-11-09) —
+   Every gold/white "foil" headline on the site is gradient text
+   (background-clip:text + transparent fill). Some browsers need the
+   -webkit text-fill spelled out, and any engine without background-clip
+   support would otherwise show INVISIBLE text — fall back to solid gold. */
+.gold-text,.stat-card strong,.player-card .num,.mcard-id,.lb-rank.gold,.ev-cap-num,.ev-cap-name .nm,.ev-cap-stats div strong{-webkit-text-fill-color:transparent}
+@supports not ((background-clip:text) or (-webkit-background-clip:text)){
+  .gold-text,.stat-card strong,.player-card .num,.mcard-id,.lb-rank.gold,.ev-cap-num,.ev-cap-name .nm,.ev-cap-stats div strong{background:none;color:var(--gold2);-webkit-text-fill-color:currentColor}
+}

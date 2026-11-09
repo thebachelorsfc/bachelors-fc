@@ -28,6 +28,15 @@ export const metadata: Metadata = {
   verification: { google: SITE.googleVerification },
   icons: { icon: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }, { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" }, { url: "/assets/logo.jpeg" }], apple: "/icons/icon-180.png" },
   appleWebApp: { capable: true, title: "Bachelors FC", statusBarStyle: "black-translucent" },
+  // Samsung Internet / Chrome forced-dark fix (2026-11-09): the site ships
+  // its own dark AND light themes, so tell the browser NOT to re-darken
+  // pages itself. Without this meta, Samsung Internet's "web page dark
+  // mode" re-processes the colours and wrecks every gold gradient —
+  // gradient text (stat numbers, captain name, hero line 2) turned dark
+  // brown and unreadable on the owner's phone. The CSS color-scheme in
+  // globals.css alone was not enough for Samsung; the meta is what it
+  // honours. Do not remove.
+  other: { "color-scheme": "dark light" },
 };
 
 export const viewport: Viewport = { themeColor: "#06060a" };
