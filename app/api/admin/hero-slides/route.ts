@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"; import { isAdmin } from "@/lib/auth"; import { supabaseWrite } from "@/lib/supabase/admin"; import { newId } from "@/lib/store";
 export const dynamic = "force-dynamic";
 const EXTS = ["jpg", "jpeg", "png", "webp"];
-const MAX = 5;
+const MAX = 15;
 type Slide = { url: string; path: string };
 async function readSlides(w: any): Promise<Slide[]> {
   const { data } = await w.storage.from("gallery").download("hero/slides.json");

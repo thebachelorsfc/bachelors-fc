@@ -680,6 +680,9 @@ html.js [data-reveal].is-visible{opacity:1;transform:none}
 .hero-dot{width:26px;height:26px;margin:0;border-radius:99px;border:0;padding:0;background:none;cursor:pointer;display:grid;place-items:center}
 .hero-dot::before{content:"";width:9px;height:9px;border-radius:99px;background:#f7f5ef59;transition:all .3s}
 .hero-dot.on::before{width:26px;background:var(--gold)}
+.hero-dots.many .hero-dot{width:17px;height:24px}
+.hero-dots.many .hero-dot::before{width:7px;height:7px}
+.hero-dots.many .hero-dot.on::before{width:15px}
 @keyframes heroZoom{from{transform:scale(1)}to{transform:scale(1.12)}}
 .hero-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,6,12,.66) 0%,rgba(4,6,12,.58) 34%,rgba(4,6,12,.8) 74%,var(--ink) 100%)}
 .hero-title{text-shadow:0 4px 34px rgba(0,0,0,.5)}
