@@ -83,6 +83,7 @@ export default async function Fixtures() {
                   <h3>{fxTitle(s)}</h3>
                   <p style={{ color: "var(--muted)" }}>{s.session_time ? `🕒 ${fmtTime(s.session_time)}` : ""}{s.ground ? `${s.session_time ? " · " : ""}📍 ${s.ground}` : ""}</p>
                   {motm && <p style={{ color: "var(--gold-text)", fontWeight: 600 }}>🏆 Man of the Match: {motm.name}</p>}
+                  <p style={{ marginTop: 12 }}><Link className="btn ghost" style={{ padding: "9px 16px", fontSize: 13 }} href={`/match/${s.id}`}>Match Report →</Link></p>
                 </div>
               );
             })}

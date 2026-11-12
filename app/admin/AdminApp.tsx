@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 const PosterGenerator = dynamic(() => import("@/components/PosterGenerator"), { ssr: false });
 const TeamSheetGenerator = dynamic(() => import("@/components/TeamSheetGenerator"), { ssr: false });
 const MatchStatsPanel = dynamic(() => import("@/components/MatchStatsPanel"), { ssr: false });
+const MatchReportPanel = dynamic(() => import("@/components/MatchReportPanel"), { ssr: false });
 const input: React.CSSProperties = { width:"100%", padding:"10px 12px", borderRadius:10, border:"1px solid var(--field-br)", background:"var(--field-bg)", color:"var(--field-tx)" };
 // Hero upload speed-up (2026-11-01): phone photos are 3-8 MB - shrink them in
 // the browser to at most 1920px JPEG before uploading, so an upload is a few
@@ -277,6 +278,10 @@ export default function AdminApp(){
       <p style={{color:"var(--muted)",fontSize:13.5,margin:"0 0 6px"}}>After a match, open the session and enter who played plus their goals, assists and cards (GKs get saves too) — the season totals on the player cards and the leaderboard then update by themselves. Editing the same session later corrects the totals automatically, and totals you entered by hand before are never wiped. Needs migration 014.</p>
       {rsvpList.map((s:any)=><MatchStatsPanel key={s.id} session={s} notify={setMsg} onSaved={()=>load()} />)}
     </div>}
+    {tab==="sessions" && (()=>{ const past=(rsvpList as any[]).filter((s:any)=>{ if(!s.session_date) return false; const ms=new Date(`${s.session_date}T${String(s.session_time||"12:00").slice(0,5)}:00+06:00`).getTime(); return !isNaN(ms) && ms<=Date.now(); }).sort((a:any,b:any)=>String(b.session_date).localeCompare(String(a.session_date))); if(past.length===0) return null; return <div className="card" style={{marginTop:14}}><h3>📝 Match Reports</h3>
+      <p style={{color:"var(--muted)",fontSize:13.5,margin:"0 0 6px"}}>Write the story of a played match — it appears on that match&apos;s public Report page (Fixtures → Played → Match Report). Keep scorelines out, always — that is the club&apos;s respect rule. The page already shows the facts by itself: MOTM, who played and their numbers from the Stats Tracker.</p>
+      {past.map((s:any)=><MatchReportPanel key={s.id} session={s} notify={setMsg} />)}
+    </div>; })()}
     {posterFor && <PosterGenerator session={posterFor} grounds={grs} inCount={(posterFor.list||[]).filter((r:any)=>r.status==="in").length} onClose={()=>setPosterFor(null)} />}
     {sheetFor && <TeamSheetGenerator session={sheetFor} players={players} onClose={()=>setSheetFor(null)} />}
     {tab==="people" && <div>
