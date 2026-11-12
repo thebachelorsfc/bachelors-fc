@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { getProducts } from "@/lib/data";
-import { KIT } from "@/lib/site";
+import { KIT, PAYMENTS } from "@/lib/site";
 import ProductCard from "./ProductCard";
 import CardCarousel from "@/components/CardCarousel";
 export const dynamic = "force-dynamic";
@@ -34,6 +34,19 @@ export default async function StorePage() {
                 <li>Base: {KIT.base}</li><li>Trim: {KIT.trim}</li><li>Crest: {KIT.crest}</li>
               </ul>
             </div>
+            {anyPriced && (
+              <div className="card" style={{ marginTop: 18 }}>
+                <p className="eyebrow">Ordering &amp; delivery</p>
+                <h3 style={{ margin: "4px 0 10px" }}>How it works</h3>
+                <ol style={{ color: "var(--muted)", margin: 0, paddingLeft: 20, lineHeight: 1.9 }}>
+                  <li><strong style={{ color: "var(--paper)" }}>Place your order here</strong> — pick your size and give your name, mobile number and delivery address.</li>
+                  <li><strong style={{ color: "var(--paper)" }}>Pay by bKash</strong> — Send Money {typeof first?.price_bdt === "number" ? <><strong style={{ color: "var(--paper)" }}>৳{first.price_bdt}</strong> </> : null}to <strong style={{ color: "var(--gold-text)" }}>{PAYMENTS.bkash}</strong> and keep the Transaction ID (TrxID) — you will type it into the order form.</li>
+                  <li><strong style={{ color: "var(--paper)" }}>The club confirms</strong> — we check your TrxID, then call or WhatsApp you to confirm the order.</li>
+                  <li><strong style={{ color: "var(--paper)" }}>Delivery</strong> — arranged personally by the club around Khulshi, Chittagong. Any delivery charge and the delivery time are confirmed with you on that call, before handover — no surprises.</li>
+                </ol>
+                <p style={{ color: "var(--muted)", margin: "10px 0 0", fontSize: 14 }}>Questions about an order? Message the club on WhatsApp or Messenger — the buttons on the jersey card above reach us directly.</p>
+              </div>
+            )}
             <figure style={{ margin: "20px 0 0", position: "relative", borderRadius: 22, overflow: "hidden", border: "1px solid #c9a22733", boxShadow: "0 26px 60px #00000059, inset 0 0 0 1px #ffffff0d", lineHeight: 0 }}>
               <Image src="/assets/kit-worn.jpg" alt="The Bachelors FC 2026 home kit worn on the pitch" width={1200} height={1200} sizes="(max-width:900px) 100vw, 900px" style={{ width: "100%", height: "auto" }} />
               <span aria-hidden="true" style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,#06060a30 0%,transparent 26%,transparent 78%,#06060a38 100%)", pointerEvents: "none" }} />
