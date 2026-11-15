@@ -117,7 +117,7 @@ export default async function Home(){
         {captain && (<div className="ev-cap">
           <div className="ev-cap-photo">
             {captain.photo_url ? <Image src={captain.photo_url} alt={captain.name} fill sizes="(max-width:560px) 88vw, 340px" style={{objectFit:"cover",objectPosition:"top"}}/> : <span className="ev-cap-fb">#{captain.jersey_no}</span>}
-            <Image className="ev-cap-crest" src="/assets/logo-transparent.png" alt="" width={88} height={104}/>
+            <Image className="ev-cap-crest" src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={88} height={104}/>
             <span className="ev-cap-num">#{captain.jersey_no}</span>
           </div>
           <div className="ev-cap-body">

@@ -31,7 +31,7 @@ export default function HeroSlides({ slides }: { slides: { url: string }[] }) {
   }, [slides.length]);
   return (<>
     <div className="hero-bg" aria-hidden="true">
-      {slides.map((s, k) => (k <= upto || k === i) ? (<Image key={s.url} className={"hero-bg-img" + (k === i ? " on" : "")} src={s.url} alt="" fill priority={k === 0} sizes="100vw" style={{ objectFit: "cover", objectPosition: "center 30%" }} />) : null)}
+      {slides.map((s, k) => (k <= upto || k === i) ? (<Image key={s.url} className={"hero-bg-img" + (k === i ? " on" : "")} src={s.url} alt={"The Bachelors FC team photo " + (k + 1)} fill priority={k === 0} sizes="100vw" style={{ objectFit: "cover", objectPosition: "center 30%" }} />) : null)}
     </div>
     <div className="hero-shade" aria-hidden="true"></div>
     {slides.length > 1 && (<div className={"hero-dots" + (slides.length > 8 ? " many" : "")}>{slides.map((s, k) => (<button key={s.url} type="button" aria-label={`Show photo ${k + 1}`} className={"hero-dot" + (k === i ? " on" : "")} onClick={() => setI(k)} />))}</div>)}

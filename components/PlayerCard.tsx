@@ -31,7 +31,7 @@ export default function PlayerCard({ p }: { p: Player }) {
         </div>
         <div className="card player-card flip-face flip-back" onClick={() => setFlip(false)} role="button" tabIndex={0} aria-label={`Flip ${p.name}'s card back`} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFlip(false); } }}>
           <span className="pb-ghost" aria-hidden="true">#{p.jersey_no}</span>
-          <Image className="pb-wm" src="/assets/logo-transparent.png" alt="" width={240} height={284} style={{ objectFit: "contain" }} aria-hidden="true" />
+          <Image className="pb-wm" src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={240} height={284} style={{ objectFit: "contain" }} aria-hidden="true" />
           <div className="pb-top"><span className="pb-chip">{p.position_code} · #{p.jersey_no}</span><span className="pb-season">Season 2026</span></div>
           <h3 className="pb-name"><span className="name-row">{p.name}{p.is_captain ? <CapBadge /> : null}</span></h3>
           <p className="pb-pos">{p.position}{p.preferred_foot ? ` · ${p.preferred_foot} foot` : ""}</p>

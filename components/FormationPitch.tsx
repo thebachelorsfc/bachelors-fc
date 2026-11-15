@@ -26,7 +26,7 @@ export default function FormationPitch({ players }: { players: any[] }) {
       {ROWS.map(r => groups[r.key].map((p: any, i: number, arr: any[]) => (
         <span key={p.id || p.jersey_no} className="pitch-p" style={{ top: r.top, left: `${((i + 1) * 100) / (arr.length + 1)}%` }}>
           {p.photo_url
-            ? <Image src={p.photo_url} alt="" width={72} height={72} loading="lazy" />
+            ? <Image src={p.photo_url} alt={p.name} width={72} height={72} loading="lazy" />
             : <span className="pitch-fb">#{p.jersey_no}</span>}
           <span className="pitch-name">{String(p.name).split(" ")[0]} <b>#{p.jersey_no}</b>{p.is_captain ? <CapBadge /> : null}</span>
         </span>
