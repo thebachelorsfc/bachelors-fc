@@ -167,6 +167,11 @@ export default async function Home(){
       <p style={{marginTop:16}}><Link className="btn ghost" href="/squad">Full squad →</Link></p>
     </section>
 
+    <section className="wrap" id="yourxi"><p className="eyebrow">Fan Zone</p><h2>Build Your XI</h2>
+      <p className="copy" style={{maxWidth:640}}>Think you can pick a better team? Choose a formation, build your eleven from the real squad, and download your XI card to share with the group chat.</p>
+      <p style={{marginTop:16}}><Link className="btn" href="/your-xi">Pick Your Team →</Link></p>
+    </section>
+
     <section className="wrap" id="leaderboard"><p className="eyebrow">Top Performers</p><h2>Leaderboard</h2>
       <Leaderboard/>
     </section>
