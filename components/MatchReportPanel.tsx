@@ -2,8 +2,8 @@
 import { useState } from "react";
 
 /* Match report editor (2026-11-12): write the story of a played session;
-   it appears on the public /match/<session-id> page linked from
-   /fixtures. Saved as plain text in the gallery bucket (reports.json) via
+   it appears on the public /match/<session-id> page (the /fixtures
+   page that linked them was removed 2026-11-17). Saved as plain text in the gallery bucket (reports.json) via
    /api/admin/report — no scorelines, ever (respect-for-opponents rule);
    a blank line starts a new paragraph. Clearing the text removes the
    written story (the page keeps its facts: MOTM, who played, stats). */

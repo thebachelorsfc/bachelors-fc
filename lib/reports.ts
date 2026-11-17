@@ -1,5 +1,6 @@
 // Match reports (2026-11-12): the written story of a played session, shown
-// on /match/<session-id> and linked from /fixtures. The owner writes them
+// on /match/<session-id> (the /fixtures page that linked them was removed
+// 2026-11-17; report pages are reached by their direct URL). The owner writes them
 // in Admin → Sessions → Match Reports. Like the ticker and the hero list,
 // the reports live in one small public JSON in the gallery bucket
 // (reports.json) — no table, no migration. Reports never carry a

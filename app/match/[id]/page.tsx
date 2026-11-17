@@ -81,7 +81,7 @@ export default async function MatchReportPage({ params }: { params: { id: string
   return (
     <main className="wrap">
       <section>
-        <p style={{ margin: "0 0 14px" }}><Link className="btn ghost" style={{ padding: "8px 14px", fontSize: 13 }} href="/fixtures">← Fixtures &amp; Results</Link></p>
+        <p style={{ margin: "0 0 14px" }}><Link className="btn ghost" style={{ padding: "8px 14px", fontSize: 13 }} href="/#fixtures">← Fixtures &amp; Results</Link></p>
         <p className="eyebrow">Match Report</p>
         <h1>{fxTitle(s)}</h1>
         <p style={{ color: "var(--muted)", fontSize: 17, marginTop: 6 }}>

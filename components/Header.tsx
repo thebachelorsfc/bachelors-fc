@@ -30,7 +30,7 @@ const I = {
 };
 const NAV: [string, string, keyof typeof I][] = [
   ["Home","/","home"],["Mission","/about","target"],["Kit","/#kit","shirt"],["Tour","/#tour","pin"],
-  ["Gallery","/gallery","image"],["Squad","/squad","users"],["Build Your XI","/your-xi","pitch"],["Leaderboard","/#leaderboard","trophy"],["Events","/#events","calendar"],["Fixtures","/fixtures","list"],["People","/people","award"],["Store","/store","bag"],["History","/history","clock"],
+  ["Gallery","/gallery","image"],["Squad","/squad","users"],["Build Your XI","/your-xi","pitch"],["Leaderboard","/#leaderboard","trophy"],["Fixtures & Results","/#fixtures","calendar"],["People","/people","award"],["Store","/store","bag"],["History","/history","clock"],
   ["Grounds","/grounds","flag"],["Rules & Privacy","/rules","list"],["Login","/login","user"],
 ];
 

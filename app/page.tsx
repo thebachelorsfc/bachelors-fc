@@ -60,11 +60,34 @@ export default async function Home(){
   const fmtEvFull = (d:any) => new Date(String(d) + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
   const upcomingEvents:any[] = allSessions.filter((x:any)=>x.session_date && sessMs(x) > Date.now()).sort((a:any,b:any)=>sessMs(a)-sessMs(b)).slice(0,4);
   // Events slimmed (owner, 2026-10-30): only the NEXT session shows here plus
-  // the captain and a Fixtures link card — the full list lives on /fixtures.
+  // the captain. RENAMED + page removed (owner, 2026-11-17): this section is
+  // now "Fixtures & Results" (id="fixtures"); the standalone /fixtures page
+  // was deleted and 308-redirects here (next.config.mjs).
   const evTitle = (s:any) => s.opponent ? `The Bachelors FC vs ${s.opponent}` : (s.title || "Club Session");
+  // SportsEvent structured data — moved here from the removed /fixtures page
+  // (2026-11-17) so search/AI still read upcoming fixtures accurately.
+  // Generated from the same live sessions as the cards; renders only when
+  // at least one upcoming session exists.
+  const TEAM_LD = { "@type": "SportsTeam", name: "The Bachelors FC", url: "https://bachelors-fc.vercel.app" };
+  const eventsLd = upcomingEvents.map((s:any) => {
+    const ev:any = {
+      "@type": "SportsEvent",
+      name: evTitle(s),
+      startDate: `${s.session_date}T${String(s.session_time || "12:00").slice(0, 5)}:00+06:00`,
+      eventStatus: "https://schema.org/EventScheduled",
+      sport: /cricket/i.test(String(s.title || "")) ? "Cricket" : "Soccer",
+      url: "https://bachelors-fc.vercel.app/#fixtures",
+      organizer: TEAM_LD,
+      homeTeam: TEAM_LD,
+    };
+    if (s.opponent) ev.awayTeam = { "@type": "SportsTeam", name: s.opponent };
+    if (s.ground) ev.location = { "@type": "Place", name: s.ground, address: { "@type": "PostalAddress", addressLocality: "Chittagong", addressCountry: "BD" } };
+    return ev;
+  });
   // Photo band (Phase-2 polish): a real club photo, full-bleed, before the Squad.
   const order:Record<string,number>={FWD:0,MID:1,DEF:2,GK:3}; const sortedPlayers=[...players].sort((a:any,b:any)=>((order[a.position_code]??9)-(order[b.position_code]??9))||(a.jersey_no-b.jersey_no));
   return(<main>
+    {eventsLd.length > 0 && (<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@graph": eventsLd }) }} />)}
     <section className={nextMatch?.session_date === todayStr ? "hero hero-matchday" : "hero"} style={{textAlign:"center"}}>
       <HeroSlides slides={heroSlides} />
       <div className="wrap" style={{position:"relative",zIndex:1}}>
@@ -111,8 +134,8 @@ export default async function Home(){
       <CardCarousel slide="min(320px,84%)">{TOUR.map(t=><div className="card" key={t.stop}><div className="eyebrow">Stop {t.stop}</div><h3>{t.name}</h3><p style={{color:"var(--muted)"}}>{t.note}</p></div>)}</CardCarousel>
     </section>
 
-    <section className="wrap" id="events"><p className="eyebrow">Mark the date</p><h2>Events</h2>
-      <p className="copy" style={{maxWidth:680}}>Matchdays, friendlies and brotherhood days — what is coming up next for the club{captain ? ", led on the pitch by our captain" : ""}. The full record lives in Fixtures &amp; Results.</p>
+    <section className="wrap" id="fixtures"><p className="eyebrow">Match Centre</p><h2>Fixtures &amp; Results</h2>
+      <p className="copy" style={{maxWidth:680}}>Matchdays, friendlies and brotherhood days — what is coming up next for the club{captain ? ", led on the pitch by our captain" : ""}.</p>
       <CardCarousel slide="min(340px,88%)">
         {captain && (<div className="ev-cap">
           <div className="ev-cap-photo">
@@ -143,12 +166,6 @@ export default async function Home(){
           <h3>Next event — to be announced</h3>
           <p style={{color:"var(--muted)",marginBottom:0}}>The next matchday is being lined up. The date lands here the moment it is set — players hear it first, then the brotherhood gathers.</p>
         </div>)}
-        <div className="card">
-          <div className="ev-top"><span className="ev-tag">Match Centre</span></div>
-          <h3>All Fixtures &amp; Results</h3>
-          <p style={{color:"var(--muted)"}}>Every upcoming fixture and every battle already played — the club&apos;s full match record in one place.</p>
-          <p style={{marginBottom:0}}><Link className="btn" href="/fixtures">See all fixtures →</Link></p>
-        </div>
       </CardCarousel>
     </section>
 
