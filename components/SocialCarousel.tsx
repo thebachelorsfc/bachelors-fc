@@ -45,6 +45,8 @@ export default function SocialCarousel({ posts }: { posts: SocialPostLike[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const bodyRefs = useRef<{ [id: string]: HTMLDivElement | null }>({});
   const startRef = useRef<{ [id: string]: number }>({});
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [near, setNear] = useState(false);
   const [idx, setIdx] = useState(0);
   const [states, setStates] = useState<{ [id: string]: CardState }>({});
   const [attempts, setAttempts] = useState<{ [id: string]: number }>({});
@@ -56,7 +58,22 @@ export default function SocialCarousel({ posts }: { posts: SocialPostLike[] }) {
   // counts as loaded only when the SDK actually inserts its iframe. If that
   // never happens (slow network, FB refusing this device/IP), the card keeps
   // a designed fallback instead of Facebook's raw "refused to connect" page.
+  // Perf (2026-11-17): the FB SDK (~80 KB) plus every embed's images
+  // (~600 KB) used to load with the homepage even though this section sits
+  // far below the fold. Now nothing Facebook-related is fetched until the
+  // section comes within ~800px of the viewport; the designed fallback
+  // cards hold the space until then.
   useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || near) return;
+    if (typeof IntersectionObserver === "undefined") { setNear(true); return; }
+    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { setNear(true); io.disconnect(); } }, { rootMargin: "800px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [near]);
+
+  useEffect(() => {
+    if (!near) return;
     let alive = true;
     posts.forEach((p) => { if (!startRef.current[p.id]) startRef.current[p.id] = Date.now(); });
     loadFbSdk().then((ok) => {
@@ -84,9 +101,10 @@ export default function SocialCarousel({ posts }: { posts: SocialPostLike[] }) {
     }, 1200);
     return () => { alive = false; clearInterval(timer); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [posts]);
+  }, [posts, near]);
 
   const retry = (p: SocialPostLike) => {
+    setNear(true);
     startRef.current[p.id] = Date.now();
     setStates((s) => ({ ...s, [p.id]: "loading" }));
     setAttempts((a) => ({ ...a, [p.id]: (a[p.id] || 0) + 1 }));
@@ -98,7 +116,7 @@ export default function SocialCarousel({ posts }: { posts: SocialPostLike[] }) {
   };
 
   return (
-    <div className="soc-wrap">
+    <div className="soc-wrap" ref={wrapRef}>
       <div className="soc-track" ref={trackRef} onScroll={onScroll}>
         {posts.map((p) => {
           const st: CardState = states[p.id] || "loading";

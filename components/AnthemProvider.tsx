@@ -23,19 +23,12 @@ export default function AnthemProvider({ src, children }: { src: string; childre
   const [started, setStarted] = useState(false);
   const [cur, setCur] = useState(0);
   const [dur, setDur] = useState(0);
-  // Perf (2026-11-02): the anthem file (~3.6 MB) used to download with the
-  // page even under preload="metadata". Now its src is only assigned once
-  // the page has settled (load + a breath) or the moment play is pressed -
-  // nothing about the player looks or behaves differently.
+  // Perf (2026-11-17, owner-approved after PageSpeed showed the 3.6 MB
+  // anthem inside the initial load): the src is assigned ONLY when play is
+  // pressed — toggle() below arms + wants play. The file never downloads
+  // for a visitor who does not press play.
   const [armed, setArmed] = useState(false);
   const wantPlayRef = useRef(false);
-  useEffect(() => {
-    if (armed) return;
-    let timer: any = null;
-    const arm = () => { timer = setTimeout(() => setArmed(true), 2200); };
-    if (document.readyState === "complete") arm(); else window.addEventListener("load", arm);
-    return () => { if (timer) clearTimeout(timer); window.removeEventListener("load", arm); };
-  }, [armed]);
   useEffect(() => {
     const a = audioRef.current; if (!a || !armed || !src) return;
     const want = new URL(src, window.location.href).href;
