@@ -1,5 +1,5 @@
 import type { Metadata } from "next"; import { getPeople } from "@/lib/data"; import CardCarousel from "@/components/CardCarousel"; import PersonCard from "@/components/PersonCard";
-export const metadata: Metadata = { title: "People | The Bachelors FC", alternates: { canonical: "/people" } };
+export const metadata: Metadata = { title: "People | The Bachelors FC", description: "The people behind The Bachelors FC — the founder, leadership and members who run the bachelor football club in Khulshi, Chittagong.", alternates: { canonical: "/people" } };
 export const dynamic = "force-dynamic";
 export default async function People() {
   const people: any[] = await getPeople();

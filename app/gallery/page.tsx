@@ -1,7 +1,7 @@
 import { getGalleryItems } from "@/lib/data";
 import GalleryClient from "./GalleryClient";
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Gallery | The Bachelors FC" };
+export const metadata = { title: "Gallery | The Bachelors FC", description: "Photos of The Bachelors FC — match days, tours and brotherhood moments from the football club in Khulshi, Chittagong." };
 export default async function GalleryPage() {
   const items: any[] = await getGalleryItems();
   return (

@@ -1,5 +1,5 @@
 import type { Metadata } from "next"; import { getGrounds, getAllSessions } from "@/lib/data"; import GroundsCarousel from "@/components/GroundsCarousel"; import { buildGroundSlides } from "@/lib/groundSlides";
-export const metadata: Metadata = { title: "Grounds | The Bachelors FC", alternates: { canonical: "/grounds" } };
+export const metadata: Metadata = { title: "Grounds | The Bachelors FC", description: "The grounds where The Bachelors FC plays in Chittagong — Stadium X, Diesel Colony Play Ground, Jhautala Playground and Shahid Sahjahan Field.", alternates: { canonical: "/grounds" } };
 export const dynamic = "force-dynamic";
 
 export default async function Grounds() {

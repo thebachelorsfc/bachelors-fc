@@ -1,5 +1,5 @@
 import type { Metadata } from "next"; import { SITE } from "@/lib/site"; import CardCarousel from "@/components/CardCarousel";
-export const metadata: Metadata = { title: "Contact | The Bachelors FC", alternates:{canonical:"/contact"} };
+export const metadata: Metadata = { title: "Contact | The Bachelors FC", description: "Contact The Bachelors FC — email thebachelorsfc@gmail.com for friendly matches and club enquiries. Football club in Khulshi, Chittagong.", alternates:{canonical:"/contact"} };
 // Brand glyphs (same set as the footer strip) — each contact card carries
 // its medium's icon in a gold chip above the name (owner, 2026-10-28).
 const MailIcon = () => (<svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4.2-8 5-8-5V6.4l8 5 8-5v1.8Z"/></svg>);

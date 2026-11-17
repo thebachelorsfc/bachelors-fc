@@ -1,5 +1,5 @@
 import type { Metadata } from "next"; import type { ReactNode } from "react"; import CardCarousel from "@/components/CardCarousel";
-export const metadata: Metadata = { title: "Rules & Privacy | The Bachelors FC", alternates: { canonical: "/rules" } };
+export const metadata: Metadata = { title: "Rules & Privacy | The Bachelors FC", description: "The Bachelors FC club rules and privacy policy — membership, attendance and discipline, and how the Khulshi, Chittagong club handles your information.", alternates: { canonical: "/rules" } };
 // Official club rules & policy — owner's own text, supplied 2026-10-26. Keep verbatim.
 // NOTE: section 3 has one line still to come from the owner — the fee amount + payment method.
 const SECTIONS: { no: string; title: string; points: string[] }[] = [

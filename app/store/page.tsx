@@ -4,7 +4,7 @@ import { KIT } from "@/lib/site";
 import ProductCard from "./ProductCard";
 import CardCarousel from "@/components/CardCarousel";
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Store | The Bachelors FC" };
+export const metadata = { title: "Store | The Bachelors FC", description: "Buy the official Bachelors FC home jersey for ৳500 — order online from the club store and pay by bKash. Khulshi, Chittagong." };
 export default async function StorePage() {
   const products: any[] = (await getProducts()).filter((p: any) => p.is_available !== false);
   const [first, ...rest] = products;
