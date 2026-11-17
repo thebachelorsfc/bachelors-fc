@@ -37,8 +37,31 @@ export default async function Fixtures() {
   const pmap = new Map((players as any[]).map(p => [p.id, p]));
   const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Dhaka" });
 
+  // SportsEvent structured data for upcoming fixtures — generated from the
+  // same live session data as the cards above, so it updates itself whenever
+  // a session is added in Admin. Helps search/AI read fixtures accurately.
+  const TEAM = { "@type": "SportsTeam", name: "The Bachelors FC", url: "https://bachelors-fc.vercel.app" };
+  const eventsLd = upcoming.map(s => {
+    const ev: any = {
+      "@type": "SportsEvent",
+      name: fxTitle(s),
+      startDate: `${s.session_date}T${String(s.session_time || "12:00").slice(0, 5)}:00+06:00`,
+      eventStatus: "https://schema.org/EventScheduled",
+      sport: /cricket/i.test(String(s.title || "")) ? "Cricket" : "Soccer",
+      url: "https://bachelors-fc.vercel.app/fixtures",
+      organizer: TEAM,
+      homeTeam: TEAM,
+    };
+    if (s.opponent) ev.awayTeam = { "@type": "SportsTeam", name: s.opponent };
+    if (s.ground) ev.location = { "@type": "Place", name: s.ground, address: { "@type": "PostalAddress", addressLocality: "Chittagong", addressCountry: "BD" } };
+    return ev;
+  });
+
   return (
     <main className="wrap">
+      {eventsLd.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@graph": eventsLd }) }} />
+      )}
       <section>
         <p className="eyebrow">Match Centre</p>
         <h1>Fixtures &amp; Results</h1>
