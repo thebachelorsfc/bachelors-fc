@@ -11,12 +11,12 @@ export default function PersonCard({ p }: { p: any }) {
       {p.quote && <blockquote className="person-quote">&ldquo;{String(p.quote).trim().replace(/^["“”]+|["“”]+$/g, "")}&rdquo;</blockquote>}
       {p.speech && <p className="person-speech">{p.speech}</p>}
       {(p.facebook_url || p.instagram_url || p.linkedin_url || wa || p.email || tg) && (<div className="person-socials">
-        {p.facebook_url && <a className="person-soc" href={p.facebook_url} target="_blank" rel="noreferrer" title={`${p.name} on Facebook`} aria-label={`${p.name} on Facebook`}>f</a>}
-        {p.instagram_url && <a className="person-soc" href={p.instagram_url} target="_blank" rel="noreferrer" title={`${p.name} on Instagram`} aria-label={`${p.name} on Instagram`}><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5" /><circle cx="12" cy="12" r="3.8" /><circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none" /></svg></a>}
-        {p.linkedin_url && <a className="person-soc" href={p.linkedin_url} target="_blank" rel="noreferrer" title={`${p.name} on LinkedIn`} aria-label={`${p.name} on LinkedIn`} style={{ fontSize: 14 }}>in</a>}
-        {wa && <a className="person-soc" href={wa} target="_blank" rel="noreferrer" title={`Chat with ${p.name} on WhatsApp`} aria-label={`WhatsApp ${p.name}`}><svg viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 0 1-12.4 7.5L3.5 20.5l1-4.4A8.5 8.5 0 1 1 20.5 12Z" /></svg></a>}
         {p.email && <a className="person-soc" href={`mailto:${p.email}`} title={`Email ${p.name}`} aria-label={`Email ${p.name}`}><svg viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2" /><path d="m4 7.5 8 6 8-6" /></svg></a>}
+        {p.linkedin_url && <a className="person-soc" href={p.linkedin_url} target="_blank" rel="noreferrer" title={`${p.name} on LinkedIn`} aria-label={`${p.name} on LinkedIn`} style={{ fontSize: 14 }}>in</a>}
+        {p.facebook_url && <a className="person-soc" href={p.facebook_url} target="_blank" rel="noreferrer" title={`${p.name} on Facebook`} aria-label={`${p.name} on Facebook`}>f</a>}
+        {wa && <a className="person-soc" href={wa} target="_blank" rel="noreferrer" title={`Chat with ${p.name} on WhatsApp`} aria-label={`WhatsApp ${p.name}`}><svg viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 0 1-12.4 7.5L3.5 20.5l1-4.4A8.5 8.5 0 1 1 20.5 12Z" /></svg></a>}
         {tg && <a className="person-soc" href={tg} target="_blank" rel="noreferrer" title={`${p.name} on Telegram`} aria-label={`${p.name} on Telegram`}><svg viewBox="0 0 24 24"><path d="M22 2 11 13" /><path d="M22 2 15 22l-4-9-9-4Z" /></svg></a>}
+        {p.instagram_url && <a className="person-soc" href={p.instagram_url} target="_blank" rel="noreferrer" title={`${p.name} on Instagram`} aria-label={`${p.name} on Instagram`}><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5" /><circle cx="12" cy="12" r="3.8" /><circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none" /></svg></a>}
       </div>)}
     </div>
   </article>);
