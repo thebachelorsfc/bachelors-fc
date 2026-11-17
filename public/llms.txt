@@ -1,0 +1,29 @@
+# The Bachelors FC
+
+> The Bachelors FC is an apolitical, non-profit football club in Khulshi, Chittagong, Bangladesh, for bachelor youth. Founded in 2026. Motto: "Forged in Brotherhood, Driven by Purpose" — also "United, Not Alone". The club has no sponsors and no stadium; it is run entirely by its members.
+
+## Key facts
+
+- Location: Khulshi, Chittagong, Bangladesh
+- Founded: 2026
+- Founder: Saidul Mostafa Chowdhury
+- Members: 16 total, 12 active squad players
+- Grounds: Stadium X, Diesel Colony Play Ground, Jhautala Playground, Shahid Sahjahan Field
+- Ethos: match outcomes are celebrated without publishing scorelines, out of respect for opponents
+
+## Key pages
+
+- Home: https://bachelors-fc.vercel.app/
+- About the club: https://bachelors-fc.vercel.app/about
+- Squad: https://bachelors-fc.vercel.app/squad
+- Fixtures and results: https://bachelors-fc.vercel.app/fixtures
+- Join the club: https://bachelors-fc.vercel.app/join
+- Club store (home jersey, ৳500): https://bachelors-fc.vercel.app/store
+- Rules and privacy: https://bachelors-fc.vercel.app/rules
+- Contact: https://bachelors-fc.vercel.app/contact
+
+## Contact
+
+- Email (official club-to-club channel): thebachelorsfc@gmail.com
+- Facebook: https://www.facebook.com/TheBachelorsFC
+- Messenger: https://m.me/TheBachelorsFC
