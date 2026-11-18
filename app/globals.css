@@ -312,8 +312,8 @@ footer a:hover{color:var(--gold-text)}
 .person-body h3{font-size:27px;margin:2px 0 6px}
 .person-quote{margin:12px 0 0;padding:2px 0 2px 14px;border-left:3px solid var(--gold);font-family:var(--font-display);font-style:italic;font-size:20px;line-height:1.35;letter-spacing:.01em;color:var(--paper)}
 .person-speech{color:var(--muted);white-space:pre-wrap;margin:12px 0 0}
-.person-socials{display:flex;gap:9px;margin-top:18px;flex-wrap:wrap}
-.person-soc{width:42px;height:42px;border-radius:50%;border:1px solid var(--line-gold);display:grid;place-items:center;color:var(--gold-text);text-decoration:none;font-weight:800;font-size:17px;background:#c9a2270d;transition:all .2s ease}
+.person-socials{display:flex;gap:9px;margin-top:18px;flex-wrap:nowrap}
+.person-soc{width:42px;aspect-ratio:1/1;flex:0 1 42px;border-radius:50%;border:1px solid var(--line-gold);display:grid;place-items:center;color:var(--gold-text);text-decoration:none;font-weight:800;font-size:17px;background:#c9a2270d;transition:all .2s ease}
 .person-soc:hover{background:var(--gold);color:#141414;transform:translateY(-2px)}
 .person-soc svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
