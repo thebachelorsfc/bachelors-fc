@@ -70,15 +70,27 @@ export default async function Home(){
   // at least one upcoming session exists.
   const TEAM_LD = { "@type": "SportsTeam", name: "The Bachelors FC", url: "https://bachelors-fc.vercel.app" };
   const eventsLd = upcomingEvents.map((s:any) => {
+    const sportName = /cricket/i.test(String(s.title || "")) ? "Cricket" : "Soccer";
+    const startMs = new Date(`${s.session_date}T${String(s.session_time || "12:00").slice(0, 5)}:00+06:00`).getTime();
+    // endDate = kick-off + 2h, re-expressed in fixed +06:00 (Dhaka) terms
+    const endDhaka = new Date(startMs + 2 * 3600 * 1000 + 6 * 3600 * 1000);
+    const p2 = (n:number) => String(n).padStart(2, "0");
+    const endDate = `${endDhaka.getUTCFullYear()}-${p2(endDhaka.getUTCMonth() + 1)}-${p2(endDhaka.getUTCDate())}T${p2(endDhaka.getUTCHours())}:${p2(endDhaka.getUTCMinutes())}:00+06:00`;
     const ev:any = {
       "@type": "SportsEvent",
       name: evTitle(s),
       startDate: `${s.session_date}T${String(s.session_time || "12:00").slice(0, 5)}:00+06:00`,
+      endDate,
+      description: s.opponent
+        ? `Friendly ${sportName === "Soccer" ? "football" : "cricket"} match: The Bachelors FC vs ${s.opponent}${s.ground ? ` at ${s.ground}` : ""}, Khulshi, Chittagong.`
+        : `The Bachelors FC club ${sportName === "Soccer" ? "football" : "cricket"} session${s.ground ? ` at ${s.ground}` : ""}, Khulshi, Chittagong.`,
+      image: "https://bachelors-fc.vercel.app/assets/team-photo-band.jpg",
       eventStatus: "https://schema.org/EventScheduled",
-      sport: /cricket/i.test(String(s.title || "")) ? "Cricket" : "Soccer",
+      sport: sportName,
       url: "https://bachelors-fc.vercel.app/#fixtures",
       organizer: TEAM_LD,
       homeTeam: TEAM_LD,
+      performer: s.opponent ? [TEAM_LD, { "@type": "SportsTeam", name: s.opponent }] : [TEAM_LD],
     };
     if (s.opponent) ev.awayTeam = { "@type": "SportsTeam", name: s.opponent };
     if (s.ground) ev.location = { "@type": "Place", name: s.ground, address: { "@type": "PostalAddress", addressLocality: "Chittagong", addressCountry: "BD" } };
