@@ -3,6 +3,7 @@ const waLink = (n?: string | null) => { if (!n) return null; let d = String(n).r
 export default function PersonCard({ p }: { p: any }) {
   const wa = waLink(p.whatsapp);
   const tg = p.telegram_url ? (String(p.telegram_url).startsWith("http") ? String(p.telegram_url) : `https://t.me/${String(p.telegram_url).replace(/^@/, "")}`) : null;
+  const web = p.website_url ? (String(p.website_url).startsWith("http") ? String(p.website_url) : `https://${String(p.website_url)}`) : null;
   return (<article className="card person-card">
     {p.photo_url ? (<div className="person-photo"><Image className="person-img" src={p.photo_url} alt={p.name} width={800} height={600} sizes="(max-width:560px) 94vw, 560px" loading="lazy" /></div>) : (<div className="person-photo person-noimg"><Image src="/assets/logo-transparent.png" alt="The Bachelors FC crest" width={84} height={99} style={{ objectFit: "contain", opacity: 0.9 }} /></div>)}
     <div className="person-body">
@@ -10,8 +11,9 @@ export default function PersonCard({ p }: { p: any }) {
       <h3>{p.name}</h3>
       {p.quote && <blockquote className="person-quote">&ldquo;{String(p.quote).trim().replace(/^["“”]+|["“”]+$/g, "")}&rdquo;</blockquote>}
       {p.speech && <p className="person-speech">{p.speech}</p>}
-      {(p.facebook_url || p.instagram_url || p.linkedin_url || wa || p.email || tg) && (<div className="person-socials">
+      {(p.facebook_url || p.instagram_url || p.linkedin_url || wa || p.email || tg || web) && (<div className="person-socials">
         {p.email && <a className="person-soc" href={`mailto:${p.email}`} title={`Email ${p.name}`} aria-label={`Email ${p.name}`}><svg viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2" /><path d="m4 7.5 8 6 8-6" /></svg></a>}
+        {web && <a className="person-soc" href={web} target="_blank" rel="noreferrer" title={`${p.name} — personal website`} aria-label={`${p.name} personal website`}><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M3 12h18" /><path d="M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3Z" /></svg></a>}
         {p.linkedin_url && <a className="person-soc" href={p.linkedin_url} target="_blank" rel="noreferrer" title={`${p.name} on LinkedIn`} aria-label={`${p.name} on LinkedIn`} style={{ fontSize: 14 }}>in</a>}
         {p.facebook_url && <a className="person-soc" href={p.facebook_url} target="_blank" rel="noreferrer" title={`${p.name} on Facebook`} aria-label={`${p.name} on Facebook`}>f</a>}
         {wa && <a className="person-soc" href={wa} target="_blank" rel="noreferrer" title={`Chat with ${p.name} on WhatsApp`} aria-label={`WhatsApp ${p.name}`}><svg viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 0 1-12.4 7.5L3.5 20.5l1-4.4A8.5 8.5 0 1 1 20.5 12Z" /></svg></a>}
