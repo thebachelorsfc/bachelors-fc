@@ -222,17 +222,21 @@ function drawScene(ctx: CanvasRenderingContext2D, t: number) {
   let heroX = 902;
   if (t < 4.2) heroX = lerp(80, 902, ease((t / 4.2) * 0.999));
   // ball
-  let ball: Pt = { x: 928, y: GY - 8 }, ballRoll = t * 7;
+  let ball: Pt = { x: 928, y: GY - 8 }, ballRoll = t * 7, ballTrail = 0;
   if (t < 4.2) {
     ball = { x: heroX + 27 + Math.sin(t * 9.5) * 4, y: GY - 8 - Math.abs(Math.sin(t * 9.5)) * 3.5 };
     // knocked past each sliding defender: a little hop over the tackle
     crossT.forEach((ct) => {
       const hp = (t - (ct - 0.16)) / 0.32;
       if (hp > 0 && hp < 1) { ball.y -= Math.sin(hp * Math.PI) * 11; ball.x += Math.sin(hp * Math.PI) * 9; }
-      // the big touch past the man (v4): as he beats each defender the ball
-      // is knocked well ahead into the space beyond, like a real dribble
+      // v5 (owner: v4 read as "no change" at phone scale — moves made BIG):
+      // the feint first drags the ball wide one way...
+      const fp = (t - (ct - 0.42)) / 0.30;
+      if (fp > 0 && fp < 1) ball.x -= Math.sin(fp * Math.PI) * 15;
+      // ...then the big touch knocks it well past the man into space,
+      // leaving a visible motion trail behind the ball
       const kp = (t - (ct - 0.10)) / 0.42;
-      if (kp > 0 && kp < 1) ball.x += Math.sin(kp * Math.PI) * 13;
+      if (kp > 0 && kp < 1) { const s = Math.sin(kp * Math.PI); ball.x += s * 30; ballTrail = Math.max(ballTrail, s); }
     });
   } else if (t < 4.5) { ball = { x: 928, y: GY - 8 }; }
   else if (t < 4.98) { const p = (t - 4.5) / 0.48; ball = { x: lerp(928, 1086, p), y: lerp(GY - 8, GY - 74, p) - Math.sin(p * Math.PI) * 14 }; ballRoll = t * 22; }
@@ -398,10 +402,10 @@ function drawScene(ctx: CanvasRenderingContext2D, t: number) {
         const bp = (t - ct) / 0.34;
         if (bp > 0 && bp < 1) burst = Math.max(burst, Math.sin(bp * Math.PI));
       });
-      const ph2 = phase + feint * 1.5;
+      const ph2 = phase + feint * 3.0;
       const L = RUN_LEGS(ph2), A = RUN_ARMS(ph2);
-      pose = { kit: HERO_KIT, legA: L.a, legB: L.b, armA: A.a, armB: A.b, lean: 0.32 + burst * 0.22 - feint * 0.06, crouch: 2 + feint * 3.5, jump: Math.abs(Math.sin(ph2)) * 2.5, rot: feint * 0.16 };
-      if (burst > 0.55) dust(ctx, hx - 12, burst, 3); // turf kicks up at the burst
+      pose = { kit: HERO_KIT, legA: L.a, legB: L.b, armA: A.a, armB: A.b, lean: 0.32 + burst * 0.34 - feint * 0.10, crouch: 2 + feint * 8, jump: Math.abs(Math.sin(ph2)) * 2.5, rot: feint * 0.34 };
+      if (burst > 0.4) dust(ctx, hx - 12, burst, 4); // turf kicks up at the burst
     } else if (t < 4.5) { // the strike
       const p = (t - 4.2) / 0.3;
       const swing = p < 0.4 ? lerp(0.3, -0.7, p / 0.4) : lerp(-0.7, 1.3, ease((p - 0.4) / 0.6));
@@ -442,6 +446,13 @@ function drawScene(ctx: CanvasRenderingContext2D, t: number) {
 
   // ball + shadow
   shadow(ctx, ball.x, GY - ball.y > 0 ? (GY - ball.y) * 0.4 : 0, 10);
+  // motion trail behind the ball on the big touch past a defender (v5)
+  if (ballTrail > 0.05) {
+    for (let g = 1; g <= 3; g++) {
+      ctx.fillStyle = `rgba(247,245,239,${(0.20 - g * 0.05) * ballTrail})`;
+      ctx.beginPath(); ctx.arc(ball.x - g * 12 * ballTrail, ball.y, 8.5 - g * 1.7, 0, Math.PI * 2); ctx.fill();
+    }
+  }
   ctx.fillStyle = PAPER;
   ctx.beginPath(); ctx.arc(ball.x, ball.y, 8.5, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = "#12203a";
