@@ -12,7 +12,10 @@ import { useEffect, useRef } from "react";
 // a whisker. Every beaten man ends on his feet (or knees) with his hands
 // on his head — nobody lies flat. The scorer lands Cristiano Ronaldo's
 // trademark "Siu" celebration (sprint, high jump with a mid-air turn,
-// wide-stance landing). Flat figures with real kits and skin tones on the
+// wide-stance landing). v4 (2026-11-20, owner's ask): the beating-a-man
+// moment sharpened — a body feint (shoulder dip, crouch, leg scissor) at
+// each defender, the ball knocked well past him, then a burst of pace;
+// celebration untouched. Flat figures with real kits and skin tones on the
 // stays-dark navy band; pauses off-screen and honours
 // prefers-reduced-motion with a still Siu frame.
 const W = 1200, H = 300, GY = 252, LOOP = 10.6;
@@ -226,6 +229,10 @@ function drawScene(ctx: CanvasRenderingContext2D, t: number) {
     crossT.forEach((ct) => {
       const hp = (t - (ct - 0.16)) / 0.32;
       if (hp > 0 && hp < 1) { ball.y -= Math.sin(hp * Math.PI) * 11; ball.x += Math.sin(hp * Math.PI) * 9; }
+      // the big touch past the man (v4): as he beats each defender the ball
+      // is knocked well ahead into the space beyond, like a real dribble
+      const kp = (t - (ct - 0.10)) / 0.42;
+      if (kp > 0 && kp < 1) ball.x += Math.sin(kp * Math.PI) * 13;
     });
   } else if (t < 4.5) { ball = { x: 928, y: GY - 8 }; }
   else if (t < 4.98) { const p = (t - 4.5) / 0.48; ball = { x: lerp(928, 1086, p), y: lerp(GY - 8, GY - 74, p) - Math.sin(p * Math.PI) * 14 }; ballRoll = t * 22; }
@@ -380,8 +387,21 @@ function drawScene(ctx: CanvasRenderingContext2D, t: number) {
     let flip = 1, pose: Pose | null = null, hx = heroX;
     const phase = t * 9.5;
     if (t < 4.2) {
-      const L = RUN_LEGS(phase), A = RUN_ARMS(phase);
-      pose = { kit: HERO_KIT, legA: L.a, legB: L.b, armA: A.a, armB: A.b, lean: 0.32, crouch: 2, jump: Math.abs(Math.sin(phase)) * 2.5, rot: 0 };
+      // v4 skill move at each defender (owner: the "peak moment" of beating
+      // a man should read like real football): a body feint — shoulder dip,
+      // crouch, quick leg scissor — just before the man, then an explosive
+      // burst of pace leaning hard forward as he comes out the other side.
+      let feint = 0, burst = 0;
+      crossT.forEach((ct) => {
+        const fp = (t - (ct - 0.42)) / 0.30;
+        if (fp > 0 && fp < 1) feint = Math.max(feint, Math.sin(fp * Math.PI));
+        const bp = (t - ct) / 0.34;
+        if (bp > 0 && bp < 1) burst = Math.max(burst, Math.sin(bp * Math.PI));
+      });
+      const ph2 = phase + feint * 1.5;
+      const L = RUN_LEGS(ph2), A = RUN_ARMS(ph2);
+      pose = { kit: HERO_KIT, legA: L.a, legB: L.b, armA: A.a, armB: A.b, lean: 0.32 + burst * 0.22 - feint * 0.06, crouch: 2 + feint * 3.5, jump: Math.abs(Math.sin(ph2)) * 2.5, rot: feint * 0.16 };
+      if (burst > 0.55) dust(ctx, hx - 12, burst, 3); // turf kicks up at the burst
     } else if (t < 4.5) { // the strike
       const p = (t - 4.2) / 0.3;
       const swing = p < 0.4 ? lerp(0.3, -0.7, p / 0.4) : lerp(-0.7, 1.3, ease((p - 0.4) / 0.6));
