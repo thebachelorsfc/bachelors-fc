@@ -115,6 +115,9 @@ export function knowledgeText(f: ChatFacts): string {
     `Club rules: Membership, attendance & RSVP, fees & funds, discipline, rewards, photos/media & privacy — full text on the Rules page (${SITE.url}/rules).`,
     `Home kit: ${KIT.base}, ${KIT.trim}, crest: ${KIT.crest}. The club jersey costs a fixed 500 BDT, ordered on the Store page (${SITE.url}/store); payment is manual bKash Send Money to ${PAYMENTS.bkash} with the transaction ID given in the order form.`,
     `Contact: email ${SITE.contacts.email}, Facebook page, Messenger ${SITE.contacts.messenger}, WhatsApp group (link in the site footer), Google Maps listing for directions.`,
+    `Total members: 16 (as shown on the homepage). The club was built for bachelor youth who chose purpose over loneliness — brotherhood, discipline and leadership.`,
+    `The club has an anthem — visitors can play it in the "Our Anthem" section of the homepage.`,
+    `For fans: "Build Your XI" (${SITE.url}/your-xi) lets supporters pick their own lineup from the real squad and download it as a picture; the "Words on the Wall" Fan Wall on the homepage lets supporters leave a message (shown after club approval); the club album is on the Gallery page (${SITE.url}/gallery).`,
     `Player login: ${SITE.url}/login — players RSVP IN / OUT / MAYBE for sessions from their dashboard.`,
     `The club never publishes match scorelines; results are celebrated without scores, out of respect for opponents.`,
   ].join("\n");
@@ -139,6 +142,8 @@ export function faqAnswer(qRaw: string, f: ChatFacts): string {
     const n = f.nextSession;
     return `পরের সেশন: ${fmtDate(n.date)}${n.time ? `, সময় ${n.time}` : ""}${n.opponent ? ` — The Bachelors FC vs ${n.opponent}` : n.title ? ` — ${n.title}` : ""}${n.ground ? `, মাঠ: ${n.ground}` : ""}। RSVP করতে Player Login করুন: ${SITE.url}/login`;
   }
+  if (has("how many member", "total member", "কতজন সদস্য", "মোট সদস্য", "সদস্য সংখ্যা", "সদস্য কত"))
+    return "ক্লাবের মোট সদস্য ১৬ জন — ওয়েবসাইটের হোমপেজের হিসাব অনুযায়ী।";
   if (has("join", "জয়েন", "যোগ দ", "সদস্য হ", "member", "খেলতে চাই", "ভর্তি"))
     return `BFC-তে জয়েন করতে ওয়েবসাইটের Join ফর্মটি পূরণ করুন: ${SITE.url}/join — ৩টি ধাপে আবেদন সম্পন্ন হয় এবং একই সঙ্গে আপনার প্লেয়ার লগইন অ্যাকাউন্ট তৈরি হয়। ক্লাব আবেদনটি যাচাই করে অনুমোদন দিলে আপনি লগইন করে সেশনে RSVP করতে পারবেন।`;
   if (has("jersey", "জার্সি", "kit", "price", "দাম", "কত টাকা", "order", "কিনতে", "store", "buy"))
