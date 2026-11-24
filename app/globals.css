@@ -740,6 +740,7 @@ html.js [data-reveal].is-visible{opacity:1;transform:none}
 @keyframes chatw-in{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
 .chatw-head{display:flex;align-items:center;gap:9px;padding:11px 13px;background:#0a1628;border-bottom:2px solid var(--gold)}
 .chatw-ava{width:30px;height:30px;flex:none;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--gold2),#A8855A);display:grid;place-items:center;font-weight:800;font-size:13px;color:#14100a}
+.chatw-ava-img{width:34px;height:34px;flex:none;border-radius:50%}
 .chatw-htext{display:flex;flex-direction:column;line-height:1.25}
 .chatw-htext b{font-size:14px}
 .chatw-htext small{font-size:10.5px;color:#9aa3b2;display:flex;align-items:center;gap:5px}

@@ -1,7 +1,7 @@
 import { SITE, KIT, PAYMENTS } from "./site";
 import { getPlayers, getAllSessions, getGrounds } from "./data";
 
-// Knowledge + fallback brain for the BFC Assistant chat widget.
+// Knowledge + fallback brain for the Bot Assistant chat widget.
 // Facts come ONLY from the site's own data (lib/site.ts + live Supabase
 // reads) — the assistant must never invent club facts. When a Gemini API
 // key is configured the model answers from this same knowledge text;
@@ -84,7 +84,7 @@ export function faqAnswer(qRaw: string, f: ChatFacts): string {
   const qt = q.trim();
   const greet = /^(hi|hello|hey)\b/.test(qt) || qt.startsWith("আসসালাম") || qt.startsWith("হ্যালো") || qt.startsWith("হাই") || qt.includes("assalamu");
   if (greet)
-    return "আসসালামু আলাইকুম! আমি BFC Assistant। ক্লাব, ম্যাচ, জয়েন করা, স্কোয়াড বা জার্সি নিয়ে যেকোনো প্রশ্ন করুন। 🖤💛";
+    return "আসসালামু আলাইকুম! আমি Bot Assistant। ক্লাব, ম্যাচ, জয়েন করা, স্কোয়াড বা জার্সি নিয়ে যেকোনো প্রশ্ন করুন। 🖤💛";
   if (has("next match", "next session", "পরের ম্যাচ", "ম্যাচ কবে", "খেলা কবে", "session কবে", "কবে খেলা")) {
     if (!f.nextSession) return "এই মুহূর্তে কোনো আসন্ন সেশন নির্ধারিত নেই। নতুন সেশন এলেই ওয়েবসাইটের Next Match কার্ডে দেখা যাবে — চোখ রাখুন!";
     const n = f.nextSession;

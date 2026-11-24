@@ -3,7 +3,7 @@ import { getChatFacts, knowledgeText, faqAnswer } from "@/lib/chatKnowledge";
 
 export const dynamic = "force-dynamic";
 
-// BFC Assistant — public chat endpoint for the website widget.
+// Bot Assistant — public chat endpoint for the website widget.
 // Brain order: (1) Gemini free-tier API when GEMINI_API_KEY is set in the
 // environment, grounded ONLY in the club knowledge text; (2) a keyword FAQ
 // matcher over the same facts, so the widget works from day one.
@@ -24,7 +24,7 @@ function rateLimited(ip: string) {
   return arr.length > 30; // 30 messages per 10 minutes per visitor
 }
 
-const SYSTEM = `You are "BFC Assistant", the friendly assistant on The Bachelors FC football club website.
+const SYSTEM = `You are "Bot Assistant", the friendly assistant on The Bachelors FC football club website.
 Answer ONLY from the club facts below. Never invent players, dates, prices, results or rules.
 If the facts do not cover the question, say so politely and suggest emailing thebachelorsfc@gmail.com.
 Reply in the same language the visitor used (Bangla if they write Bangla/Banglish, English if English).

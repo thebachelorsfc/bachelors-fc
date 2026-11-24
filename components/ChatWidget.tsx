@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 
-// BFC Assistant — floating visitor chat (design approved by the owner
+// Bot Assistant — floating visitor chat (design approved by the owner
 // 2026-11-24: navy/gold, gold bubble bottom-right, quick-question chips).
 // The panel stays dark in both site themes, like the social cards.
 // Brain lives server-side in /api/chat (club facts only, no invention).
@@ -10,7 +10,7 @@ type Msg = { role: "user" | "assistant"; content: string };
 
 const GREETING: Msg = {
   role: "assistant",
-  content: "আসসালামু আলাইকুম! আমি BFC Assistant। ক্লাব, ম্যাচ, জয়েন করা বা জার্সি নিয়ে যেকোনো প্রশ্ন করুন। 🖤💛",
+  content: "আসসালামু আলাইকুম! আমি Bot Assistant। ক্লাব, ম্যাচ, জয়েন করা বা জার্সি নিয়ে যেকোনো প্রশ্ন করুন। 🖤💛",
 };
 const CHIPS = ["পরের ম্যাচ কবে?", "কীভাবে জয়েন করব?", "জার্সির দাম কত?", "ক্লাবের নিয়ম"];
 
@@ -56,17 +56,17 @@ export default function ChatWidget() {
       {!open && (
         <div className="chatw-launch">
           <span className="chatw-hint">কিছু জানতে চান?</span>
-          <button type="button" className="chatw-bubble" aria-label="Chat with BFC Assistant" onClick={() => setOpen(true)}>
+          <button type="button" className="chatw-bubble" aria-label="Chat with Bot Assistant" onClick={() => setOpen(true)}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 4h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9.4L5 19.6V5a1 1 0 0 1 1-1z" fill="#14100a"/></svg>
           </button>
         </div>
       )}
       {open && (
-        <div className="chatw-panel" role="dialog" aria-label="BFC Assistant chat">
+        <div className="chatw-panel" role="dialog" aria-label="Bot Assistant chat">
           <div className="chatw-head">
-            <span className="chatw-ava">B</span>
+            <img className="chatw-ava-img" src="/bot-avatar.svg" alt="Bot Assistant" width={34} height={34} />
             <span className="chatw-htext">
-              <b>BFC Assistant</b>
+              <b>Bot Assistant</b>
               <small><i /> Online — সাধারণত সাথে সাথে উত্তর দেয়</small>
             </span>
             <button type="button" className="chatw-x" aria-label="Close chat" onClick={() => setOpen(false)}>✕</button>
