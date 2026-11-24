@@ -11,6 +11,8 @@ export type ChatPlayer = {
   name: string; jersey_no: number; position: string; position_code: string;
   matches: number; goals: number; assists: number; motm: number;
   cleanSheets: number; saves: number;
+  joinedYear: number; foot: string; yellow: number; red: number; pensSaved: number;
+  passing: number; passion: number; speed: number; isCaptain: boolean;
 };
 
 export type ChatFacts = {
@@ -72,6 +74,9 @@ export async function getChatFacts(): Promise<ChatFacts> {
         name: p.name, jersey_no: p.jersey_no, position: p.position, position_code: p.position_code || "",
         matches: p.matches_played || 0, goals: p.goals || 0, assists: p.assists || 0, motm: p.motm || 0,
         cleanSheets: p.clean_sheets || 0, saves: p.saves || 0,
+        joinedYear: p.joined_year || 2026, foot: p.preferred_foot || "", yellow: p.yellow_cards || 0,
+        red: p.red_cards || 0, pensSaved: p.penalties_saved || 0,
+        passing: p.passing || 0, passion: p.passion || 0, speed: p.speed || 0, isCaptain: !!p.is_captain,
       })),
     nextSession: next
       ? {
@@ -96,11 +101,14 @@ export function knowledgeText(f: ChatFacts): string {
   const next = f.nextSession
     ? `Next session: ${fmtDate(f.nextSession.date)}${f.nextSession.time ? ` at ${f.nextSession.time}` : ""}${f.nextSession.opponent ? ` — The Bachelors FC vs ${f.nextSession.opponent}` : f.nextSession.title ? ` — ${f.nextSession.title}` : " — Club Session"}${f.nextSession.ground ? ` at ${f.nextSession.ground}` : ""}.`
     : "There is no upcoming session scheduled right now.";
-  const statLines = f.players.map((p) =>
-    p.position_code === "GK"
-      ? `#${p.jersey_no} ${p.name}: ${p.matches} matches, ${p.cleanSheets} clean sheets, ${p.saves} saves, ${p.motm} MOTM`
-      : `#${p.jersey_no} ${p.name}: ${p.matches} matches, ${p.goals} goals, ${p.assists} assists, ${p.motm} MOTM`
-  ).join("; ");
+  const statLines = f.players.map((p) => {
+    const base = `#${p.jersey_no} ${p.name} (${p.position}${p.isCaptain ? ", club captain" : ""}, member since ${p.joinedYear}${p.foot ? `, preferred foot: ${p.foot}` : ""})`;
+    const stats = p.position_code === "GK"
+      ? `${p.matches} matches, ${p.cleanSheets} clean sheets, ${p.saves} saves, ${p.pensSaved} penalties saved, ${p.motm} MOTM, ${p.yellow} yellow cards`
+      : `${p.matches} matches, ${p.goals} goals, ${p.assists} assists, ${p.motm} MOTM, ${p.yellow} yellow cards, ${p.red} red cards`;
+    const ratings = p.passing || p.passion || p.speed ? ` Coach ratings: Passing ${p.passing}, Passion ${p.passion}, Speed ${p.speed}.` : "";
+    return `${base}: ${stats}.${ratings}`;
+  }).join("\n");
   const records = recordsText(f.players);
   return [
     `Club: ${SITE.name} (BFC) — an apolitical, non-profit football club in ${SITE.location}, founded in ${SITE.founded}. Motto: "${SITE.motto}" / "${SITE.mottoAlt}".`,
@@ -154,6 +162,25 @@ export function faqAnswer(qRaw: string, f: ChatFacts): string {
     const rec = recordsText(f.players);
     if (!rec) return "এখনো কোনো রেকর্ড তৈরি হয়নি — পরিসংখ্যান ওয়েবসাইটের Record Book-এ দেখা যাবে।";
     return `ক্লাবের রেকর্ডসমূহ — ${rec}। বিস্তারিত ওয়েবসাইটের Record Book-এ আছে।`;
+  }
+  // Individual player lookup — "Arafat ke?" / "Who is Kazi Iqbal?" etc.
+  const named = f.players.find((p) => {
+    const full = p.name.toLowerCase();
+    const first = full.split(" ")[0];
+    return q.includes(full) || (first.length >= 4 && q.includes(first));
+  });
+  if (named) {
+    const p = named;
+    const head = `${p.name} — #${p.jersey_no}, ${p.position}${p.isCaptain ? ", ক্লাব ক্যাপ্টেন" : ""}। সদস্য ${p.joinedYear} সাল থেকে${p.foot ? `, পছন্দের পা: ${p.foot}` : ""}।`;
+    const stats = p.position_code === "GK"
+      ? `পরিসংখ্যান: ${p.matches} ম্যাচ, ${p.cleanSheets} clean sheet, ${p.saves} saves, ${p.pensSaved} penalty saved, ${p.motm} বার Man of the Match।`
+      : `পরিসংখ্যান: ${p.matches} ম্যাচ, ${p.goals} গোল, ${p.assists} assist, ${p.motm} বার Man of the Match।`;
+    const extra = p.name.startsWith("Noman")
+      ? " তিনিই ক্লাবের নিজস্ব 'Ashraful' — সবার প্রিয় বট প্লেয়ার!"
+      : p.name.startsWith("Chowdhury")
+        ? " তিনিই ক্লাবের প্রতিষ্ঠাতা ও 'Founder & Managing Dictator'।"
+        : "";
+    return head + " " + stats + extra + ` বিস্তারিত: ${SITE.url}/squad`;
   }
   if (has("ashraful", "আশরাফুল", "bot player", "বট প্লেয়ার", "sitter"))
     return "আমাদের ক্লাবের নিজস্ব 'Ashraful' হলেন Noman (#7, Forward) — সবার প্রিয় বট প্লেয়ার, সহজ ওপেন-গোলের সুযোগ মিস করার জন্য ক্লাবের চিরচেনা রসিকতা! 😄";
