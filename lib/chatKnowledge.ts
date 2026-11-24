@@ -131,37 +131,65 @@ export function knowledgeText(f: ChatFacts): string {
   ].join("\n");
 }
 
-// ---- Fallback FAQ (used until GEMINI_API_KEY is set) ----
+// ---- Fallback FAQ (used when Gemini is unavailable) ----
+// Trilingual: understands Bengali script, English and Banglish (Roman
+// Bangla), and answers in the same style the visitor used.
 
 export function faqAnswer(qRaw: string, f: ChatFacts): string {
   const q = qRaw.toLowerCase();
   const has = (...words: string[]) => words.some((w) => q.includes(w));
   const squadList = f.players.map((p) => `#${p.jersey_no} ${p.name} (${p.position})`).join(", ");
 
+  // Banglish detection: no Bengali script, but unmistakable Roman-Bangla
+  // words are present (whole-word match, so English stays English).
+  const ROMAN_MARKERS = ["koto", "kobe", "kothay", "kivabe", "keno", "chai", "ache", "achen", "amar", "tomar", "apnar", "khela", "khelte", "dam", "jog", "hobe", "kore", "theke", "jonno", "ekta", "konta", "jitlo", "harlo", "dhonnobad", "niom", "niyom", "sodosso", "kara", "kotha", "bolte", "paro", "parbo", "lagbe", "mane", "karon", "ekhon", "kivabe"];
+  const words = q.split(/[^a-z]+/).filter(Boolean);
+  const roman = !/[\u0980-\u09FE]/.test(q) && ROMAN_MARKERS.some((w) => words.includes(w));
+
   // Greeting must match at the START of the message — a bare substring
   // check for "hi" also fires inside words like "this" or "which" and
   // swallowed real questions (owner's phone test, 2026-11-24).
   const qt = q.trim();
-  const greet = /^(hi|hello|hey)\b/.test(qt) || qt.startsWith("আসসালাম") || qt.startsWith("হ্যালো") || qt.startsWith("হাই") || qt.includes("assalamu");
+  const greet = /^(hi|hello|hey)\b/.test(qt) || qt.startsWith("আসসালাম") || qt.startsWith("হ্যালো") || qt.startsWith("হাই") || qt.startsWith("salam") || qt.includes("assalamu");
   if (greet)
-    return "আসসালামু আলাইকুম! আমি Bot Assistant। ক্লাব, ম্যাচ, জয়েন করা, স্কোয়াড বা জার্সি নিয়ে যেকোনো প্রশ্ন করুন। 🖤💛";
-  if (has("next match", "next session", "পরের ম্যাচ", "ম্যাচ কবে", "খেলা কবে", "session কবে", "কবে খেলা")) {
-    if (!f.nextSession) return "এই মুহূর্তে কোনো আসন্ন সেশন নির্ধারিত নেই। নতুন সেশন এলেই ওয়েবসাইটের Next Match কার্ডে দেখা যাবে — চোখ রাখুন!";
+    return roman
+      ? "Assalamu Alaikum! Ami Bot Assistant. Club, match, join kora ba jersey niye jekono proshno korun. 🖤💛"
+      : "আসসালামু আলাইকুম! আমি Bot Assistant। ক্লাব, ম্যাচ, জয়েন করা, স্কোয়াড বা জার্সি নিয়ে যেকোনো প্রশ্ন করুন। 🖤💛";
+  if (has("next match", "next session", "পরের ম্যাচ", "ম্যাচ কবে", "খেলা কবে", "session কবে", "কবে খেলা", "porer match", "match kobe", "khela kobe", "kobe khela")) {
+    if (!f.nextSession)
+      return roman
+        ? "Ei muhurte kono asonno session nirdharito nei. Notun session elei website er Next Match card e dekha jabe — chokh rakhun!"
+        : "এই মুহূর্তে কোনো আসন্ন সেশন নির্ধারিত নেই। নতুন সেশন এলেই ওয়েবসাইটের Next Match কার্ডে দেখা যাবে — চোখ রাখুন!";
     const n = f.nextSession;
-    return `পরের সেশন: ${fmtDate(n.date)}${n.time ? `, সময় ${n.time}` : ""}${n.opponent ? ` — The Bachelors FC vs ${n.opponent}` : n.title ? ` — ${n.title}` : ""}${n.ground ? `, মাঠ: ${n.ground}` : ""}। RSVP করতে Player Login করুন: ${SITE.url}/login`;
+    return roman
+      ? `Porer session: ${fmtDate(n.date)}${n.time ? `, somoy ${n.time}` : ""}${n.opponent ? ` — The Bachelors FC vs ${n.opponent}` : n.title ? ` — ${n.title}` : ""}${n.ground ? `, math: ${n.ground}` : ""}. RSVP korte Player Login korun: ${SITE.url}/login`
+      : `পরের সেশন: ${fmtDate(n.date)}${n.time ? `, সময় ${n.time}` : ""}${n.opponent ? ` — The Bachelors FC vs ${n.opponent}` : n.title ? ` — ${n.title}` : ""}${n.ground ? `, মাঠ: ${n.ground}` : ""}। RSVP করতে Player Login করুন: ${SITE.url}/login`;
   }
-  if (has("how many member", "total member", "কতজন সদস্য", "মোট সদস্য", "সদস্য সংখ্যা", "সদস্য কত"))
-    return "ক্লাবের মোট সদস্য ১৬ জন — ওয়েবসাইটের হোমপেজের হিসাব অনুযায়ী।";
-  if (has("join", "জয়েন", "যোগ দ", "সদস্য হ", "member", "খেলতে চাই", "ভর্তি"))
-    return `BFC-তে জয়েন করতে ওয়েবসাইটের Join ফর্মটি পূরণ করুন: ${SITE.url}/join — ৩টি ধাপে আবেদন সম্পন্ন হয় এবং একই সঙ্গে আপনার প্লেয়ার লগইন অ্যাকাউন্ট তৈরি হয়। ক্লাব আবেদনটি যাচাই করে অনুমোদন দিলে আপনি লগইন করে সেশনে RSVP করতে পারবেন।`;
-  if (has("jersey", "জার্সি", "kit", "price", "দাম", "কত টাকা", "order", "কিনতে", "store", "buy"))
-    return `ক্লাব জার্সির দাম নির্ধারিত ৫০০ টাকা। অর্ডার করতে Store পেজে যান: ${SITE.url}/store — পেমেন্ট ম্যানুয়াল bKash Send Money (${PAYMENTS.bkash}) নম্বরে পাঠিয়ে TrxID টি অর্ডার ফর্মে দিতে হয়। কিট: ${KIT.base}, ${KIT.trim}।`;
-  if (has("rule", "নিয়ম", "privacy", "নীতিমালা"))
-    return `ক্লাবের পূর্ণ নিয়মাবলি (সদস্যপদ, উপস্থিতি ও RSVP, ফি, শৃঙ্খলা, পুরস্কার, ছবি ও গোপনীয়তা) Rules পেজে আছে: ${SITE.url}/rules`;
-  if (has("record", "রেকর্ড", "top scorer", "সর্বোচ্চ গোল", "বেশি গোল", "most goal", "top playmaker", "most appearance", "most motm", "সেরা গোলদাতা", "কে সেরা")) {
+  if (has("how many member", "total member", "কতজন সদস্য", "মোট সদস্য", "সদস্য সংখ্যা", "সদস্য কত", "member koto", "kotojon member", "member koyjon"))
+    return roman
+      ? "Club er mot sodosso 16 jon — website er homepage er hisab onujayi."
+      : "ক্লাবের মোট সদস্য ১৬ জন — ওয়েবসাইটের হোমপেজের হিসাব অনুযায়ী।";
+  if (has("join", "জয়েন", "যোগ দ", "সদস্য হ", "member", "খেলতে চাই", "ভর্তি", "jog dite", "jog debo", "member hote", "khelte chai"))
+    return roman
+      ? `BFC te join korte website er Join form ti puron korun: ${SITE.url}/join — 3 ti dhape abedon somponno hoy ebong ekoi songe apnar player login account toiri hoy. Club abedon jachai kore onumodon dile apni login kore session e RSVP korte parben.`
+      : `BFC-তে জয়েন করতে ওয়েবসাইটের Join ফর্মটি পূরণ করুন: ${SITE.url}/join — ৩টি ধাপে আবেদন সম্পন্ন হয় এবং একই সঙ্গে আপনার প্লেয়ার লগইন অ্যাকাউন্ট তৈরি হয়। ক্লাব আবেদনটি যাচাই করে অনুমোদন দিলে আপনি লগইন করে সেশনে RSVP করতে পারবেন।`;
+  if (has("jersey", "জার্সি", "kit", "price", "দাম", "কত টাকা", "order", "কিনতে", "store", "buy", "dam koto", "koto taka", "kinte"))
+    return roman
+      ? `Club jersey er dam nirdharito 500 taka. Order korte Store page e jan: ${SITE.url}/store — payment manual bKash Send Money (${PAYMENTS.bkash}) number e pathiye TrxID ti order form e dite hoy. Kit: ${KIT.base}, ${KIT.trim}.`
+      : `ক্লাব জার্সির দাম নির্ধারিত ৫০০ টাকা। অর্ডার করতে Store পেজে যান: ${SITE.url}/store — পেমেন্ট ম্যানুয়াল bKash Send Money (${PAYMENTS.bkash}) নম্বরে পাঠিয়ে TrxID টি অর্ডার ফর্মে দিতে হয়। কিট: ${KIT.base}, ${KIT.trim}।`;
+  if (has("rule", "নিয়ম", "privacy", "নীতিমালা", "niom", "niyom"))
+    return roman
+      ? `Club er purno niyomaboli (sodosso pod, uposthiti o RSVP, fee, srinkhola, puroskar, chobi o goponiyota) Rules page e ache: ${SITE.url}/rules`
+      : `ক্লাবের পূর্ণ নিয়মাবলি (সদস্যপদ, উপস্থিতি ও RSVP, ফি, শৃঙ্খলা, পুরস্কার, ছবি ও গোপনীয়তা) Rules পেজে আছে: ${SITE.url}/rules`;
+  if (has("record", "রেকর্ড", "top scorer", "সর্বোচ্চ গোল", "বেশি গোল", "most goal", "top playmaker", "most appearance", "most motm", "সেরা গোলদাতা", "কে সেরা", "beshi gol", "koto gol")) {
     const rec = recordsText(f.players);
-    if (!rec) return "এখনো কোনো রেকর্ড তৈরি হয়নি — পরিসংখ্যান ওয়েবসাইটের Record Book-এ দেখা যাবে।";
-    return `ক্লাবের রেকর্ডসমূহ — ${rec}। বিস্তারিত ওয়েবসাইটের Record Book-এ আছে।`;
+    if (!rec)
+      return roman
+        ? "Ekhono kono record toiri hoyni — porisongkhyan website er Record Book e dekha jabe."
+        : "এখনো কোনো রেকর্ড তৈরি হয়নি — পরিসংখ্যান ওয়েবসাইটের Record Book-এ দেখা যাবে।";
+    return roman
+      ? `Club er recordshomuho — ${rec}. Bistarito website er Record Book e ache.`
+      : `ক্লাবের রেকর্ডসমূহ — ${rec}। বিস্তারিত ওয়েবসাইটের Record Book-এ আছে।`;
   }
   // Individual player lookup — "Arafat ke?" / "Who is Kazi Iqbal?" etc.
   const named = f.players.find((p) => {
@@ -171,6 +199,18 @@ export function faqAnswer(qRaw: string, f: ChatFacts): string {
   });
   if (named) {
     const p = named;
+    if (roman) {
+      const head = `${p.name} — #${p.jersey_no}, ${p.position}${p.isCaptain ? ", club captain" : ""}. Sodosso ${p.joinedYear} sal theke${p.foot ? `, pochonder pa: ${p.foot}` : ""}.`;
+      const stats = p.position_code === "GK"
+        ? `Porisongkhyan: ${p.matches} match, ${p.cleanSheets} clean sheet, ${p.saves} saves, ${p.pensSaved} penalty saved, ${p.motm} bar Man of the Match.`
+        : `Porisongkhyan: ${p.matches} match, ${p.goals} gol, ${p.assists} assist, ${p.motm} bar Man of the Match.`;
+      const extra = p.name.startsWith("Noman")
+        ? " Tini e club er nijossho 'Ashraful' — sobar priyo bot player!"
+        : p.name.startsWith("Chowdhury")
+          ? " Tini e club er protisthata o 'Founder & Managing Dictator'."
+          : "";
+      return head + " " + stats + extra + ` Bistarito: ${SITE.url}/squad`;
+    }
     const head = `${p.name} — #${p.jersey_no}, ${p.position}${p.isCaptain ? ", ক্লাব ক্যাপ্টেন" : ""}। সদস্য ${p.joinedYear} সাল থেকে${p.foot ? `, পছন্দের পা: ${p.foot}` : ""}।`;
     const stats = p.position_code === "GK"
       ? `পরিসংখ্যান: ${p.matches} ম্যাচ, ${p.cleanSheets} clean sheet, ${p.saves} saves, ${p.pensSaved} penalty saved, ${p.motm} বার Man of the Match।`
@@ -183,20 +223,38 @@ export function faqAnswer(qRaw: string, f: ChatFacts): string {
     return head + " " + stats + extra + ` বিস্তারিত: ${SITE.url}/squad`;
   }
   if (has("ashraful", "আশরাফুল", "bot player", "বট প্লেয়ার", "sitter"))
-    return "আমাদের ক্লাবের নিজস্ব 'Ashraful' হলেন Noman (#7, Forward) — সবার প্রিয় বট প্লেয়ার, সহজ ওপেন-গোলের সুযোগ মিস করার জন্য ক্লাবের চিরচেনা রসিকতা! 😄";
-  if (has("squad", "player", "স্কোয়াড", "খেলোয়াড়", "team", "দল"))
-    return `বর্তমান স্কোয়াড (${f.players.length} জন): ${squadList}। বিস্তারিত প্রোফাইল ও পরিসংখ্যান: ${SITE.url}/squad`;
+    return roman
+      ? "Amader club er nijossho 'Ashraful' holen Noman (#7, Forward) — sobar priyo bot player, shohoj open-goal er sujog miss korar jonno club er chirchen rosikota! 😄"
+      : "আমাদের ক্লাবের নিজস্ব 'Ashraful' হলেন Noman (#7, Forward) — সবার প্রিয় বট প্লেয়ার, সহজ ওপেন-গোলের সুযোগ মিস করার জন্য ক্লাবের চিরচেনা রসিকতা! 😄";
+  if (has("squad", "player", "স্কোয়াড", "খেলোয়াড়", "team", "দল", "kara ache"))
+    return roman
+      ? `Bortoman squad (${f.players.length} jon): ${squadList}. Bistarito profile o porisongkhyan: ${SITE.url}/squad`
+      : `বর্তমান স্কোয়াড (${f.players.length} জন): ${squadList}। বিস্তারিত প্রোফাইল ও পরিসংখ্যান: ${SITE.url}/squad`;
   if (has("captain", "ক্যাপ্টেন", "founder", "founded", "প্রতিষ্ঠাতা", "কে চালায়", "dictator"))
-    return "ক্লাবের প্রতিষ্ঠাতা ও 'Founder & Managing Dictator' হলেন Mostafa (Saidul Mostafa Chowdhury) — তিনিই ক্লাবের ক্যাপ্টেন ও গোলকিপার (#99)।";
-  if (has("contact", "যোগাযোগ", "email", "ইমেইল", "phone", "whatsapp", "facebook", "messenger"))
-    return `যোগাযোগ: ইমেইল ${SITE.contacts.email} · Messenger ${SITE.contacts.messenger} · Facebook পেজ ও WhatsApp গ্রুপের লিংক ওয়েবসাইটের ফুটারে আছে।`;
-  if (has("where", "কোথায়", "location", "ঠিকানা", "ground", "মাঠ", "khulshi"))
-    return `ক্লাবটি Khulshi, Chittagong-এ। আমাদের মাঠগুলো: ${f.grounds.join(", ") || "Khulshi এলাকার মাঠসমূহ"}। বিস্তারিত: ${SITE.url}/grounds`;
+    return roman
+      ? "Club er protisthata o 'Founder & Managing Dictator' holen Mostafa (Saidul Mostafa Chowdhury) — tini e club er captain o goalkeeper (#99)."
+      : "ক্লাবের প্রতিষ্ঠাতা ও 'Founder & Managing Dictator' হলেন Mostafa (Saidul Mostafa Chowdhury) — তিনিই ক্লাবের ক্যাপ্টেন ও গোলকিপার (#99)।";
+  if (has("contact", "যোগাযোগ", "email", "ইমেইল", "phone", "whatsapp", "facebook", "messenger", "jogajog"))
+    return roman
+      ? `Jogajog: email ${SITE.contacts.email} · Messenger ${SITE.contacts.messenger} · Facebook page o WhatsApp group er link website er footer e ache.`
+      : `যোগাযোগ: ইমেইল ${SITE.contacts.email} · Messenger ${SITE.contacts.messenger} · Facebook পেজ ও WhatsApp গ্রুপের লিংক ওয়েবসাইটের ফুটারে আছে।`;
+  if (has("where", "কোথায়", "location", "ঠিকানা", "ground", "মাঠ", "khulshi", "kothay"))
+    return roman
+      ? `Club ti Khulshi, Chittagong e. Amader mathgulo: ${f.grounds.join(", ") || "Khulshi elakar mathshomuho"}. Bistarito: ${SITE.url}/grounds`
+      : `ক্লাবটি Khulshi, Chittagong-এ। আমাদের মাঠগুলো: ${f.grounds.join(", ") || "Khulshi এলাকার মাঠসমূহ"}। বিস্তারিত: ${SITE.url}/grounds`;
   if (has("login", "লগইন", "rsvp", "dashboard"))
-    return `প্লেয়ার লগইন: ${SITE.url}/login — অনুমোদিত প্লেয়াররা লগইন করে ড্যাশবোর্ড থেকে সেশনে IN / OUT / MAYBE RSVP দিতে পারেন। নতুন হলে আগে Join ফর্মটি পূরণ করুন।`;
-  if (has("score", "স্কোর", "result", "ফলাফল", "কে জিতল", "হারল"))
-    return "সম্মানিত প্রতিপক্ষের প্রতি শ্রদ্ধা রেখে BFC কোনো ম্যাচের স্কোরলাইন প্রকাশ করে না। ম্যাচ রিপোর্ট (স্কোর ছাড়া) ওয়েবসাইটের Fixtures & Results অংশে পাওয়া যায়।";
-  if (has("ধন্যবাদ", "thank", "শুকরিয়া"))
-    return "আপনাকেও ধন্যবাদ! আর কিছু জানতে চাইলে জিজ্ঞেস করুন। United, Not Alone. 🖤💛";
-  return "দুঃখিত, এই প্রশ্নটার উত্তর আমার কাছে নেই। ক্লাব, ম্যাচ, জয়েন করা, স্কোয়াড, নিয়ম বা জার্সি নিয়ে জিজ্ঞেস করে দেখুন — অথবা সরাসরি যোগাযোগ করুন: " + SITE.contacts.email;
+    return roman
+      ? `Player login: ${SITE.url}/login — onumodito player ra login kore dashboard theke session e IN / OUT / MAYBE RSVP dite paren. Notun hole age Join form ti puron korun.`
+      : `প্লেয়ার লগইন: ${SITE.url}/login — অনুমোদিত প্লেয়াররা লগইন করে ড্যাশবোর্ড থেকে সেশনে IN / OUT / MAYBE RSVP দিতে পারেন। নতুন হলে আগে Join ফর্মটি পূরণ করুন।`;
+  if (has("score", "স্কোর", "result", "ফলাফল", "কে জিতল", "হারল", "ke jitlo", "harlo"))
+    return roman
+      ? "Sommanito protipokkher proti shroddha rekhe BFC kono match er scoreline prokash kore na. Match report (score chara) website er Fixtures & Results ongse pawa jay."
+      : "সম্মানিত প্রতিপক্ষের প্রতি শ্রদ্ধা রেখে BFC কোনো ম্যাচের স্কোরলাইন প্রকাশ করে না। ম্যাচ রিপোর্ট (স্কোর ছাড়া) ওয়েবসাইটের Fixtures & Results অংশে পাওয়া যায়।";
+  if (has("ধন্যবাদ", "thank", "শুকরিয়া", "dhonnobad"))
+    return roman
+      ? "Apnakeo dhonnobad! Ar kichu jante chaile jigges korun. United, Not Alone. 🖤💛"
+      : "আপনাকেও ধন্যবাদ! আর কিছু জানতে চাইলে জিজ্ঞেস করুন। United, Not Alone. 🖤💛";
+  return roman
+    ? "Dukkhito, ei proshnotar uttor amar kache nei. Club, match, join kora, squad, niyom ba jersey niye jigges kore dekhun — othoba shorashori jogajog korun: " + SITE.contacts.email
+    : "দুঃখিত, এই প্রশ্নটার উত্তর আমার কাছে নেই। ক্লাব, ম্যাচ, জয়েন করা, স্কোয়াড, নিয়ম বা জার্সি নিয়ে জিজ্ঞেস করে দেখুন — অথবা সরাসরি যোগাযোগ করুন: " + SITE.contacts.email;
 }
