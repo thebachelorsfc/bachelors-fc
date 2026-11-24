@@ -58,7 +58,7 @@ export function knowledgeText(f: ChatFacts): string {
     : "There is no upcoming session scheduled right now.";
   return [
     `Club: ${SITE.name} (BFC) — an apolitical, non-profit football club in ${SITE.location}, founded in ${SITE.founded}. Motto: "${SITE.motto}" / "${SITE.mottoAlt}".`,
-    `Founder: Mostafa (Saidul Mostafa Chowdhury), who is also the club captain and goalkeeper, shirt #99.`,
+    `Founder: Mostafa (Saidul Mostafa Chowdhury). His official club title is "Founder & Managing Dictator" — the club's playful title for him, as shown on the People page. He is also the club captain and goalkeeper, shirt #99. So if anyone asks who the club's Dictator is, the answer is Mostafa.`,
     `Squad (${f.players.length} players): ${squad}.`,
     next,
     `Grounds the club uses: ${f.grounds.join(", ") || "grounds in Khulshi, Chittagong"}.`,
@@ -99,7 +99,7 @@ export function faqAnswer(qRaw: string, f: ChatFacts): string {
   if (has("squad", "player", "স্কোয়াড", "খেলোয়াড়", "team", "দল"))
     return `বর্তমান স্কোয়াড (${f.players.length} জন): ${squadList}। বিস্তারিত প্রোফাইল ও পরিসংখ্যান: ${SITE.url}/squad`;
   if (has("captain", "ক্যাপ্টেন", "founder", "founded", "প্রতিষ্ঠাতা", "কে চালায়", "dictator"))
-    return "ক্লাবের প্রতিষ্ঠাতা Mostafa (Saidul Mostafa Chowdhury) — তিনিই ক্লাবের ক্যাপ্টেন ও গোলকিপার (#99)।";
+    return "ক্লাবের প্রতিষ্ঠাতা ও 'Founder & Managing Dictator' হলেন Mostafa (Saidul Mostafa Chowdhury) — তিনিই ক্লাবের ক্যাপ্টেন ও গোলকিপার (#99)।";
   if (has("contact", "যোগাযোগ", "email", "ইমেইল", "phone", "whatsapp", "facebook", "messenger"))
     return `যোগাযোগ: ইমেইল ${SITE.contacts.email} · Messenger ${SITE.contacts.messenger} · Facebook পেজ ও WhatsApp গ্রুপের লিংক ওয়েবসাইটের ফুটারে আছে।`;
   if (has("where", "কোথায়", "location", "ঠিকানা", "ground", "মাঠ", "khulshi"))
