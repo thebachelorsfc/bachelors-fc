@@ -60,6 +60,7 @@ export async function POST(req: Request) {
     const VERSIONS = ["v1beta", "v1"];
     let lastStatus: number | string = "fetch-error";
     let lastError = "";
+    const attempts: string[] = [];
     outer: for (const ver of VERSIONS) {
       for (const model of MODELS) {
         try {
@@ -79,13 +80,16 @@ export async function POST(req: Request) {
             const data: any = await res.json();
             const text = data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text || "").join("").trim();
             if (text) return NextResponse.json({ reply: text.slice(0, 1500), brain: "gemini", model, ver });
+            attempts.push(`${ver}/${model} -> 200-empty`);
           } else {
             lastStatus = res.status;
             const errData: any = await res.json().catch(() => ({}));
             lastError = String(errData?.error?.message || "").slice(0, 200);
+            attempts.push(`${ver}/${model} -> ${res.status}: ${lastError.slice(0, 90)}`);
           }
         } catch {
           lastStatus = "fetch-error";
+          attempts.push(`${ver}/${model} -> fetch-error`);
         }
       }
     }
@@ -103,7 +107,7 @@ export async function POST(req: Request) {
     } catch {
       availableModels = "list-fetch-error";
     }
-    return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: lastStatus, geminiError: lastError, availableModels });
+    return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: lastStatus, geminiError: lastError, attempts });
   }
   return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: "no-key" });
 }
