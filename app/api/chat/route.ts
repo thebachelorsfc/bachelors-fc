@@ -89,8 +89,21 @@ export async function POST(req: Request) {
         }
       }
     }
-    // Diagnostic fields (widget ignores them): tell us why Gemini said no.
-    return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: lastStatus, geminiError: lastError });
+    // Diagnostic fields (widget ignores them): tell us why Gemini said no,
+    // and which models this key can actually see.
+    let availableModels = "";
+    try {
+      const lm = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}&pageSize=100`);
+      const lmData: any = await lm.json().catch(() => ({}));
+      if (lm.ok) {
+        availableModels = (lmData?.models || []).map((m: any) => String(m.name || "").replace("models/", "")).join(",").slice(0, 500);
+      } else {
+        availableModels = `list-error ${lm.status}: ${String(lmData?.error?.message || "").slice(0, 150)}`;
+      }
+    } catch {
+      availableModels = "list-fetch-error";
+    }
+    return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: lastStatus, geminiError: lastError, availableModels });
   }
   return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: "no-key" });
 }
