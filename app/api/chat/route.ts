@@ -53,30 +53,37 @@ export async function POST(req: Request) {
   const key = process.env.GEMINI_API_KEY;
 
   if (key) {
-    try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            systemInstruction: { parts: [{ text: SYSTEM + knowledgeText(facts) }] },
-            contents: msgs.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })),
-            generationConfig: { temperature: 0.4, maxOutputTokens: 400 },
-          }),
+    // Model names retire over time (gemini-2.0-flash returned 404 on
+    // 2026-11-24) — try the current ones in order until one answers.
+    const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+    let lastStatus: number | string = "fetch-error";
+    for (const model of MODELS) {
+      try {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              systemInstruction: { parts: [{ text: SYSTEM + knowledgeText(facts) }] },
+              contents: msgs.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })),
+              generationConfig: { temperature: 0.4, maxOutputTokens: 400 },
+            }),
+          }
+        );
+        if (res.ok) {
+          const data: any = await res.json();
+          const text = data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text || "").join("").trim();
+          if (text) return NextResponse.json({ reply: text.slice(0, 1500), brain: "gemini", model });
+        } else {
+          lastStatus = res.status;
         }
-      );
-      if (res.ok) {
-        const data: any = await res.json();
-        const text = data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text || "").join("").trim();
-        if (text) return NextResponse.json({ reply: text.slice(0, 1500), brain: "gemini" });
-      } else {
-        // Diagnostic fields (widget ignores them): tell us why Gemini said no.
-        return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: res.status });
+      } catch {
+        lastStatus = "fetch-error";
       }
-    } catch (e: any) {
-      return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: "fetch-error" });
     }
+    // Diagnostic fields (widget ignores them): tell us why Gemini said no.
+    return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: lastStatus });
   }
   return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: "no-key" });
 }
