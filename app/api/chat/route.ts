@@ -56,8 +56,11 @@ export async function POST(req: Request) {
     // Model names and API versions retire over time — on 2026-11-24 every
     // v1beta model tried returned 404. Walk versions x models until one
     // answers, and surface Google's own error text in the diagnostics.
-    const MODELS = ["gemini-2.5-flash", "gemini-3-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest"];
-    const VERSIONS = ["v1beta", "v1"];
+    // Verified against this key's ListModels on 2026-11-24: the named
+    // releases (2.5-flash etc.) are closed to new users; the "-latest"
+    // aliases and 3.x previews are what this key can actually call.
+    const MODELS = ["gemini-flash-latest", "gemini-3-flash-preview", "gemini-flash-lite-latest", "gemini-2.5-flash-lite", "gemini-3.1-flash-lite"];
+    const VERSIONS = ["v1beta"];
     let lastStatus: number | string = "fetch-error";
     let lastError = "";
     const attempts: string[] = [];
