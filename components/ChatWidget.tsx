@@ -57,7 +57,7 @@ export default function ChatWidget() {
         <div className="chatw-launch">
           <span className="chatw-hint">কিছু জানতে চান?</span>
           <button type="button" className="chatw-bubble" aria-label="Chat with Bot Assistant" onClick={() => setOpen(true)}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 4h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9.4L5 19.6V5a1 1 0 0 1 1-1z" fill="#14100a"/></svg>
+            <img src="/bot-avatar.svg" alt="Bot Assistant" width={52} height={52} />
           </button>
         </div>
       )}
