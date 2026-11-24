@@ -55,7 +55,7 @@ export default function ChatWidget() {
     <>
       {!open && (
         <div className="chatw-launch">
-          <span className="chatw-hint">কিছু জানতে চান?</span>
+          <span className="chatw-hint">গরিবঅল কী খঅর! ক্যান গরি সাহায্য গইরগুম?</span>
           <button type="button" className="chatw-bubble" aria-label="Chat with Bot Assistant" onClick={() => setOpen(true)}>
             <img src="/bot-avatar.svg" alt="Bot Assistant" width={52} height={52} />
           </button>
