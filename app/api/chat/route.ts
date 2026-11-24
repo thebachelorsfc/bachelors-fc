@@ -53,37 +53,44 @@ export async function POST(req: Request) {
   const key = process.env.GEMINI_API_KEY;
 
   if (key) {
-    // Model names retire over time (gemini-2.0-flash returned 404 on
-    // 2026-11-24) — try the current ones in order until one answers.
-    const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+    // Model names and API versions retire over time — on 2026-11-24 every
+    // v1beta model tried returned 404. Walk versions x models until one
+    // answers, and surface Google's own error text in the diagnostics.
+    const MODELS = ["gemini-2.5-flash", "gemini-3-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest"];
+    const VERSIONS = ["v1beta", "v1"];
     let lastStatus: number | string = "fetch-error";
-    for (const model of MODELS) {
-      try {
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              systemInstruction: { parts: [{ text: SYSTEM + knowledgeText(facts) }] },
-              contents: msgs.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })),
-              generationConfig: { temperature: 0.4, maxOutputTokens: 400 },
-            }),
+    let lastError = "";
+    outer: for (const ver of VERSIONS) {
+      for (const model of MODELS) {
+        try {
+          const res = await fetch(
+            `https://generativelanguage.googleapis.com/${ver}/models/${model}:generateContent?key=${key}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                systemInstruction: { parts: [{ text: SYSTEM + knowledgeText(facts) }] },
+                contents: msgs.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })),
+                generationConfig: { temperature: 0.4, maxOutputTokens: 400 },
+              }),
+            }
+          );
+          if (res.ok) {
+            const data: any = await res.json();
+            const text = data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text || "").join("").trim();
+            if (text) return NextResponse.json({ reply: text.slice(0, 1500), brain: "gemini", model, ver });
+          } else {
+            lastStatus = res.status;
+            const errData: any = await res.json().catch(() => ({}));
+            lastError = String(errData?.error?.message || "").slice(0, 200);
           }
-        );
-        if (res.ok) {
-          const data: any = await res.json();
-          const text = data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text || "").join("").trim();
-          if (text) return NextResponse.json({ reply: text.slice(0, 1500), brain: "gemini", model });
-        } else {
-          lastStatus = res.status;
+        } catch {
+          lastStatus = "fetch-error";
         }
-      } catch {
-        lastStatus = "fetch-error";
       }
     }
     // Diagnostic fields (widget ignores them): tell us why Gemini said no.
-    return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: lastStatus });
+    return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: lastStatus, geminiError: lastError });
   }
   return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: "no-key" });
 }
