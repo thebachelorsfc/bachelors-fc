@@ -78,7 +78,12 @@ export function faqAnswer(qRaw: string, f: ChatFacts): string {
   const has = (...words: string[]) => words.some((w) => q.includes(w));
   const squadList = f.players.map((p) => `#${p.jersey_no} ${p.name} (${p.position})`).join(", ");
 
-  if (has("salam", "hello", "hi", "হ্যালো", "আসসালাম", "হাই"))
+  // Greeting must match at the START of the message — a bare substring
+  // check for "hi" also fires inside words like "this" or "which" and
+  // swallowed real questions (owner's phone test, 2026-11-24).
+  const qt = q.trim();
+  const greet = /^(hi|hello|hey)\b/.test(qt) || qt.startsWith("আসসালাম") || qt.startsWith("হ্যালো") || qt.startsWith("হাই") || qt.includes("assalamu");
+  if (greet)
     return "আসসালামু আলাইকুম! আমি BFC Assistant। ক্লাব, ম্যাচ, জয়েন করা, স্কোয়াড বা জার্সি নিয়ে যেকোনো প্রশ্ন করুন। 🖤💛";
   if (has("next match", "next session", "পরের ম্যাচ", "ম্যাচ কবে", "খেলা কবে", "session কবে", "কবে খেলা")) {
     if (!f.nextSession) return "এই মুহূর্তে কোনো আসন্ন সেশন নির্ধারিত নেই। নতুন সেশন এলেই ওয়েবসাইটের Next Match কার্ডে দেখা যাবে — চোখ রাখুন!";
@@ -93,7 +98,7 @@ export function faqAnswer(qRaw: string, f: ChatFacts): string {
     return `ক্লাবের পূর্ণ নিয়মাবলি (সদস্যপদ, উপস্থিতি ও RSVP, ফি, শৃঙ্খলা, পুরস্কার, ছবি ও গোপনীয়তা) Rules পেজে আছে: ${SITE.url}/rules`;
   if (has("squad", "player", "স্কোয়াড", "খেলোয়াড়", "team", "দল"))
     return `বর্তমান স্কোয়াড (${f.players.length} জন): ${squadList}। বিস্তারিত প্রোফাইল ও পরিসংখ্যান: ${SITE.url}/squad`;
-  if (has("captain", "ক্যাপ্টেন", "founder", "প্রতিষ্ঠাতা", "কে চালায়", "dictator"))
+  if (has("captain", "ক্যাপ্টেন", "founder", "founded", "প্রতিষ্ঠাতা", "কে চালায়", "dictator"))
     return "ক্লাবের প্রতিষ্ঠাতা Mostafa (Saidul Mostafa Chowdhury) — তিনিই ক্লাবের ক্যাপ্টেন ও গোলকিপার (#99)।";
   if (has("contact", "যোগাযোগ", "email", "ইমেইল", "phone", "whatsapp", "facebook", "messenger"))
     return `যোগাযোগ: ইমেইল ${SITE.contacts.email} · Messenger ${SITE.contacts.messenger} · Facebook পেজ ও WhatsApp গ্রুপের লিংক ওয়েবসাইটের ফুটারে আছে।`;
