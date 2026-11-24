@@ -12,6 +12,7 @@ import AnthemProvider from "@/components/AnthemProvider";
 import { resolveAnthemSrc } from "@/lib/anthem";
 import { getTickerItems } from "@/lib/ticker";
 import TopButton from "@/components/TopButton";
+import ChatWidget from "@/components/ChatWidget";
 import { Analytics } from "@vercel/analytics/next";
 import SwRegister from "@/components/SwRegister";
 import RevealInit from "@/components/RevealInit";
@@ -56,7 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('bfc-theme');if(t==='light')document.documentElement.dataset.theme='light'}catch(e){}" }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
         <div className="ticker" aria-hidden="true"><div className="ticker-track" style={{ animationDuration: `${tickerDur}s` }}>{[0,1].map(k=><span key={k}>{tickerText.repeat(2)}</span>)}</div></div>
-        <AnthemProvider src={anthemSrc}><Header />{children}<Footer /><TopButton /></AnthemProvider><RecoveryRedirect /><Analytics /><SwRegister /><RevealInit />
+        <AnthemProvider src={anthemSrc}><Header />{children}<Footer /><TopButton /></AnthemProvider><ChatWidget /><RecoveryRedirect /><Analytics /><SwRegister /><RevealInit />
       </body>
     </html>
   );
