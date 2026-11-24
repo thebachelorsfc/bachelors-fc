@@ -60,6 +60,7 @@ export function knowledgeText(f: ChatFacts): string {
     `Club: ${SITE.name} (BFC) — an apolitical, non-profit football club in ${SITE.location}, founded in ${SITE.founded}. Motto: "${SITE.motto}" / "${SITE.mottoAlt}".`,
     `Founder: Mostafa (Saidul Mostafa Chowdhury). His official club title is "Founder & Managing Dictator" — the club's playful title for him, as shown on the People page. He is also the club captain and goalkeeper, shirt #99. So if anyone asks who the club's Dictator is, the answer is Mostafa.`,
     `Squad (${f.players.length} players): ${squad}.`,
+    `Club folklore: Noman (#7, Forward) is the club's very own "Ashraful" — the beloved bot player famous for missing open-goal sitters. It is the club's long-running joke, always said with affection.`,
     next,
     `Grounds the club uses: ${f.grounds.join(", ") || "grounds in Khulshi, Chittagong"}.`,
     `How to join: Fill the application form on the Join page (${SITE.url}/join). It has 3 steps and also creates the player's login account. The club reviews the application; approved and linked players can log in and RSVP for sessions from their dashboard.`,
@@ -96,6 +97,8 @@ export function faqAnswer(qRaw: string, f: ChatFacts): string {
     return `ক্লাব জার্সির দাম নির্ধারিত ৫০০ টাকা। অর্ডার করতে Store পেজে যান: ${SITE.url}/store — পেমেন্ট ম্যানুয়াল bKash Send Money (${PAYMENTS.bkash}) নম্বরে পাঠিয়ে TrxID টি অর্ডার ফর্মে দিতে হয়। কিট: ${KIT.base}, ${KIT.trim}।`;
   if (has("rule", "নিয়ম", "privacy", "নীতিমালা"))
     return `ক্লাবের পূর্ণ নিয়মাবলি (সদস্যপদ, উপস্থিতি ও RSVP, ফি, শৃঙ্খলা, পুরস্কার, ছবি ও গোপনীয়তা) Rules পেজে আছে: ${SITE.url}/rules`;
+  if (has("ashraful", "আশরাফুল", "bot player", "বট প্লেয়ার", "sitter"))
+    return "আমাদের ক্লাবের নিজস্ব 'Ashraful' হলেন Noman (#7, Forward) — সবার প্রিয় বট প্লেয়ার, সহজ ওপেন-গোলের সুযোগ মিস করার জন্য ক্লাবের চিরচেনা রসিকতা! 😄";
   if (has("squad", "player", "স্কোয়াড", "খেলোয়াড়", "team", "দল"))
     return `বর্তমান স্কোয়াড (${f.players.length} জন): ${squadList}। বিস্তারিত প্রোফাইল ও পরিসংখ্যান: ${SITE.url}/squad`;
   if (has("captain", "ক্যাপ্টেন", "founder", "founded", "প্রতিষ্ঠাতা", "কে চালায়", "dictator"))
