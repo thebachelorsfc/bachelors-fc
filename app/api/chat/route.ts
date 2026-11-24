@@ -59,7 +59,9 @@ export async function POST(req: Request) {
     // Verified against this key's ListModels on 2026-11-24: the named
     // releases (2.5-flash etc.) are closed to new users; the "-latest"
     // aliases and 3.x previews are what this key can actually call.
-    const MODELS = ["gemini-flash-latest", "gemini-3-flash-preview", "gemini-flash-lite-latest", "gemini-2.5-flash-lite", "gemini-3.1-flash-lite"];
+    // Order matters: flash-lite has the most generous free quota and
+    // answered most reliably; flash-latest hits its 429 quota fast.
+    const MODELS = ["gemini-flash-lite-latest", "gemini-3.1-flash-lite", "gemini-3-flash-preview", "gemini-flash-latest"];
     const VERSIONS = ["v1beta"];
     let lastStatus: number | string = "fetch-error";
     let lastError = "";
@@ -93,6 +95,36 @@ export async function POST(req: Request) {
         } catch {
           lastStatus = "fetch-error";
           attempts.push(`${ver}/${model} -> fetch-error`);
+        }
+      }
+    }
+    // Free-tier 503 "high demand" spikes usually clear within seconds —
+    // one short pause + retry of the two most reliable models rescues
+    // most failed turns (owner hit all-503 on 2026-11-24 evening).
+    if (attempts.some((a) => a.includes("503") || a.includes("429"))) {
+      await new Promise((r) => setTimeout(r, 1800));
+      for (const model of MODELS.slice(0, 2)) {
+        try {
+          const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                systemInstruction: { parts: [{ text: SYSTEM + knowledgeText(facts) }] },
+                contents: msgs.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })),
+                generationConfig: { temperature: 0.4, maxOutputTokens: 400 },
+              }),
+            }
+          );
+          if (res.ok) {
+            const data: any = await res.json();
+            const text = data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text || "").join("").trim();
+            if (text) return NextResponse.json({ reply: text.slice(0, 1500), brain: "gemini", model, ver: "v1beta", retried: true });
+          }
+          attempts.push(`retry/${model} -> ${res.status}`);
+        } catch {
+          attempts.push(`retry/${model} -> fetch-error`);
         }
       }
     }
