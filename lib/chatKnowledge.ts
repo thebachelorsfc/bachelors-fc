@@ -7,11 +7,47 @@ import { getPlayers, getAllSessions, getGrounds } from "./data";
 // key is configured the model answers from this same knowledge text;
 // without a key, a keyword FAQ matcher below answers from it instead.
 
+export type ChatPlayer = {
+  name: string; jersey_no: number; position: string; position_code: string;
+  matches: number; goals: number; assists: number; motm: number;
+  cleanSheets: number; saves: number;
+};
+
 export type ChatFacts = {
-  players: { name: string; jersey_no: number; position: string }[];
+  players: ChatPlayer[];
   nextSession: { date: string; time: string; title: string; opponent: string; ground: string } | null;
   grounds: string[];
 };
+
+// Club records, computed from the same live player stats the site's
+// Record Book uses. Zero-value records are omitted; ties list everyone.
+export function computeRecords(players: ChatPlayer[]) {
+  const top = (get: (p: ChatPlayer) => number) => {
+    const best = Math.max(0, ...players.map(get));
+    if (best <= 0) return null;
+    return { value: best, names: players.filter((p) => get(p) === best).map((p) => p.name) };
+  };
+  return {
+    scorer: top((p) => p.goals),
+    playmaker: top((p) => p.assists),
+    appearances: top((p) => p.matches),
+    motm: top((p) => p.motm),
+    wall: top((p) => p.cleanSheets),
+    saves: top((p) => p.saves),
+  };
+}
+
+export function recordsText(players: ChatPlayer[]): string {
+  const r = computeRecords(players);
+  const parts: string[] = [];
+  if (r.scorer) parts.push(`Top Scorer: ${r.scorer.names.join(" & ")} (${r.scorer.value} goals)`);
+  if (r.playmaker) parts.push(`Top Playmaker: ${r.playmaker.names.join(" & ")} (${r.playmaker.value} assists)`);
+  if (r.appearances) parts.push(`Most Appearances: ${r.appearances.names.join(" & ")} (${r.appearances.value} matches)`);
+  if (r.motm) parts.push(`Most Man of the Match awards: ${r.motm.names.join(" & ")} (${r.motm.value})`);
+  if (r.wall) parts.push(`The Wall (most clean sheets, goalkeeper): ${r.wall.names.join(" & ")} (${r.wall.value})`);
+  if (r.saves) parts.push(`Most saves (goalkeeper): ${r.saves.names.join(" & ")} (${r.saves.value})`);
+  return parts.join("; ");
+}
 
 const sessMs = (x: any) => {
   const [Y, M, D] = String(x.session_date).split("-").map(Number);
@@ -32,7 +68,11 @@ export async function getChatFacts(): Promise<ChatFacts> {
   return {
     players: (players as any[])
       .filter((p) => p.status !== "inactive")
-      .map((p) => ({ name: p.name, jersey_no: p.jersey_no, position: p.position })),
+      .map((p) => ({
+        name: p.name, jersey_no: p.jersey_no, position: p.position, position_code: p.position_code || "",
+        matches: p.matches_played || 0, goals: p.goals || 0, assists: p.assists || 0, motm: p.motm || 0,
+        cleanSheets: p.clean_sheets || 0, saves: p.saves || 0,
+      })),
     nextSession: next
       ? {
           date: next.session_date,
@@ -56,8 +96,16 @@ export function knowledgeText(f: ChatFacts): string {
   const next = f.nextSession
     ? `Next session: ${fmtDate(f.nextSession.date)}${f.nextSession.time ? ` at ${f.nextSession.time}` : ""}${f.nextSession.opponent ? ` — The Bachelors FC vs ${f.nextSession.opponent}` : f.nextSession.title ? ` — ${f.nextSession.title}` : " — Club Session"}${f.nextSession.ground ? ` at ${f.nextSession.ground}` : ""}.`
     : "There is no upcoming session scheduled right now.";
+  const statLines = f.players.map((p) =>
+    p.position_code === "GK"
+      ? `#${p.jersey_no} ${p.name}: ${p.matches} matches, ${p.cleanSheets} clean sheets, ${p.saves} saves, ${p.motm} MOTM`
+      : `#${p.jersey_no} ${p.name}: ${p.matches} matches, ${p.goals} goals, ${p.assists} assists, ${p.motm} MOTM`
+  ).join("; ");
+  const records = recordsText(f.players);
   return [
     `Club: ${SITE.name} (BFC) — an apolitical, non-profit football club in ${SITE.location}, founded in ${SITE.founded}. Motto: "${SITE.motto}" / "${SITE.mottoAlt}".`,
+    `Player stats (live, from the club's own records): ${statLines}.`,
+    ...(records ? [`Club records: ${records}. These come from the Record Book on the website.`] : []),
     `Founder: Mostafa (Saidul Mostafa Chowdhury). His official club title is "Founder & Managing Dictator" — the club's playful title for him, as shown on the People page. He is also the club captain and goalkeeper, shirt #99. So if anyone asks who the club's Dictator is, the answer is Mostafa.`,
     `Squad (${f.players.length} players): ${squad}.`,
     `Club folklore: Noman (#7, Forward) is the club's very own "Ashraful" — the beloved bot player famous for missing open-goal sitters. It is the club's long-running joke, always said with affection.`,
@@ -97,6 +145,11 @@ export function faqAnswer(qRaw: string, f: ChatFacts): string {
     return `ক্লাব জার্সির দাম নির্ধারিত ৫০০ টাকা। অর্ডার করতে Store পেজে যান: ${SITE.url}/store — পেমেন্ট ম্যানুয়াল bKash Send Money (${PAYMENTS.bkash}) নম্বরে পাঠিয়ে TrxID টি অর্ডার ফর্মে দিতে হয়। কিট: ${KIT.base}, ${KIT.trim}।`;
   if (has("rule", "নিয়ম", "privacy", "নীতিমালা"))
     return `ক্লাবের পূর্ণ নিয়মাবলি (সদস্যপদ, উপস্থিতি ও RSVP, ফি, শৃঙ্খলা, পুরস্কার, ছবি ও গোপনীয়তা) Rules পেজে আছে: ${SITE.url}/rules`;
+  if (has("record", "রেকর্ড", "top scorer", "সর্বোচ্চ গোল", "বেশি গোল", "most goal", "top playmaker", "most appearance", "most motm", "সেরা গোলদাতা", "কে সেরা")) {
+    const rec = recordsText(f.players);
+    if (!rec) return "এখনো কোনো রেকর্ড তৈরি হয়নি — পরিসংখ্যান ওয়েবসাইটের Record Book-এ দেখা যাবে।";
+    return `ক্লাবের রেকর্ডসমূহ — ${rec}। বিস্তারিত ওয়েবসাইটের Record Book-এ আছে।`;
+  }
   if (has("ashraful", "আশরাফুল", "bot player", "বট প্লেয়ার", "sitter"))
     return "আমাদের ক্লাবের নিজস্ব 'Ashraful' হলেন Noman (#7, Forward) — সবার প্রিয় বট প্লেয়ার, সহজ ওপেন-গোলের সুযোগ মিস করার জন্য ক্লাবের চিরচেনা রসিকতা! 😄";
   if (has("squad", "player", "স্কোয়াড", "খেলোয়াড়", "team", "দল"))
