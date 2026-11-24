@@ -69,11 +69,14 @@ export async function POST(req: Request) {
       if (res.ok) {
         const data: any = await res.json();
         const text = data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text || "").join("").trim();
-        if (text) return NextResponse.json({ reply: text.slice(0, 1500) });
+        if (text) return NextResponse.json({ reply: text.slice(0, 1500), brain: "gemini" });
+      } else {
+        // Diagnostic fields (widget ignores them): tell us why Gemini said no.
+        return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: res.status });
       }
-    } catch {
-      // fall through to the FAQ brain
+    } catch (e: any) {
+      return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: "fetch-error" });
     }
   }
-  return NextResponse.json({ reply: faqAnswer(last.content, facts) });
+  return NextResponse.json({ reply: faqAnswer(last.content, facts), brain: "faq", geminiStatus: "no-key" });
 }
