@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { pageMeta } from "@/lib/meta";
 import { getNews } from "@/lib/news";
+import CardCarousel from "@/components/CardCarousel";
 import { fmtNewsDate, newsTagChip } from "@/components/ClubNews";
 
 // Club News page (2026-11-26): every published item in full, newest
@@ -25,16 +26,20 @@ export default async function NewsPage() {
       {items.length === 0 && (
         <div className="card"><p style={{ margin: 0 }}>No news yet — the next announcement lands here the moment the club makes it.</p></div>
       )}
-      {items.map(n => (
-        <article className="card" key={n.id} style={{ marginBottom: 14 }}>
-          <p style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", margin: "0 0 10px" }}>
-            <span style={newsTagChip}>{n.tag}</span>
-            <span style={{ color: "var(--muted)", fontSize: 13 }}>{fmtNewsDate(n.date)}</span>
-          </p>
-          <h3 style={{ marginTop: 0 }}>{n.title}</h3>
-          <p style={{ whiteSpace: "pre-wrap", marginBottom: 0 }}>{n.body}</p>
-        </article>
-      ))}
+      {items.length > 0 && (
+        <CardCarousel slide="min(340px,86%)">
+          {items.map(n => (
+            <article className="card" key={n.id}>
+              <p style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", margin: "0 0 10px" }}>
+                <span style={newsTagChip}>{n.tag}</span>
+                <span style={{ color: "var(--muted)", fontSize: 13 }}>{fmtNewsDate(n.date)}</span>
+              </p>
+              <h3 style={{ marginTop: 0 }}>{n.title}</h3>
+              <p style={{ whiteSpace: "pre-wrap", marginBottom: 0 }}>{n.body}</p>
+            </article>
+          ))}
+        </CardCarousel>
+      )}
     </main>
   );
 }
