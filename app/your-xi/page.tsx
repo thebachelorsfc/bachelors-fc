@@ -2,11 +2,8 @@ import type { Metadata } from "next";
 import YourXi from "@/components/YourXi";
 import { getPlayers } from "@/lib/data";
 
-export const metadata: Metadata = {
-  title: "Build Your XI | The Bachelors FC",
-  description: "Pick your formation and build your dream XI from the real Bachelors FC squad — then download your XI card and share it.",
-  alternates: { canonical: "/your-xi" },
-};
+import { pageMeta } from "@/lib/meta";
+export const metadata: Metadata = pageMeta("Build Your XI | The Bachelors FC", "Pick your formation and build your dream XI from the real Bachelors FC squad — then download your XI card and share it.", "/your-xi");
 export const dynamic = "force-dynamic";
 
 export default async function YourXiPage() {

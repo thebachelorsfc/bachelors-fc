@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import JoinForm from "./JoinForm";
 import CardCarousel from "@/components/CardCarousel";
 
-export const metadata: Metadata = { title: "Join | The Bachelors FC", description: "Join The Bachelors FC — the football club for bachelor youth in Khulshi, Chittagong. One application form, a trial session, then your jersey number.", alternates: { canonical: "/join" } };
+import { pageMeta } from "@/lib/meta";
+export const metadata: Metadata = pageMeta("Join | The Bachelors FC", "Join The Bachelors FC — the football club for bachelor youth in Khulshi, Chittagong. One application form, a trial session, then your jersey number.", "/join");
 
 const STEPS = [
   ["1 · Apply", "One single form: your details, your position — and your account password."],

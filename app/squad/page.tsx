@@ -1,6 +1,7 @@
 import type { Metadata } from "next"; import { SEED_PLAYERS, openNumbers } from "@/lib/players"; import { getPlayers } from "@/lib/data"; import PlayerCard, { OpenShirt } from "@/components/PlayerCard"; import SquadCarousel from "@/components/SquadCarousel"; import FormationPitch from "@/components/FormationPitch";
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Squad | The Bachelors FC", description: "Meet the squad of The Bachelors FC — the players of the Khulshi, Chittagong bachelor football club, with photos, positions, numbers and stats.", alternates: { canonical: "/squad" } };
+import { pageMeta } from "@/lib/meta";
+export const metadata: Metadata = pageMeta("Squad | The Bachelors FC", "Meet the squad of The Bachelors FC — the players of the Khulshi, Chittagong bachelor football club, with photos, positions, numbers and stats.", "/squad");
 export default async function Squad() {
   const players = (await getPlayers()) ?? SEED_PLAYERS;
   const order: Record<string, number> = { FWD: 0, MID: 1, DEF: 2, GK: 3 };

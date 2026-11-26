@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import CardCarousel from "@/components/CardCarousel";
 
-export const metadata: Metadata = { title: "History | The Bachelors FC", description: "The history of The Bachelors FC — the milestones of the Khulshi, Chittagong bachelor football club since 2026, from the first friendly onwards.", alternates: { canonical: "/history" } };
+import { pageMeta } from "@/lib/meta";
+export const metadata: Metadata = pageMeta("History | The Bachelors FC", "The history of The Bachelors FC — the milestones of the Khulshi, Chittagong bachelor football club since 2026, from the first friendly onwards.", "/history");
 
 // Only verified events. Add real match results here as the owner supplies them — do not invent results.
 // The Record Book moved from here to the homepage (under the Leaderboard)

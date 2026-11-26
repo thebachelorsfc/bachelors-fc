@@ -6,6 +6,7 @@ import { getAllSessions, getPlayers } from "@/lib/data";
 import { getInPlayers } from "@/lib/rsvps";
 import { getReports } from "@/lib/reports";
 import { getSessionMatchStats } from "@/lib/matchStats";
+import { pageMeta } from "@/lib/meta";
 
 export const dynamic = "force-dynamic";
 
@@ -37,11 +38,11 @@ async function loadSession(id: string) {
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const s = await loadSession(params.id);
   if (!s) return { title: "Match Report | The Bachelors FC" };
-  return {
-    title: `Match Report — ${fxTitle(s)} | The Bachelors FC`,
-    description: `The story of ${fxTitle(s)} — played ${s.session_date ? fmtDate(s.session_date) : ""} in Khulshi, Chittagong. Friendlies are about brotherhood; no scorelines, ever.`,
-    alternates: { canonical: `/match/${params.id}` },
-  };
+  return pageMeta(
+    `Match Report — ${fxTitle(s)} | The Bachelors FC`,
+    `The story of ${fxTitle(s)} — played ${s.session_date ? fmtDate(s.session_date) : ""} in Khulshi, Chittagong. Friendlies are about brotherhood; no scorelines, ever.`,
+    `/match/${params.id}`
+  );
 }
 
 export default async function MatchReportPage({ params }: { params: { id: string } }) {
