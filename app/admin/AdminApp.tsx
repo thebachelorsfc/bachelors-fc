@@ -45,7 +45,7 @@ export default function AdminApp(){
   const [posts,setPosts]=useState<any[]>([]); const [spUrl,setSpUrl]=useState("");
   const [prods,setProds]=useState<any[]>([]); const [pf,setPf]=useState({name:"",photo_url:"",description:"",price_bdt:"",stock:""});
   const [ords,setOrds]=useState<any[]>([]); const [fw,setFw]=useState<any[]>([]);
-  const [heroSlides,setHeroSlides]=useState<any[]>([]); const [heroQueue,setHeroQueue]=useState<any[]>([]); const [heroProg,setHeroProg]=useState({done:0,total:0}); const [heroBusy,setHeroBusy]=useState(false); const [heroNote,setHeroNote]=useState(""); const [accs,setAccs]=useState<any[]>([]); const [rsvpList,setRsvpList]=useState<any[]>([]); const [anthemCustom,setAnthemCustom]=useState<boolean|null>(null); const [anthemKey,setAnthemKey]=useState(0); const [tickerItems,setTickerItems]=useState<string[]>([]); const [tickerCustom,setTickerCustom]=useState(false); const [tickerNote,setTickerNote]=useState(""); const [tickerBusy,setTickerBusy]=useState(false); const [backupBusy,setBackupBusy]=useState(false); const [backupNote,setBackupNote]=useState("");
+  const [heroSlides,setHeroSlides]=useState<any[]>([]); const [heroQueue,setHeroQueue]=useState<any[]>([]); const [heroProg,setHeroProg]=useState({done:0,total:0}); const [heroBusy,setHeroBusy]=useState(false); const [heroNote,setHeroNote]=useState(""); const [accs,setAccs]=useState<any[]>([]); const [rsvpList,setRsvpList]=useState<any[]>([]); const [anthemCustom,setAnthemCustom]=useState<boolean|null>(null); const [anthemKey,setAnthemKey]=useState(0); const [tickerItems,setTickerItems]=useState<string[]>([]); const [tickerCustom,setTickerCustom]=useState(false); const [tickerNote,setTickerNote]=useState(""); const [tickerBusy,setTickerBusy]=useState(false); const [backupBusy,setBackupBusy]=useState(false); const [backupNote,setBackupNote]=useState(""); const [newsItems,setNewsItems]=useState<any[]>([]); const [newsCustom,setNewsCustom]=useState(false); const [newsNote,setNewsNote]=useState(""); const [newsBusy,setNewsBusy]=useState(false);
   // Perf: 2026-10-29 parallelised the data fetches. 2026-10-31: the auth
   // gate runs alongside the batch (no serial block), in two waves so the
   // Home/Matchday/People data paints first.
@@ -63,6 +63,7 @@ export default function AdminApp(){
   useEffect(()=>{ load(); },[load]);
   useEffect(()=>{ if(tab==="hero"){ fetch("/api/admin/hero-slides").then(r=>r.json()).then(j=>setHeroSlides(j.slides||[])).catch(()=>{}); } },[tab]);
   useEffect(()=>{ if(tab==="ticker"){ fetch("/api/admin/ticker").then(r=>r.json()).then(j=>{ setTickerItems(j.items||[]); setTickerCustom(!!j.custom); }).catch(()=>{}); } },[tab]);
+  useEffect(()=>{ if(tab==="news"){ fetch("/api/admin/news").then(r=>r.json()).then(j=>{ setNewsItems(j.items||[]); setNewsCustom(!!j.custom); }).catch(()=>{}); } },[tab]);
   // Hero multi-upload (2026-11-01): pick several photos at once; each shows a
   // local preview instantly, is shrunk, then uploads one by one with progress
   // written inside the Hero card (the page-top message is too easy to miss).
@@ -143,7 +144,7 @@ export default function AdminApp(){
     {(()=>{ const GROUPS:{id:string;label:string;tabs:[string,string][]}[]=[
       {id:"matchday",label:"⚽ Matchday",tabs:[["sessions","Sessions"]]},
       {id:"people",label:"👥 People",tabs:[["applications","Applications"],["players","Players"],["accounts","Accounts"],["people","People"]]},
-      {id:"content",label:"🖼 Content",tabs:[["gallery","Gallery"],["social","Social"],["fanwall","Fan Wall"],["anthem","Anthem"],["hero","Hero"],["ticker","Ticker"]]},
+      {id:"content",label:"🖼 Content",tabs:[["gallery","Gallery"],["social","Social"],["fanwall","Fan Wall"],["anthem","Anthem"],["hero","Hero"],["ticker","Ticker"],["news","News"]]},
       {id:"club",label:"🏪 Club",tabs:[["grounds","Grounds"],["store","Store"],["orders","Orders"]]},
     ]; const active=GROUPS.find(g=>g.tabs.some(([id])=>id===tab)); const pendOrds=ords.filter((o:any)=>o.status==="pending").length; const pendFw=fw.filter((m:any)=>m.status==="pending").length; const chip=(on:boolean):React.CSSProperties=>on?{}:{background:"var(--chip-bg)",color:"var(--chip-tx)",border:"1px solid var(--chip-br)"};
     return (<>
@@ -390,6 +391,30 @@ export default function AdminApp(){
         {tickerCustom && <button className="btn ghost" disabled={tickerBusy} onClick={async()=>{ if(!confirm("Built-in default phrase ferot anbe?")) return; const r=await fetch("/api/admin/ticker",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"reset"})}); const j=await r.json().catch(()=>({})); if(r.ok&&j.items){ setTickerItems(j.items); setTickerCustom(false); setTickerNote("Saved — default phrase ferot esheche"); setMsg("Ticker reset to default ✓"); } }}>↩ Reset to default</button>}
       </div>
       <p style={{color:"var(--muted)",fontSize:13,marginTop:12}}>Tip: choto phrase bhalo lage — jemon "Next Match: Friday 6 AM" ba "New Jersey — ৳500". Ekbare sorboccho 12 ta phrase.</p>
+    </div>}
+    {tab==="news" && <div className="card"><h3>📰 Club News</h3>
+      <p style={{color:"var(--muted)"}}>Homepage-er "Club News" section-e ar /news page-e dekhay — date onujayi notun ta sobar upore. Headline chara item save hobe na. Published off thakle item ta lukano thakbe. Save dile ~1 minute er modhye live hobe.</p>
+      {newsNote ? <div style={{border:`1px solid ${newsNote.startsWith("Saved")?"var(--ok)":"var(--bad)"}`,color:newsNote.startsWith("Saved")?"var(--ok)":"var(--bad)",borderRadius:12,padding:"12px 14px",fontSize:16,margin:"12px 0"}}>{newsNote.startsWith("Saved")?"✓ ":"⚠ "}{newsNote}</div>
+      : <div style={{border:"1px solid var(--line-gold)",color:"var(--muted)",borderRadius:12,padding:"12px 14px",fontSize:15,margin:"12px 0"}}>{newsCustom?"Ei news gulo ekhon site-e live":"Ekhon prothom 3 ta asol club milestone dekhacche — nijer news likhe Save dile segulo live hobe"}</div>}
+      <div style={{display:"grid",gap:12}}>
+        {newsItems.map((n,i)=><div key={n.id||i} style={{border:"1px solid var(--line-gold)",borderRadius:12,padding:12,display:"grid",gap:8}}>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+            <input type="date" style={{...input,width:170}} value={n.date||""} onChange={e=>{ const c=[...newsItems]; c[i]={...c[i],date:e.target.value}; setNewsItems(c); }}/>
+            <select style={{...input,width:150}} value={n.tag||"Club"} onChange={e=>{ const c=[...newsItems]; c[i]={...c[i],tag:e.target.value}; setNewsItems(c); }}>{["Announcement","Match","Squad","Kit","Fan Zone","Club"].map(t=><option key={t} value={t}>{t}</option>)}</select>
+            <label style={{display:"flex",gap:6,alignItems:"center",fontSize:14}}>Published <input type="checkbox" checked={n.published!==false} onChange={e=>{ const c=[...newsItems]; c[i]={...c[i],published:e.target.checked}; setNewsItems(c); }} style={{width:18,height:18}}/></label>
+            <button className="btn ghost" style={{marginLeft:"auto",padding:".4rem .7rem"}} onClick={()=>setNewsItems(newsItems.filter((_,x)=>x!==i))}>✕ Delete</button>
+          </div>
+          <input style={input} value={n.title||""} maxLength={120} placeholder="News headline…" onChange={e=>{ const c=[...newsItems]; c[i]={...c[i],title:e.target.value}; setNewsItems(c); }}/>
+          <textarea style={{...input,minHeight:90,resize:"vertical"}} value={n.body||""} maxLength={1200} placeholder="News details…" onChange={e=>{ const c=[...newsItems]; c[i]={...c[i],body:e.target.value}; setNewsItems(c); }}/>
+        </div>)}
+        {newsItems.length===0 && <p style={{color:"var(--muted)",margin:0}}>No news items — "+ Add news" diye prothom ta jog koro, nahole Save dile site-e news section faka thakbe.</p>}
+      </div>
+      <div style={{display:"flex",gap:8,marginTop:14,flexWrap:"wrap"}}>
+        <button className="btn ghost" disabled={newsItems.length>=30||newsBusy} onClick={()=>setNewsItems([{id:`n${Date.now()}`,date:new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Dhaka"}),tag:"Announcement",title:"",body:"",published:true},...newsItems])}>+ Add news</button>
+        <button className="btn" disabled={newsBusy} onClick={async()=>{ setNewsBusy(true); setNewsNote(""); const r=await fetch("/api/admin/news",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"save",items:newsItems})}); const j=await r.json().catch(()=>({})); setNewsBusy(false); if(r.ok&&j.items){ setNewsItems(j.items); setNewsCustom(true); setNewsNote("Saved — news ~1 minute er modhye site-e live hobe"); setMsg("News saved ✓"); } else { setNewsNote(j.error||"Save hoyni — abar try koro"); } }}>{newsBusy?"Saving…":"Save news"}</button>
+        {newsCustom && <button className="btn ghost" disabled={newsBusy} onClick={async()=>{ if(!confirm("Starter 3 ta milestone ferot anbe? Tomar save kora news muche jabe.")) return; const r=await fetch("/api/admin/news",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"reset"})}); const j=await r.json().catch(()=>({})); if(r.ok&&j.items){ setNewsItems(j.items); setNewsCustom(false); setNewsNote("Saved — starter milestone ferot esheche"); setMsg("News reset ✓"); } }}>↩ Reset to starter news</button>}
+      </div>
+      <p style={{color:"var(--muted)",fontSize:13,marginTop:12}}>Tip: khobor choto ar porishkar rakho — ki hoyeche, kobe, kar jonno. Score line kokhono news-eo na (club rule).</p>
     </div>}
     {tab==="store" && <div><div className="grid" style={{marginBottom:16}}>{prods.map((p,i)=><div className="card" key={p.id}><div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}><strong>{p.name}</strong>{p.price_bdt?<span className="eyebrow">On sale · ৳{p.price_bdt}</span>:<span className="eyebrow">Showcase</span>}</div>
       <div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",marginTop:12}}>

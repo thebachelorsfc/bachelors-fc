@@ -22,6 +22,8 @@ import RecordBook from "@/components/RecordBook";
 import { computeStreaks } from "@/lib/streaks";
 import CapBadge from "@/components/CapBadge";
 import { getInPlayers } from "@/lib/rsvps";
+import { getNews } from "@/lib/news";
+import ClubNews from "@/components/ClubNews";
 
 // Phase 1 (owner-approved 2026-11-06): the homepage reads run through the
 // 60s-cached Supabase client (the getters' `true` flag), so repeat visits
@@ -29,7 +31,7 @@ import { getInPlayers } from "@/lib/rsvps";
 // rule the ticker already uses. Nothing visual changes; every other page
 // and API keeps the live no-store client.
 export default async function Home(){
-  const [playersRaw, people, allSessions, groundsRaw, galleryItems, socialPosts, heroSlides, streaks]: any[] = await Promise.all([getPlayers(true), getPeople(true), getAllSessions(true), getGrounds(true), getGalleryItems(true), getSocialPosts(true), getHeroSlides(), computeStreaks()]);
+  const [playersRaw, people, allSessions, groundsRaw, galleryItems, socialPosts, heroSlides, streaks, newsItems]: any[] = await Promise.all([getPlayers(true), getPeople(true), getAllSessions(true), getGrounds(true), getGalleryItems(true), getSocialPosts(true), getHeroSlides(), computeStreaks(), getNews()]);
   const players:any[] = playersRaw ?? SEED_PLAYERS;
   const groundSlides = buildGroundSlides(groundsRaw, allSessions);
   // Slim Next Match card (owner re-requested 2026-10-27 after the old Next
@@ -180,6 +182,8 @@ export default async function Home(){
         </div>)}
       </CardCarousel>
     </section>
+
+    <ClubNews items={newsItems}/>
 
     <section className="wrap"><p className="eyebrow">Join Us</p><h2>How to Join</h2>
       <p className="copy" style={{maxWidth:680}}>Three steps between you and the shirt — no trials by fire, no politics. Just football, brotherhood and purpose.</p>
