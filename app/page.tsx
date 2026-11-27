@@ -1,5 +1,5 @@
 import Link from "next/link"; import Image from "next/image";
-import { SITE, PILLARS, TOUR, KIT } from "@/lib/site";
+import { SITE, PILLARS, TOUR, KIT, GK_KIT } from "@/lib/site";
 import { SEED_PLAYERS, openNumbers } from "@/lib/players";
 import { getPlayers, getPeople, getGrounds, getAllSessions, getGalleryItems, getSocialPosts } from "@/lib/data";
 import { buildGroundSlides } from "@/lib/groundSlides";
@@ -140,8 +140,11 @@ export default async function Home(){
       </section>
     )}
 
-    <section className="wrap" id="kit"><p className="eyebrow">Home Kit</p><h2>Our colors, our identity</h2>
-      <div className="grid" style={{gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",alignItems:"center"}}><Image src={KIT.image} alt="The Bachelors FC home jersey" width={400} height={700} style={{width:"100%",height:"auto",borderRadius:16}}/><div className="card"><p>White and navy pinstripes, gold crest on the chest — the kit isn&apos;t just fabric. It&apos;s what eleven men chose to belong to.</p><ul style={{color:"var(--muted)"}}><li>Base: {KIT.base}</li><li>Trim: {KIT.trim}</li><li>Crest: {KIT.crest}</li></ul></div></div>
+    <section className="wrap" id="kit"><p className="eyebrow">The Kits</p><h2>Our colors, our identity</h2>
+      <CardCarousel slide="min(520px,92%)">
+        <div className="card"><Image src={KIT.image} alt="The Bachelors FC home jersey" width={400} height={700} style={{width:"100%",height:"auto",borderRadius:12,marginBottom:12}}/><div className="eyebrow">Home Kit</div><h3>The White Pinstripe</h3><p>White and navy pinstripes, gold crest on the chest — the kit isn&apos;t just fabric. It&apos;s what eleven men chose to belong to.</p><ul style={{color:"var(--muted)"}}><li>Base: {KIT.base}</li><li>Trim: {KIT.trim}</li><li>Crest: {KIT.crest}</li></ul></div>
+        <div className="card"><Image src={GK_KIT.image} alt="The Bachelors FC Tornado jersey — goalkeeper and officials edition" width={800} height={800} style={{width:"100%",height:"auto",borderRadius:12,marginBottom:12}}/><div className="eyebrow">Goalkeeper &amp; Officials Edition</div><h3>The Tornado</h3><p>Teal and mint, cut long in the sleeve — the DRACO Tornado is not worn by the eleven. It is reserved for the club&apos;s goalkeeper and select club officials. For the faithful, it lives on as a collector&apos;s edition: a piece of the brotherhood to keep.</p><ul style={{color:"var(--muted)"}}><li>Base: {GK_KIT.base}</li><li>Trim: {GK_KIT.trim}</li><li>Crest: {GK_KIT.crest}</li></ul></div>
+      </CardCarousel>
     </section>
 
     <section className="wrap" id="tour"><p className="eyebrow">Off the pitch</p><h2>The Bachelors on Tour</h2>
