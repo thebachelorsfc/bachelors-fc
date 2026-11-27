@@ -42,7 +42,7 @@ export const TOUR = [
 ] as const;
 
 export const KIT = { base: "White, navy pinstripes", trim: "Navy sleeves & collar", crest: "Gold & black hexagon, lion emblem", image: "/assets/jersey.jpg" } as const;
-export const GK_KIT = { base: "Teal & mint, DRACO Tornado", trim: "Long sleeves, polo collar", crest: "Gold & black hexagon, lion emblem", image: "/assets/jersey-tornado.jpg" } as const;
+export const GK_KIT = { base: "Teal & mint, DRACO Tornado", trim: "Long sleeves, polo collar", crest: "Gold & black hexagon, lion emblem", image: "/assets/jersey-tornado-gk.jpg" } as const;
 
 // Manual mobile-payment numbers buyers send money to (owner-provided; empty = that method is hidden on the order form)
 export const PAYMENTS: { bkash: string; nagad: string } = { bkash: "01866855340", nagad: "" };
